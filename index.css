@@ -2417,4 +2417,75 @@ a {
     100% { box-shadow: 0 0 0 0 rgba(74, 20, 140, 0); }
 }
 
+/* ==========================================================================
+   Responsive Menu Alignment & Overflow Fixes (Smartphones)
+   ========================================================================== */
+@media (max-width: 992px) {
+    .pizza-size-selector-intro {
+        flex-wrap: wrap;
+        gap: 16px;
+        padding: 0 16px;
+    }
+    .size-intro-card {
+        width: calc(50% - 8px);
+        min-width: 200px;
+        padding: 16px;
+    }
+}
+
+@media (max-width: 600px) {
+    /* Header/Hero centering fixes */
+    .pizzeria-subtitle {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Categories Bar: Horizontal Scrolling without overflow */
+    .nav-tabs-wrapper {
+        justify-content: flex-start;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+        gap: 8px;
+        padding: 12px 16px;
+        scrollbar-width: none; /* Firefox */
+    }
+    .nav-tabs-wrapper::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+    }
+    .nav-tab {
+        flex-shrink: 0;
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+
+    /* Subcategory Tabs: Clean wrapping instead of overflow */
+    .subcategory-tabs {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 24px;
+        padding: 0 16px;
+    }
+    .sub-tab {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    /* Pizza Size Cards: Vertical stack */
+    .pizza-size-selector-intro {
+        flex-direction: column;
+        align-items: center;
+    }
+    .size-intro-card {
+        width: 100%;
+        max-width: 320px;
+    }
+
+    /* Adjust main layout padding slightly on mobile */
+    .container {
+        padding: 0 16px;
+    }
+}
+
 
