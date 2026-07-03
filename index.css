@@ -1707,47 +1707,24 @@ a {
 /* New Hero Layout Styles */
 .hero-flex-layout {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: 48px;
+    justify-content: center;
     width: 100%;
+    text-align: center;
 }
 .hero-left {
-    flex: 1.2;
-    max-width: 650px;
-}
-.hero-right {
-    flex: 0.8;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.nano-banana-placeholder-wrapper {
-    position: relative;
-}
-.nano-banana-placeholder {
-    width: 450px;
-    height: 450px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(212, 175, 55, 0.05);
-    border: 4px solid var(--primary);
-    border-radius: 50%;
-    position: relative;
-    box-shadow: 0 0 35px rgba(212, 175, 55, 0.35);
-    overflow: hidden;
-}
-.hero-pizza-video {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
-.hero-pizza-image {
-    width: 85%;
-    height: 85%;
-    object-fit: contain;
-    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.8));
+.pizzeria-brand-wrapper {
+    justify-content: center;
+}
+.hero-slogan {
+    justify-content: center;
 }
 @keyframes float {
     0%, 100% { transform: translateY(0) rotate(0deg); }
