@@ -947,8 +947,7 @@ function initMenuSync() {
             const data = snapshot.val();
             if (data) {
                 if (data.settings) {
-                    if (data.settings.whatsapp) CONFIG_SETTINGS.whatsapp = data.settings.whatsapp;
-                    if (data.settings.whatsappFormatted) CONFIG_SETTINGS.whatsappFormatted = data.settings.whatsappFormatted;
+                    CONFIG_SETTINGS = { ...CONFIG_SETTINGS, ...data.settings };
                     tempSettings = JSON.parse(JSON.stringify(data.settings));
                 }
                 let updated = false;
@@ -1061,14 +1060,18 @@ function renderFlavorsList() {
         
         const badgeHTML = pizza.badge ? `<span class="flavor-badge-label">${pizza.badge}</span>` : '';
         const isChecked = pizza.available !== false ? 'checked' : '';
+        const promoTagHTML = pizza.isPromo ? `<span class="category-tag promo" style="background: rgba(255, 193, 7, 0.15); color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.3); font-weight: bold;">Promoção</span>` : '';
         
         card.innerHTML = `
             <div class="flavor-card-header">
                 <div class="flavor-card-info">
                     <h4 style="margin: 0; color: var(--text-main); font-size: 15px;">${pizza.name}</h4>
-                    <span class="category-tag ${pizza.category === 'salgadas' ? 'salgada' : 'doce'}">
-                        ${pizza.category === 'salgadas' ? 'Salgada' : 'Doce'}
-                    </span>
+                    <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px;">
+                        <span class="category-tag ${pizza.category === 'salgadas' ? 'salgada' : 'doce'}">
+                            ${pizza.category === 'salgadas' ? 'Salgada' : 'Doce'}
+                        </span>
+                        ${promoTagHTML}
+                    </div>
                 </div>
                 
                 <label class="switch" title="${pizza.available !== false ? 'Disponível no Site' : 'Pausado/Indisponível'}">
@@ -1575,6 +1578,10 @@ function openAddMenuItemModal(type) {
     document.getElementById('flavorEditId').value = '';
     document.getElementById('flavorForm').reset();
     
+    // Reset checkbox promocional
+    const promoCheck = document.getElementById('flavorIsPromo');
+    if (promoCheck) promoCheck.checked = false;
+    
     adjustModalFields(type, false);
     
     const imgInput = document.getElementById('flavorImage');
@@ -1610,6 +1617,8 @@ function openEditMenuItemModal(type, id) {
         document.getElementById('flavorCategoryType').value = item.categoryType || 'tradicional';
         document.getElementById('flavorBadge').value = item.badge || '';
         document.getElementById('flavorImage').value = item.image || 'assets/pizza_hero.png';
+        const promoCheck = document.getElementById('flavorIsPromo');
+        if (promoCheck) promoCheck.checked = item.isPromo || false;
         document.getElementById('itemPrice').value = '';
         
         // Carrega os preços por tamanho
@@ -1637,6 +1646,11 @@ function openEditMenuItemModal(type, id) {
 }
 
 function adjustModalFields(type, isEdit) {
+    const promoGroup = document.getElementById('flavorPromoGroup');
+    if (promoGroup) {
+        promoGroup.style.display = (type === 'pizza') ? 'flex' : 'none';
+    }
+    
     const title = document.getElementById('flavorModalTitle');
     const nameLabel = document.getElementById('flavorNameLabel');
     const descGroup = document.getElementById('flavorDescriptionGroup');
@@ -1761,6 +1775,7 @@ function saveMenuItem(event) {
                 items[index].category = document.getElementById('flavorCategory').value;
                 items[index].categoryType = document.getElementById('flavorCategoryType').value;
                 items[index].badge = document.getElementById('flavorBadge').value.trim();
+                items[index].isPromo = document.getElementById('flavorIsPromo')?.checked || false;
                 
                 // Salva os preços por tamanho
                 items[index].prices = {
@@ -1799,6 +1814,7 @@ function saveMenuItem(event) {
             newItem.category = document.getElementById('flavorCategory').value;
             newItem.categoryType = document.getElementById('flavorCategoryType').value;
             newItem.badge = document.getElementById('flavorBadge').value.trim();
+            newItem.isPromo = document.getElementById('flavorIsPromo')?.checked || false;
             
             // Salva os preços por tamanho
             newItem.prices = {
@@ -2092,6 +2108,9 @@ function renderSettingsDashboard() {
     
     document.getElementById('settingsWhatsapp').value = tempSettings.whatsapp || '';
     document.getElementById('settingsWhatsappFormatted').value = tempSettings.whatsappFormatted || '';
+    document.getElementById('settingsPromoActive').checked = tempSettings.promoActive || false;
+    document.getElementById('settingsPromoPrice').value = tempSettings.promoPrice || 95.00;
+    document.getElementById('settingsPromoSize').value = tempSettings.promoSize || 'G';
     
     renderSettingsFeesTable();
 }
@@ -2173,6 +2192,9 @@ function saveSettings() {
     
     const whatsapp = document.getElementById('settingsWhatsapp').value.trim();
     const whatsappFormatted = document.getElementById('settingsWhatsappFormatted').value.trim();
+    const promoActive = document.getElementById('settingsPromoActive').checked;
+    const promoPrice = parseFloat(document.getElementById('settingsPromoPrice').value) || 95.00;
+    const promoSize = document.getElementById('settingsPromoSize').value;
     
     if (!whatsapp) {
         alert("O número do WhatsApp é obrigatório.");
@@ -2181,6 +2203,9 @@ function saveSettings() {
     
     tempSettings.whatsapp = whatsapp;
     tempSettings.whatsappFormatted = whatsappFormatted;
+    tempSettings.promoActive = promoActive;
+    tempSettings.promoPrice = promoPrice;
+    tempSettings.promoSize = promoSize;
     
     if (!menuData) menuData = {};
     menuData.settings = tempSettings;

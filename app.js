@@ -2900,8 +2900,15 @@ function renderCustomizerFlavors() {
         }
         
         const catLabel = item.category === 'doces' ? 'Doce' : 'Salgada';
-        const priceVal = (item.prices && item.prices[SIZE_MAP[currentPizza.size]]) || 0;
+        const sizeKey = SIZE_MAP[currentPizza.size] || 'M';
+        const isEligiblePromo = CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && sizeKey === (CONFIG_SETTINGS.promoSize || 'G') && item.isPromo;
+        
+        const priceVal = isEligiblePromo 
+            ? (parseFloat(CONFIG_SETTINGS.promoPrice) || 95.00) 
+            : ((item.prices && item.prices[sizeKey]) || 0);
+            
         const priceLabel = `R$ ${priceVal.toFixed(0)}`;
+        const promoLabel = isEligiblePromo ? ' <span style="color:#ffc107; font-weight:bold;">(Promo)</span>' : '';
         
         card.innerHTML = `
             ${selectNumberHTML}
@@ -2909,7 +2916,7 @@ function renderCustomizerFlavors() {
                 <img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.src='assets/pizza_hero.png'">
             </div>
             <span class="flavor-name">${item.name}</span>
-            <span class="flavor-category-badge">${catLabel} • ${priceLabel}</span>
+            <span class="flavor-category-badge">${catLabel} • ${priceLabel}${promoLabel}</span>
         `;
         container.appendChild(card);
     });
@@ -3120,15 +3127,29 @@ function calculateCustomizerPrice() {
     let maxFlavorPrice = 0;
     const sizeKey = SIZE_MAP[currentPizza.size] || 'M'; // 'B', 'M', 'G', 'F'
     
+    // Verifica se todos os sabores selecionados são promocionais
+    let allFlavorsArePromo = currentPizza.selectedFlavors.length > 0;
     currentPizza.selectedFlavors.forEach(flavorId => {
         const flavorData = MENU_ITEMS.pizzas.find(p => p.id === flavorId);
-        if (flavorData && flavorData.prices) {
-            const price = parseFloat(flavorData.prices[sizeKey]) || 0;
-            if (price > maxFlavorPrice) {
-                maxFlavorPrice = price;
-            }
+        if (!flavorData || !flavorData.isPromo) {
+            allFlavorsArePromo = false;
         }
     });
+    
+    // Se a promoção estiver ativa para o tamanho atual e todos os sabores forem promocionais
+    if (CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && sizeKey === (CONFIG_SETTINGS.promoSize || 'G') && allFlavorsArePromo) {
+        maxFlavorPrice = parseFloat(CONFIG_SETTINGS.promoPrice) || 95.00;
+    } else {
+        currentPizza.selectedFlavors.forEach(flavorId => {
+            const flavorData = MENU_ITEMS.pizzas.find(p => p.id === flavorId);
+            if (flavorData && flavorData.prices) {
+                const price = parseFloat(flavorData.prices[sizeKey]) || 0;
+                if (price > maxFlavorPrice) {
+                    maxFlavorPrice = price;
+                }
+            }
+        });
+    }
     
     // Se por algum motivo o preço não puder ser calculado individualmente, usa o fallback da matriz anterior
     if (maxFlavorPrice === 0 && PIZZA_PRICES && PIZZA_PRICES[currentPizza.size]) {
@@ -3755,8 +3776,7 @@ function initMenuData() {
                 if (data.pizza_prices) PIZZA_PRICES = data.pizza_prices;
                 if (data.borders) BORDAS = data.borders;
                 if (data.settings) {
-                    if (data.settings.whatsapp) CONFIG_SETTINGS.whatsapp = data.settings.whatsapp;
-                    if (data.settings.whatsappFormatted) CONFIG_SETTINGS.whatsappFormatted = data.settings.whatsappFormatted;
+                    CONFIG_SETTINGS = { ...CONFIG_SETTINGS, ...data.settings };
                     if (data.settings.deliveryFees) TAXAS_ENTREGA = data.settings.deliveryFees;
                     populateNeighborhoodDropdown();
                     updateContactInfoUI();

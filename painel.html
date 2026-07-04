@@ -412,6 +412,31 @@
                         </div>
                     </div>
 
+                    <!-- Pizza Promotion Card -->
+                    <div class="prices-table-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px;">
+                        <h3 style="margin-bottom: 20px; color: var(--text-main); font-family: var(--font-display); font-size: 18px;">Configurações de Pizza Promocional</h3>
+                        
+                        <div class="form-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px;">
+                            <input type="checkbox" id="settingsPromoActive" style="width: 18px; height: 18px; cursor: pointer;">
+                            <label for="settingsPromoActive" style="font-size: 13px; font-weight: 500; color: var(--text-light); cursor: pointer;">Ativar Preço Promocional</label>
+                        </div>
+                        
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px;">
+                            <label for="settingsPromoPrice" style="font-size: 13px; font-weight: 500; color: var(--text-light);">Preço da Promoção (R$)</label>
+                            <input type="number" step="0.01" id="settingsPromoPrice" placeholder="Ex: 95.00" style="padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main);">
+                        </div>
+                        
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                            <label for="settingsPromoSize" style="font-size: 13px; font-weight: 500; color: var(--text-light);">Tamanho da Pizza Elegível</label>
+                            <select id="settingsPromoSize" style="padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); cursor: pointer;">
+                                <option value="B">Brotinho (B)</option>
+                                <option value="M">Média (M)</option>
+                                <option value="G" selected>Grande (G)</option>
+                                <option value="F">Família (F)</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <!-- Neighborhoods and Fees Card -->
                     <div class="prices-table-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px;">
                         <h3 style="margin-bottom: 20px; color: var(--text-main); font-family: var(--font-display); font-size: 18px;">Taxas de Entrega por Bairro</h3>
@@ -528,6 +553,11 @@
                 <div class="form-group" id="flavorBadgeGroup" style="display: flex; flex-direction: column; gap: 6px;">
                     <label for="flavorBadge" style="font-size: 13px; font-weight: 500; color: var(--text-light);">Selo Destaque (Opcional)</label>
                     <input type="text" id="flavorBadge" placeholder="Ex: Mais Pedido, Vegetariana, Apimentado" style="padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main);">
+                </div>
+                
+                <div class="form-group" id="flavorPromoGroup" style="display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="flavorIsPromo" style="width: 18px; height: 18px; cursor: pointer;">
+                    <label for="flavorIsPromo" style="font-size: 13px; font-weight: 500; color: var(--text-light); cursor: pointer;">Sabor Promocional</label>
                 </div>
                 
                 <div class="form-group" id="flavorImageGroup" style="display: flex; flex-direction: column; gap: 6px;">
