@@ -6,6 +6,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3001;
 const ORDERS_FILE = path.join(__dirname, 'orders.json');
+const STATUS_FILE = path.join(__dirname, 'status.json');
 
 app.use(cors());
 app.use(express.json());
@@ -16,6 +17,11 @@ app.use(express.static(__dirname));
 // Ensure orders.json exists
 if (!fs.existsSync(ORDERS_FILE)) {
     fs.writeFileSync(ORDERS_FILE, JSON.stringify([], null, 2), 'utf8');
+}
+
+// Ensure status.json exists
+if (!fs.existsSync(STATUS_FILE)) {
+    fs.writeFileSync(STATUS_FILE, JSON.stringify({ isOpen: true }, null, 2), 'utf8');
 }
 
 // Read orders helper
@@ -38,9 +44,46 @@ function writeOrders(orders) {
     }
 }
 
+// Read status helper
+function readStatus() {
+    try {
+        const data = fs.readFileSync(STATUS_FILE, 'utf8');
+        return JSON.parse(data);
+    } catch (err) {
+        console.error("Error reading status file:", err);
+        return { isOpen: true };
+    }
+}
+
+// Write status helper
+function writeStatus(status) {
+    try {
+        fs.writeFileSync(STATUS_FILE, JSON.stringify(status, null, 2), 'utf8');
+    } catch (err) {
+        console.error("Error writing status file:", err);
+    }
+}
+
 /* ==========================================================================
    API Endpoints
    ========================================================================== */
+
+// GET /api/status - Get shop status
+app.get('/api/status', (req, res) => {
+    res.json(readStatus());
+});
+
+// PUT /api/status - Update shop status
+app.put('/api/status', (req, res) => {
+    const { isOpen } = req.body;
+    if (typeof isOpen !== 'boolean') {
+        return res.status(400).json({ error: "Campo isOpen inválido." });
+    }
+    const status = { isOpen };
+    writeStatus(status);
+    console.log(`[INFO] Status da loja atualizado para: ${isOpen ? 'Aberto' : 'Fechado'}`);
+    res.json(status);
+});
 
 // GET /api/orders - List all orders
 app.get('/api/orders', (req, res) => {

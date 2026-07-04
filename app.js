@@ -3670,7 +3670,15 @@ function submitOrder() {
         };
 
         firebase.database().ref('fina_massa_orders/' + orderId).set(firebaseOrder)
-        .catch(err => console.error("Erro ao enviar para o Firebase:", err));
+        .catch(err => {
+            console.error("Erro ao enviar para o Firebase, enviando para o servidor local:", err);
+            fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            })
+            .catch(localErr => console.error("Erro ao enviar pedido para o painel local:", localErr));
+        });
     } else {
         fetch('/api/orders', {
             method: 'POST',
@@ -3767,6 +3775,11 @@ function initMenuData() {
             } else {
                 seedFirebaseMenu();
             }
+        }, (error) => {
+            console.error("Erro ao carregar o cardápio do Firebase:", error);
+            // Fallback para dev server local / padrões
+            PIZZA_TYPES = getPizzaTypesDynamic();
+            renderMenu();
         });
     } else {
         // Fallback for local dev server
@@ -3783,6 +3796,10 @@ function initShopStatusListener() {
                 isShopOpen = isOpen;
                 updateShopStatusUI();
             }
+        }, (error) => {
+            console.error("Erro ao obter status de funcionamento do Firebase:", error);
+            isShopOpen = true;
+            updateShopStatusUI();
         });
     } else {
         // Fallback for local dev server

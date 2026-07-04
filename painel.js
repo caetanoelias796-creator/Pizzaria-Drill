@@ -9,6 +9,7 @@ if (typeof firebase !== 'undefined' && typeof firebaseConfig !== 'undefined' && 
    State Variables
    ========================================================================== */
 let orders = [];
+let isUsingFallback = false;
 let filterStatus = 'Todos';
 let soundEnabled = true;
 let lastOrdersCount = 0;
@@ -101,6 +102,28 @@ function setupFirebaseRealtime() {
         }
     }, (error) => {
         console.error("Firebase read error:", error);
+        
+        // Altera o status do servidor na interface para alertar sobre a permissão
+        const statusContainer = document.querySelector('.server-status');
+        if (statusContainer) {
+            statusContainer.className = 'server-status error';
+            statusContainer.style.background = 'rgba(244, 67, 54, 0.1)';
+            statusContainer.style.border = '1px solid rgba(244, 67, 54, 0.2)';
+            statusContainer.innerHTML = '<span class="dot" style="background-color: #f44336;"></span> Firebase Bloqueado';
+            statusContainer.title = "O Firebase retornou 'Permission Denied'. Verifique as regras de leitura/escrita do Realtime Database.";
+        }
+
+        // Fallback automático para a API de pedidos local
+        if (!isUsingFallback) {
+            isUsingFallback = true;
+            console.warn("Iniciando fallback para API de pedidos local...");
+            fetchOrders(true); // Primeira carga silenciosa
+            
+            // Polling local de 5 em 5 segundos
+            setInterval(() => {
+                fetchOrders(false);
+            }, 5000);
+        }
     });
 }
 
@@ -969,6 +992,11 @@ function initMenuSync() {
                 .then(() => console.log("Cardápio semeado com sucesso a partir do painel."))
                 .catch(err => console.error("Erro ao semear cardápio a partir do painel:", err));
             }
+        }, (error) => {
+            console.error("Erro ao sincronizar cardápio do Firebase:", error);
+            // Fallback ao carregar do Firebase com erro (recarrega os padrões locais)
+            menuData = DEFAULT_MENU_DATA;
+            renderMenuManager();
         });
     } else {
         // Fallback local
@@ -1553,6 +1581,8 @@ function openAddMenuItemModal(type) {
     if (imgInput) {
         if (type === 'bebida') {
             imgInput.value = 'assets/agua.png';
+        } else if (type === 'lanche') {
+            imgInput.value = 'assets/lanche_hamburguer.png';
         } else {
             imgInput.value = 'assets/pizza_hero.png';
         }
@@ -1590,7 +1620,7 @@ function openEditMenuItemModal(type, id) {
     } else if (type === 'calzone' || type === 'lanche') {
         document.getElementById('flavorDescription').value = item.description || '';
         document.getElementById('itemPrice').value = item.price || 0;
-        document.getElementById('flavorImage').value = item.image || 'assets/pizza_hero.png';
+        document.getElementById('flavorImage').value = item.image || (type === 'lanche' ? 'assets/lanche_hamburguer.png' : 'assets/pizza_hero.png');
         
         // Se for lanche, podemos ter categoria secundária no modal? Lanches no Firebase salvam a subcategoria no campo category.
         // Vamos permitir salvar/editar.
@@ -1599,7 +1629,7 @@ function openEditMenuItemModal(type, id) {
         }
     } else if (type === 'bebida') {
         document.getElementById('itemPrice').value = item.price || 0;
-        document.getElementById('flavorImage').value = item.image || 'assets/pizza_hero.png';
+        document.getElementById('flavorImage').value = item.image || 'assets/agua.png';
     }
     
     adjustModalFields(type, true);
@@ -2198,6 +2228,15 @@ function populateImageSuggestions(type) {
             { label: 'Vinho', value: 'assets/vinho.png' },
             { label: 'Padrão', value: 'assets/pizza_hero.png' }
         ];
+    } else if (type === 'lanche') {
+        suggestions = [
+            { label: 'Hambúrguer', value: 'assets/lanche_hamburguer.png' },
+            { label: 'Xis', value: 'assets/lanche_xis.png' },
+            { label: 'Barca', value: 'assets/lanche_barca.png' },
+            { label: 'Fritas', value: 'assets/lanche_fritas.png' },
+            { label: 'Açaí', value: 'assets/acai_hero.png' },
+            { label: 'Padrão', value: 'assets/pizza_hero.png' }
+        ];
     }
     
     if (suggestions.length === 0) return;
@@ -2259,6 +2298,23 @@ function initShopStatus() {
                     label.style.color = isOpen ? "#81c784" : "#ef5350";
                 }
             }
+        }, (error) => {
+            console.error("Erro ao obter status de funcionamento do Firebase:", error);
+            // Fallback ao status local
+            fetch('/api/status')
+                .then(res => res.json())
+                .then(data => {
+                    const toggle = document.getElementById('shopStatusToggle');
+                    const label = document.getElementById('shopStatusLabel');
+                    if (data && typeof data.isOpen === 'boolean') {
+                        if (toggle) toggle.checked = data.isOpen;
+                        if (label) {
+                            label.innerText = data.isOpen ? "Aberto" : "Fechado";
+                            label.style.color = data.isOpen ? "#81c784" : "#ef5350";
+                        }
+                    }
+                })
+                .catch(err => console.error("Erro ao carregar status local pós falha do Firebase:", err));
         });
     } else {
         fetch('/api/status')
