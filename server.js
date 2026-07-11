@@ -166,6 +166,11 @@ app.delete('/api/orders', (req, res) => {
     res.json({ message: "Todos os pedidos foram apagados com sucesso." });
 });
 
+// Explicit route to serve catalog.html
+app.get('/catalog', (req, res) => {
+    res.sendFile(path.join(__dirname, 'catalog.html'));
+});
+
 // Explicit route to serve painel.html
 app.get('/painel', (req, res) => {
     res.sendFile(path.join(__dirname, 'painel.html'));

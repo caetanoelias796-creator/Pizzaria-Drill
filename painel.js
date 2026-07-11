@@ -1,8 +1,10 @@
 /* ==========================================================================
    Firebase Initialization
    ========================================================================== */
+let db = null;
 if (typeof firebase !== 'undefined' && typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey !== 'SUA_API_KEY') {
     firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
 }
 
 /* ==========================================================================
@@ -53,19 +55,25 @@ function initializeDashboard() {
 }
 
 function setupFirebaseRealtime() {
-    const ordersRef = firebase.database().ref('fina_massa_orders');
-    ordersRef.on('value', (snapshot) => {
-        const data = snapshot.val();
-        let ordersArray = [];
-        
-        if (data) {
-            ordersArray = Object.keys(data).map(key => {
-                return {
-                    ...data[key],
-                    firebaseKey: key
-                };
-            });
+    if (!db) {
+        console.warn("Firestore não inicializado. Usando polling local.");
+        if (!isUsingFallback) {
+            isUsingFallback = true;
+            fetchOrders(true);
+            setInterval(() => {
+                fetchOrders(false);
+            }, 5000);
         }
+        return;
+    }
+    db.collection('fina_massa_orders').onSnapshot((querySnapshot) => {
+        let ordersArray = [];
+        querySnapshot.forEach((doc) => {
+            ordersArray.push({
+                ...doc.data(),
+                firebaseKey: doc.id
+            });
+        });
         
         // Sort newest first
         ordersArray.sort((a, b) => b.timestamp - a.timestamp);
@@ -110,7 +118,7 @@ function setupFirebaseRealtime() {
             statusContainer.style.background = 'rgba(244, 67, 54, 0.1)';
             statusContainer.style.border = '1px solid rgba(244, 67, 54, 0.2)';
             statusContainer.innerHTML = '<span class="dot" style="background-color: #f44336;"></span> Firebase Bloqueado';
-            statusContainer.title = "O Firebase retornou 'Permission Denied'. Verifique as regras de leitura/escrita do Realtime Database.";
+            statusContainer.title = "O Firebase retornou erro de permissão. Verifique as regras do Cloud Firestore.";
         }
 
         // Fallback automático para a API de pedidos local
@@ -445,11 +453,11 @@ function renderOrdersList() {
    Order State Updates
    ========================================================================== */
 function updateOrderStatus(id, newStatus) {
-    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
         const order = orders.find(o => o.id === id);
         const refKey = (order && order.firebaseKey) ? order.firebaseKey : id;
         
-        firebase.database().ref(`fina_massa_orders/${refKey}`).update({ status: newStatus })
+        db.collection('fina_massa_orders').doc(String(refKey)).update({ status: newStatus })
         .catch(err => {
             alert("Erro ao atualizar status no Firebase.");
             console.error(err);
@@ -842,7 +850,20 @@ const DEFAULT_MENU_DATA = {
             'linha-olinda': { name: 'Linha Olinda', fee: 30.00 },
             'pinhal': { name: 'Pinhal', fee: 40.00 }
         }
-    }
+    },
+    categories: [
+        { id: 'todos', name: 'Todos', icon: '🍽️' },
+        { id: 'mais-pedidos', name: 'Mais Pedidos', icon: '🔥' },
+        { id: 'pizzas', name: 'Pizzas', icon: '🍕' },
+        { id: 'lanches', name: 'Lanches', icon: '🍔' },
+        { id: 'calzones', name: 'Calzones', icon: '🥟' },
+        { id: 'bebidas', name: 'Bebidas', icon: '🥤' },
+        { id: 'acai', name: 'Açaís', icon: '🍧' }
+    ],
+    banners: [
+        { tag: 'Promoção', title: 'Pizzas Promocionais G', subtitle: 'Selecione apenas sabores promocionais e pague preço único fixo!', gradient: 'linear-gradient(135deg, #b71c1c 0%, #1a0a0a 100%)' },
+        { tag: 'Forno de Pedra', title: 'Massa Fina & Crocante', subtitle: 'Ingredientes frescos selecionados diariamente', gradient: 'linear-gradient(135deg, #ffd600 0%, #3e2723 100%)' }
+    ]
 };
 
 /* ==========================================================================
@@ -941,11 +962,10 @@ function initMenuSync() {
     menuData = DEFAULT_MENU_DATA;
     renderMenuManager();
 
-    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-        const menuRef = firebase.database().ref('pizzaria_drill_menu');
-        menuRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        db.collection('pizzaria_drill_menu').doc('main').onSnapshot((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
                 if (data.settings) {
                     CONFIG_SETTINGS = { ...CONFIG_SETTINGS, ...data.settings };
                     tempSettings = JSON.parse(JSON.stringify(data.settings));
@@ -977,28 +997,26 @@ function initMenuSync() {
                 }
                 
                 if (updated) {
-                    firebase.database().ref('pizzaria_drill_menu').set(data)
+                    db.collection('pizzaria_drill_menu').doc('main').set(data)
                     .then(() => console.log("Cardápio do Firebase atualizado com as opções de Coca Zero no painel."))
                     .catch(err => console.error("Erro ao atualizar Coca Zero no painel:", err));
-                    return; // The database update will trigger this on('value') again
+                    return;
                 }
 
                 menuData = data;
                 renderMenuManager();
             } else {
                 console.log("Banco de dados do cardápio vazio. Semeando valores padrão do painel...");
-                firebase.database().ref('pizzaria_drill_menu').set(DEFAULT_MENU_DATA)
+                db.collection('pizzaria_drill_menu').doc('main').set(DEFAULT_MENU_DATA)
                 .then(() => console.log("Cardápio semeado com sucesso a partir do painel."))
                 .catch(err => console.error("Erro ao semear cardápio a partir do painel:", err));
             }
         }, (error) => {
             console.error("Erro ao sincronizar cardápio do Firebase:", error);
-            // Fallback ao carregar do Firebase com erro (recarrega os padrões locais)
             menuData = DEFAULT_MENU_DATA;
             renderMenuManager();
         });
     } else {
-        // Fallback local
         menuData = DEFAULT_MENU_DATA;
         renderMenuManager();
     }
@@ -1306,10 +1324,10 @@ function saveMenuPrices() {
         }
     });
     
-    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-        firebase.database().ref('pizzaria_drill_menu/pizza_prices').set(updatedPrices)
-        .then(() => {
-            return firebase.database().ref('pizzaria_drill_menu/borders').set(updatedBorders);
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        db.collection('pizzaria_drill_menu').doc('main').update({
+            pizza_prices: updatedPrices,
+            borders: updatedBorders
         })
         .then(() => {
             alert("Preços e bordas atualizados com sucesso no Firebase!");
@@ -1334,8 +1352,10 @@ function toggleFlavorAvailability(id, isChecked) {
     
     pizzas[index].available = isChecked;
     
-    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-        firebase.database().ref(`pizzaria_drill_menu/menu_items/pizzas/${index}/available`).set(isChecked)
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        db.collection('pizzaria_drill_menu').doc('main').update({
+            'menu_items.pizzas': pizzas
+        })
         .then(() => {
             console.log(`Disponibilidade de ${pizzas[index].name} alterada para: ${isChecked}`);
         })
@@ -1836,8 +1856,10 @@ function saveMenuItem(event) {
         items.push(newItem);
     }
     
-    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-        firebase.database().ref(`pizzaria_drill_menu/menu_items/${dbType}`).set(items)
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        db.collection('pizzaria_drill_menu').doc('main').update({
+            [`menu_items.${dbType}`]: items
+        })
         .then(() => {
             closeFlavorModal();
             alert("Item gravado com sucesso!");
@@ -1867,8 +1889,10 @@ function deleteMenuItem(type, id) {
     
     const updatedItems = items.filter(i => i.id !== id);
     
-    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-        firebase.database().ref(`pizzaria_drill_menu/menu_items/${dbType}`).set(updatedItems)
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        db.collection('pizzaria_drill_menu').doc('main').update({
+            [`menu_items.${dbType}`]: updatedItems
+        })
         .then(() => {
             alert(`Item "${item.name}" excluído com sucesso!`);
         })
@@ -1894,8 +1918,10 @@ function toggleItemAvailability(type, id, isChecked) {
     
     items[index].available = isChecked;
     
-    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-        firebase.database().ref(`pizzaria_drill_menu/menu_items/${type}/${index}/available`).set(isChecked)
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        db.collection('pizzaria_drill_menu').doc('main').update({
+            [`menu_items.${type}`]: items
+        })
         .then(() => {
             console.log(`Disponibilidade de ${items[index].name} alterada para: ${isChecked}`);
         })
@@ -1924,9 +1950,15 @@ function confirmClearAllOrders() {
 }
 
 function clearAllOrders() {
-    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-        // Clear from Firebase Realtime Database
-        firebase.database().ref('fina_massa_orders').remove()
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        db.collection('fina_massa_orders').get()
+        .then(snapshot => {
+            const batch = db.batch();
+            snapshot.docs.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+            return batch.commit();
+        })
         .then(() => {
             alert("Sucesso: Todos os pedidos foram apagados no Firebase!");
             orders = [];
@@ -2210,8 +2242,10 @@ function saveSettings() {
     if (!menuData) menuData = {};
     menuData.settings = tempSettings;
     
-    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-        firebase.database().ref('pizzaria_drill_menu/settings').set(tempSettings)
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        db.collection('pizzaria_drill_menu').doc('main').update({
+            settings: tempSettings
+        })
         .then(() => {
             alert("Configurações salvas no banco de dados com sucesso!");
         })
@@ -2310,17 +2344,19 @@ function populateImageSuggestions(type) {
    Shop Status Management (Open/Closed Toggle)
    ========================================================================== */
 function initShopStatus() {
-    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-        firebase.database().ref('pizzaria_drill_status/isOpen').on('value', (snapshot) => {
-            const isOpen = snapshot.val();
-            const toggle = document.getElementById('shopStatusToggle');
-            const label = document.getElementById('shopStatusLabel');
-            
-            if (isOpen !== null) {
-                if (toggle) toggle.checked = isOpen;
-                if (label) {
-                    label.innerText = isOpen ? "Aberto" : "Fechado";
-                    label.style.color = isOpen ? "#81c784" : "#ef5350";
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        db.collection('pizzaria_drill_status').doc('status').onSnapshot((doc) => {
+            if (doc.exists) {
+                const isOpen = doc.data().isOpen;
+                const toggle = document.getElementById('shopStatusToggle');
+                const label = document.getElementById('shopStatusLabel');
+                
+                if (isOpen !== null && isOpen !== undefined) {
+                    if (toggle) toggle.checked = isOpen;
+                    if (label) {
+                        label.innerText = isOpen ? "Aberto" : "Fechado";
+                        label.style.color = isOpen ? "#81c784" : "#ef5350";
+                    }
                 }
             }
         }, (error) => {
@@ -2360,8 +2396,8 @@ function initShopStatus() {
 }
 
 function toggleShopStatus(isOpen) {
-    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-        firebase.database().ref('pizzaria_drill_status/isOpen').set(isOpen)
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        db.collection('pizzaria_drill_status').doc('status').set({ isOpen: isOpen })
         .then(() => {
             console.log(`Status de funcionamento da Pizzaria Drill alterado para: ${isOpen ? 'Aberto' : 'Fechado'}`);
         })

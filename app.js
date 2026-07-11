@@ -2063,7 +2063,8 @@ let MENU_ITEMS = {
             "size": "700ml",
             "maxFree": 5
         }
-    ]
+    ],
+    "calzones": []
 };
 let PIZZA_PRICES = {}; // No longer used, but kept for compatibility
 
@@ -2100,11 +2101,10 @@ let BORDAS = {
     'gergelim': { name: 'Borda com Gergelim Branco', price: 5.00, category: 'ambas' }
 };
 
-/* ==========================================================================
-   Firebase Initialization
-   ========================================================================== */
+let db = null;
 if (typeof firebase !== 'undefined' && typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey !== 'SUA_API_KEY') {
     firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
 }
 
 /* ==========================================================================
@@ -2486,7 +2486,7 @@ function addAcaiToOrder() {
     closeAcaiCustomizer();
     toggleCart(true);
     
-    const badge = document.getElementById('cartCountBadge');
+    const badge = document.getElementById('cartBadgeCount');
     if (badge) {
         badge.classList.remove('animate-bounce');
         void badge.offsetWidth;
@@ -2608,65 +2608,64 @@ function setupSubcategoryTabs() {
    Render Catalog Functions
    ========================================================================== */
 function renderMenu() {
-    renderPizzas('salgadas');
-    renderLanches('xis');
-    renderBebidas();
-    renderAcais();
+    renderPromoSection();
+    renderRecommendedGrid(currentCategory || 'todos');
+    setupHeaderScrollEffect();
 }
 
-function renderPizzas(subcategory = 'salgadas') {
-    const pizzasGrid = document.getElementById('pizzasGrid');
-    if (!pizzasGrid) return;
-    pizzasGrid.innerHTML = '';
+let currentCategory = 'todos';
+
+function filterCategory(category, buttonElement) {
+    currentCategory = category;
     
-    const pizzas = MENU_ITEMS.pizzas || [];
-    const filtered = pizzas.filter(p => p.category === subcategory && p.available !== false);
+    // Remove active class from all category chips
+    const chips = document.querySelectorAll(".category-chip");
+    chips.forEach(chip => chip.classList.remove("active"));
     
-    filtered.forEach(pizza => {
-        pizzasGrid.appendChild(createPizzaFlavorCard(pizza));
-    });
+    // Add active class to selected chip
+    if (buttonElement) {
+        buttonElement.classList.add("active");
+    } else {
+        const targetChip = document.querySelector(`.category-chip[onclick*="'${category}'"]`);
+        if (targetChip) targetChip.classList.add("active");
+    }
+    
+    // Update the recommended title
+    const sectionTitle = document.querySelector("#recommendedSection .section-title");
+    if (sectionTitle) {
+        if (category === "todos") {
+            sectionTitle.innerHTML = "⭐ Recomendadas para você";
+        } else if (category === "mais-pedidos") {
+            sectionTitle.innerHTML = "🔥 Mais Pedidos do Cardápio";
+        } else if (category === "promocoes") {
+            sectionTitle.innerHTML = "🔥 Promoções Selecionadas";
+        } else {
+            const catNames = {
+                pizzas: "Pizzas",
+                lanches: "Lanches",
+                calzones: "Calzones",
+                bebidas: "Bebidas",
+                acai: "Açaís"
+            };
+            sectionTitle.innerHTML = `⭐ Principais ${catNames[category] || category}`;
+        }
+    }
+    
+    renderRecommendedGrid(category);
 }
 
-function createPizzaFlavorCard(pizza) {
-    const card = document.createElement('div');
-    card.className = 'item-card';
-    
-    const pB = pizza.prices?.B || 0;
-    const pM = pizza.prices?.M || 0;
-    const pG = pizza.prices?.G || 0;
-    const pF = pizza.prices?.F || 0;
-    
-    const nonZeroPrices = [pB, pM, pG, pF].filter(p => p > 0);
-    const priceMin = nonZeroPrices.length > 0 ? Math.min(...nonZeroPrices) : 0;
-    const priceMax = nonZeroPrices.length > 0 ? Math.max(...nonZeroPrices) : 0;
-    
-    const badgeHTML = pizza.badge ? `<span class="item-card-badge">${pizza.badge}</span>` : '';
-    const categoryTag = '';
-    
-    card.innerHTML = `
-        <div class="item-card-image-wrapper">
-            ${badgeHTML}
-            <img src="${pizza.image}" alt="${pizza.name}" loading="lazy">
-        </div>
-        <div class="item-card-content">
-            <div class="item-card-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <h3 class="item-card-title" style="margin: 0; font-size: 18px; font-weight: 600;">${pizza.name}</h3>
-                ${categoryTag}
-            </div>
-            <p class="item-card-desc" style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px; flex-grow: 1;">${pizza.description}</p>
-            <div class="item-card-footer">
-                <div class="item-card-price">
-                    <span class="from-text">Valores (B / M / G / F)</span>
-                    <span class="price-value" style="font-size: 16px; font-weight: 700; color: #ffffff;">R$ ${priceMin.toFixed(2).replace('.', ',')} a R$ ${priceMax.toFixed(2).replace('.', ',')}</span>
-                </div>
-                <button class="btn-add" onclick="openPizzaCustomizerWithFlavor('${pizza.id}')" title="Escolher este sabor">
-                    <span class="material-symbols-rounded">local_pizza</span>
-                </button>
-            </div>
-        </div>
-    `;
-    
-    return card;
+function handleAddToCartClick(itemId, type, size) {
+    if (type === 'pizza') {
+        openPizzaCustomizerWithFlavor(itemId);
+    } else if (type === 'acai') {
+        openAcaiCustomizer(size || '500ml');
+    } else if (type === 'lanche') {
+        addSimpleItemToCart(itemId, 'lanches');
+    } else if (type === 'calzone') {
+        addSimpleItemToCart(itemId, 'calzones');
+    } else if (type === 'bebida') {
+        addSimpleItemToCart(itemId, 'bebidas');
+    }
 }
 
 function openPizzaCustomizerWithFlavor(flavorId) {
@@ -2674,56 +2673,363 @@ function openPizzaCustomizerWithFlavor(flavorId) {
     handleFlavorSelection(flavorId);
 }
 
-function renderBebidas() {
-    const bebidasGrid = document.getElementById('bebidasGrid');
-    if (!bebidasGrid) return;
-    bebidasGrid.innerHTML = '';
+function renderPromoSection() {
+    const promoGrid = document.getElementById("promoGrid");
+    if (!promoGrid) return;
+    promoGrid.innerHTML = '';
     
-    MENU_ITEMS.bebidas.forEach(item => {
-        bebidasGrid.appendChild(createSimpleItemCard(item, 'bebidas'));
+    const promos = [];
+    
+    // Pizzas
+    const pizzas = MENU_ITEMS.pizzas || [];
+    pizzas.forEach(p => {
+        if (p.isPromo && p.available !== false) {
+            promos.push({
+                ...p,
+                type: 'pizza',
+                priceText: `R$ ${(parseFloat(CONFIG_SETTINGS.promoPrice) || 95.00).toFixed(0)} (G)`,
+                emoji: '🍕'
+            });
+        }
+    });
+    
+    // Lanches
+    const lanches = MENU_ITEMS.lanches || [];
+    lanches.forEach(l => {
+        if (l.isPromo && l.available !== false) {
+            promos.push({
+                ...l,
+                type: 'lanche',
+                priceText: `R$ ${l.price.toFixed(0)}`,
+                emoji: '🍔'
+            });
+        }
+    });
+    
+    // Calzones
+    const calzones = MENU_ITEMS.calzones || [];
+    calzones.forEach(c => {
+        if (c.isPromo && c.available !== false) {
+            promos.push({
+                ...c,
+                type: 'calzone',
+                priceText: `R$ ${c.price.toFixed(0)}`,
+                emoji: '🥟'
+            });
+        }
+    });
+    
+    // Bebidas
+    const bebidas = MENU_ITEMS.bebidas || [];
+    bebidas.forEach(b => {
+        if (b.isPromo && b.available !== false) {
+            promos.push({
+                ...b,
+                type: 'bebida',
+                priceText: `R$ ${b.price.toFixed(0)}`,
+                emoji: '🥤'
+            });
+        }
+    });
+
+    const promoSection = document.getElementById("promoSection");
+    if (promos.length === 0) {
+        if (promoSection) promoSection.style.display = 'none';
+        return;
+    } else {
+        if (promoSection) promoSection.style.display = 'block';
+    }
+    
+    promos.forEach(product => {
+        const card = document.createElement("div");
+        card.className = "promo-mini-card";
+        card.style.cursor = "pointer";
+        
+        const badgeText = product.badge || "PROMO";
+        
+        card.innerHTML = `
+            <div class="promo-mini-emoji">${product.emoji}</div>
+            <h4 class="promo-mini-title">${product.name}</h4>
+            <p class="promo-mini-desc">${product.description || ''}</p>
+            <div class="promo-mini-footer">
+                <span class="promo-mini-price">${product.priceText}</span>
+                <span class="discount-badge">${badgeText}</span>
+            </div>
+        `;
+        
+        card.onclick = () => handleAddToCartClick(product.id, product.type);
+        promoGrid.appendChild(card);
     });
 }
 
-function renderLanches(subcategory = 'xis') {
-    const lanchesGrid = document.getElementById('lanchesGrid');
-    if (!lanchesGrid) return;
-    lanchesGrid.innerHTML = '';
+function renderBestSellers() {
+    const bestSellersScroll = document.getElementById("bestSellersScroll");
+    if (!bestSellersScroll) return;
+    bestSellersScroll.innerHTML = '';
+    
+    const bests = [];
+    
+    const pizzas = MENU_ITEMS.pizzas || [];
+    pizzas.forEach(p => {
+        if (p.bestSeller || (p.badge && p.badge.toLowerCase().includes('pedido'))) {
+            bests.push({ ...p, type: 'pizza', emoji: '🍕' });
+        }
+    });
     
     const lanches = MENU_ITEMS.lanches || [];
-    const filtered = lanches.filter(l => l.category === subcategory && l.available !== false);
+    lanches.forEach(l => {
+        if (l.bestSeller || (l.badge && l.badge.toLowerCase().includes('pedido'))) {
+            bests.push({ ...l, type: 'lanche', emoji: '🍔' });
+        }
+    });
     
-    filtered.forEach(lanche => {
-        lanchesGrid.appendChild(createSimpleItemCard(lanche, 'lanches'));
+    if (bests.length === 0) {
+        if (pizzas.length > 0) bests.push({ ...pizzas[0], type: 'pizza', emoji: '🍕' });
+        if (lanches.length > 0) bests.push({ ...lanches[0], type: 'lanche', emoji: '🍔' });
+        const calzones = MENU_ITEMS.calzones || [];
+        if (calzones.length > 0) bests.push({ ...calzones[0], type: 'calzone', emoji: '🥟' });
+        const acais = MENU_ITEMS.acais || [];
+        if (acais.length > 0) bests.push({ ...acais[0], type: 'acai', emoji: '🍧' });
+    }
+    
+    bests.forEach(product => {
+        const itemContainer = document.createElement("div");
+        itemContainer.className = "scroll-item-lg";
+        
+        let priceText = "";
+        if (product.type === 'pizza') {
+            const pB = product.prices?.B || 0;
+            const pM = product.prices?.M || 0;
+            const pG = product.prices?.G || 0;
+            const pF = product.prices?.F || 0;
+            const nonZero = [pB, pM, pG, pF].filter(p => p > 0);
+            const priceMin = nonZero.length > 0 ? Math.min(...nonZero) : 0;
+            const priceMax = nonZero.length > 0 ? Math.max(...nonZero) : 0;
+            const isEligiblePromo = CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && product.isPromo;
+            if (isEligiblePromo) {
+                const promoPrice = parseFloat(CONFIG_SETTINGS.promoPrice) || 95.00;
+                priceText = `R$ ${promoPrice.toFixed(0)}`;
+            } else if (priceMin === priceMax) {
+                priceText = `R$ ${priceMin.toFixed(0)}`;
+            } else {
+                priceText = `R$ ${priceMin.toFixed(0)} a R$ ${priceMax.toFixed(0)}`;
+            }
+        } else {
+            priceText = `R$ ${product.price.toFixed(2).replace('.', ',')}`;
+        }
+        
+        const imagePath = product.image || 'assets/pizza_hero.png';
+        
+        itemContainer.innerHTML = `
+            <div class="product-card">
+                <div class="product-image-wrapper">
+                    <img class="product-img" src="${imagePath}" alt="${product.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                    <div class="product-image-placeholder" style="display: none;">${product.emoji}</div>
+                </div>
+                <div class="product-body">
+                    <h4 class="product-title">${product.name}</h4>
+                    <p class="product-desc">${product.description || ''}</p>
+                    <div class="product-footer">
+                        <span class="product-price">${priceText}</span>
+                        <button class="add-to-cart-btn" onclick="handleAddToCartClick('${product.id}', '${product.type}')">+</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        bestSellersScroll.appendChild(itemContainer);
     });
 }
 
-function createSimpleItemCard(item, category) {
-    const card = document.createElement('div');
-    card.className = 'item-card';
+function renderRecommendedGrid(categoryFilter) {
+    const recommendedGrid = document.getElementById("recommendedGrid");
+    if (!recommendedGrid) return;
+    recommendedGrid.innerHTML = '';
     
-    const imagePath = item.image || (category === 'bebidas' ? 'assets/pizza_hero.png' : 'assets/pizza_hero.png');
-    const descHTML = item.description ? `<p class="item-card-desc">${item.description}</p>` : '';
+    let list = [];
     
-    card.innerHTML = `
-        <div class="item-card-image-wrapper">
-            <img src="${imagePath}" alt="${item.name}" loading="lazy">
-        </div>
-        <div class="item-card-content">
-            <h3 class="item-card-title">${item.name}</h3>
-            ${descHTML}
-            <div class="item-card-footer">
-                <div class="item-card-price">
-                    <span class="price-value">R$ ${item.price.toFixed(2).replace('.', ',')}</span>
-                </div>
-                <button class="btn-add" onclick="addSimpleItemToCart('${item.id}', '${category}')" title="Adicionar ao carrinho">
-                    <span class="material-symbols-rounded">add_shopping_cart</span>
-                </button>
+    if (categoryFilter === 'todos') {
+        const pizzas = (MENU_ITEMS.pizzas || []).filter(p => p.available !== false).map(p => ({ ...p, type: 'pizza', emoji: '🍕' }));
+        const lanches = (MENU_ITEMS.lanches || []).filter(l => l.available !== false).map(l => ({ ...l, type: 'lanche', emoji: '🍔' }));
+        const calzones = (MENU_ITEMS.calzones || []).filter(c => c.available !== false).map(c => ({ ...c, type: 'calzone', emoji: '🥟' }));
+        const bebidas = (MENU_ITEMS.bebidas || []).filter(b => b.available !== false).map(b => ({ ...b, type: 'bebida', emoji: '🥤' }));
+        const acais = (MENU_ITEMS.acais || []).filter(a => a.available !== false).map(a => ({ ...a, type: 'acai', emoji: '🍧', size: '500ml' }));
+        
+        const maxLen = Math.max(pizzas.length, lanches.length, calzones.length, bebidas.length, acais.length);
+        for (let i = 0; i < maxLen; i++) {
+            if (i < pizzas.length) list.push(pizzas[i]);
+            if (i < lanches.length) list.push(lanches[i]);
+            if (i < calzones.length) list.push(calzones[i]);
+            if (i < acais.length) list.push(acais[i]);
+            if (i < bebidas.length) list.push(bebidas[i]);
+        }
+    } else if (categoryFilter === 'mais-pedidos') {
+        const pizzas = (MENU_ITEMS.pizzas || []).filter(p => p.available !== false && (p.bestSeller || (p.badge && p.badge.toLowerCase().includes('pedido')))).map(p => ({ ...p, type: 'pizza', emoji: '🍕' }));
+        const lanches = (MENU_ITEMS.lanches || []).filter(l => l.available !== false && (l.bestSeller || (l.badge && l.badge.toLowerCase().includes('pedido')))).map(l => ({ ...l, type: 'lanche', emoji: '🍔' }));
+        const calzones = (MENU_ITEMS.calzones || []).filter(c => c.available !== false && (c.bestSeller || (c.badge && c.badge.toLowerCase().includes('pedido')))).map(c => ({ ...c, type: 'calzone', emoji: '🥟' }));
+        const acais = (MENU_ITEMS.acais || []).filter(a => a.available !== false && (a.bestSeller || (a.badge && a.badge.toLowerCase().includes('pedido')))).map(a => ({ ...a, type: 'acai', emoji: '🍧', size: '500ml' }));
+        list = [...pizzas, ...lanches, ...calzones, ...acais];
+        if (list.length === 0) {
+            const firstPizzas = (MENU_ITEMS.pizzas || []).slice(0, 3).map(p => ({ ...p, type: 'pizza', emoji: '🍕' }));
+            const firstLanches = (MENU_ITEMS.lanches || []).slice(0, 2).map(l => ({ ...l, type: 'lanche', emoji: '🍔' }));
+            list = [...firstPizzas, ...firstLanches];
+        }
+    } else if (categoryFilter === 'pizzas') {
+        list = (MENU_ITEMS.pizzas || []).filter(p => p.available !== false).map(p => ({ ...p, type: 'pizza', emoji: '🍕' }));
+    } else if (categoryFilter === 'lanches') {
+        list = (MENU_ITEMS.lanches || []).filter(l => l.available !== false).map(l => ({ ...l, type: 'lanche', emoji: '🍔' }));
+    } else if (categoryFilter === 'calzones') {
+        list = (MENU_ITEMS.calzones || []).filter(c => c.available !== false).map(c => ({ ...c, type: 'calzone', emoji: '🥟' }));
+    } else if (categoryFilter === 'bebidas') {
+        list = (MENU_ITEMS.bebidas || []).filter(b => b.available !== false).map(b => ({ ...b, type: 'bebida', emoji: '🥤' }));
+    } else if (categoryFilter === 'acai') {
+        list = (MENU_ITEMS.acais || []).filter(a => a.available !== false).map(a => ({ ...a, type: 'acai', emoji: '🍧', size: '500ml' }));
+    }
+    
+    list.forEach(product => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        
+        let priceText = "";
+        if (product.type === 'pizza') {
+            const pB = product.prices?.B || 0;
+            const pM = product.prices?.M || 0;
+            const pG = product.prices?.G || 0;
+            const pF = product.prices?.F || 0;
+            const nonZero = [pB, pM, pG, pF].filter(p => p > 0);
+            const priceMin = nonZero.length > 0 ? Math.min(...nonZero) : 0;
+            const priceMax = nonZero.length > 0 ? Math.max(...nonZero) : 0;
+            
+            const isEligiblePromo = CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && product.isPromo;
+            if (isEligiblePromo) {
+                const promoPrice = parseFloat(CONFIG_SETTINGS.promoPrice) || 95.00;
+                priceText = `R$ ${promoPrice.toFixed(0)} (Promo)`;
+            } else if (priceMin === priceMax) {
+                priceText = `R$ ${priceMin.toFixed(0)}`;
+            } else {
+                priceText = `R$ ${priceMin.toFixed(0)} a R$ ${priceMax.toFixed(0)}`;
+            }
+        } else {
+            priceText = `R$ ${product.price.toFixed(2).replace('.', ',')}`;
+        }
+        
+        const imagePath = product.image || 'assets/pizza_hero.png';
+        
+        card.innerHTML = `
+            <div class="product-image-wrapper">
+                <img class="product-img" src="${imagePath}" alt="${product.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                <div class="product-image-placeholder" style="display: none;">${product.emoji}</div>
             </div>
-        </div>
-    `;
-    
-    return card;
+            <div class="product-body">
+                <h4 class="product-title">${product.name}</h4>
+                <p class="product-desc">${product.description || ''}</p>
+                <div class="product-footer">
+                    <span class="product-price">${priceText}</span>
+                    <button class="add-to-cart-btn" onclick="handleAddToCartClick('${product.id}', '${product.type}', '${product.size || ''}')">+</button>
+                </div>
+            </div>
+        `;
+        recommendedGrid.appendChild(card);
+    });
 }
+
+function switchTab(tabId, tabElement) {
+    const navItems = document.querySelectorAll(".navbar-item");
+    navItems.forEach(item => item.classList.remove("active"));
+    
+    if (tabElement) {
+        tabElement.classList.add("active");
+    } else {
+        const targetNav = document.querySelector(`.navbar-item[onclick*="'${tabId}'"]`);
+        if (targetNav) targetNav.classList.add("active");
+    }
+    
+    if (tabId === 'home') {
+        const mainContent = document.getElementById("mainContent");
+        if (mainContent) mainContent.scrollTo({ top: 0, behavior: "smooth" });
+        filterCategory('todos');
+    } else if (tabId === 'menu') {
+        filterCategory('pizzas');
+        const categoriesScroll = document.getElementById("categoriesScroll");
+        if (categoriesScroll) categoriesScroll.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (tabId === 'cart') {
+        toggleCart(true);
+        setTimeout(() => {
+            const navHome = document.querySelector(`.navbar-item[onclick*="'home'"]`);
+            if (navHome) {
+                navItems.forEach(item => item.classList.remove("active"));
+                navHome.classList.add("active");
+            }
+        }, 300);
+    } else if (tabId === 'orders') {
+        if (CONFIG_SETTINGS && CONFIG_SETTINGS.whatsapp) {
+            window.open(`https://wa.me/${CONFIG_SETTINGS.whatsapp}`, '_blank');
+        } else {
+            window.open('https://wa.me/5554996704189', '_blank');
+        }
+        setTimeout(() => {
+            const navHome = document.querySelector(`.navbar-item[onclick*="'home'"]`);
+            if (navHome) {
+                navItems.forEach(item => item.classList.remove("active"));
+                navHome.classList.add("active");
+            }
+        }, 300);
+    }
+}
+
+function openAddressModal() {
+    const modal = document.getElementById("addressModal");
+    if (modal) {
+        modal.classList.add("active");
+    }
+}
+
+function closeAddressModal() {
+    const modal = document.getElementById("addressModal");
+    if (modal) {
+        modal.classList.remove("active");
+    }
+}
+
+function saveAddress() {
+    const input = document.getElementById("addressInput");
+    const display = document.getElementById("addressDisplay");
+    
+    if (input && display && input.value.trim() !== '') {
+        const val = input.value.trim();
+        display.innerText = val;
+        
+        const checkoutAddressInput = document.getElementById("addressStreet");
+        if (checkoutAddressInput) {
+            checkoutAddressInput.value = val;
+        }
+        
+        alert("Endereço de entrega atualizado!");
+        closeAddressModal();
+    }
+}
+
+function setupHeaderScrollEffect() {
+    const mainContent = document.getElementById("mainContent");
+    const header = document.getElementById("appHeader");
+    
+    if (mainContent && header) {
+        mainContent.addEventListener("scroll", () => {
+            if (mainContent.scrollTop > 10) {
+                header.classList.add("scrolled");
+            } else {
+                header.classList.remove("scrolled");
+            }
+        });
+    }
+}
+
+// Bind to window to allow HTML onclick access
+window.filterCategory = filterCategory;
+window.handleAddToCartClick = handleAddToCartClick;
+window.switchTab = switchTab;
+window.openAddressModal = openAddressModal;
+window.closeAddressModal = closeAddressModal;
+window.saveAddress = saveAddress;
 
 function setupPizzaCustomizerEvents() {
     const form = document.getElementById('pizzaCustomizerForm');
@@ -3211,10 +3517,12 @@ function addPizzaToOrder() {
     closePizzaCustomizer();
     toggleCart(true);
     
-    const badge = document.getElementById('cartCountBadge');
-    badge.classList.remove('animate-bounce');
-    void badge.offsetWidth;
-    badge.classList.add('animate-bounce');
+    const badge = document.getElementById('cartBadgeCount');
+    if (badge) {
+        badge.classList.remove('animate-bounce');
+        void badge.offsetWidth;
+        badge.classList.add('animate-bounce');
+    }
 }
 
 /* ==========================================================================
@@ -3226,6 +3534,8 @@ function addSimpleItemToCart(itemId, category) {
         list = MENU_ITEMS.bebidas;
     } else if (category === 'lanches') {
         list = MENU_ITEMS.lanches;
+    } else if (category === 'calzones') {
+        list = MENU_ITEMS.calzones || [];
     }
     const itemData = list.find(item => item.id === itemId);
     
@@ -3298,7 +3608,11 @@ function updateCartUI() {
     if (cart.length === 0) {
         emptyState.classList.remove('display-none');
         content.classList.add('display-none');
-        document.getElementById('cartCountBadge').innerText = '0';
+        const badgeCount = document.getElementById('cartBadgeCount');
+        if (badgeCount) {
+            badgeCount.innerText = '0';
+            badgeCount.style.display = 'none';
+        }
         return;
     }
     
@@ -3377,7 +3691,11 @@ function updateCartUI() {
     document.getElementById('cartSubtotal').innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
     document.getElementById('cartDeliveryFee').innerText = deliveryFee === 0 ? 'Grátis' : `R$ ${deliveryFee.toFixed(2).replace('.', ',')}`;
     document.getElementById('cartTotal').innerText = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
-    document.getElementById('cartCountBadge').innerText = totalItems;
+    const badgeCount = document.getElementById('cartBadgeCount');
+    if (badgeCount) {
+        badgeCount.innerText = totalItems;
+        badgeCount.style.display = totalItems > 0 ? 'flex' : 'none';
+    }
     
     // Desabilitar botão de checkout se a pizzaria estiver fechada
     const checkoutBtn = document.querySelector('.checkout-btn');
@@ -3690,7 +4008,7 @@ function submitOrder() {
             date: dateFormatted
         };
 
-        firebase.database().ref('fina_massa_orders/' + orderId).set(firebaseOrder)
+        db.collection('fina_massa_orders').doc(String(orderId)).set(firebaseOrder)
         .catch(err => {
             console.error("Erro ao enviar para o Firebase, enviando para o servidor local:", err);
             fetch('/api/orders', {
@@ -3721,15 +4039,12 @@ function submitOrder() {
     // Show success dialog
     alert('Pedido enviado com sucesso! Você será redirecionado para o WhatsApp para confirmar.');
 }
-/* ==========================================================================
-   Dynamic Menu Synchronization (Firebase)
-   ========================================================================== */
+
 function initMenuData() {
-    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-        const menuRef = firebase.database().ref('pizzaria_drill_menu');
-        menuRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        db.collection('pizzaria_drill_menu').doc('main').onSnapshot((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
                 let updated = false;
                 if (data.menu_items && data.menu_items.bebidas) {
                     const hasZero600 = data.menu_items.bebidas.some(b => b.id === 'coca_zero_600');
@@ -3757,10 +4072,10 @@ function initMenuData() {
                 }
                 
                 if (updated) {
-                    firebase.database().ref('pizzaria_drill_menu').set(data)
-                    .then(() => console.log("Cardápio atualizado com as opções de Coca Zero."))
+                    db.collection('pizzaria_drill_menu').doc('main').set(data)
+                    .then(() => console.log("Cardápio atualizado no Firestore com as opções de Coca Zero."))
                     .catch(err => console.error("Erro ao atualizar Coca Zero:", err));
-                    return; // The database update will trigger this on('value') again
+                    return;
                 }
 
                 if (data.menu_items) {
@@ -3782,11 +4097,34 @@ function initMenuData() {
                     updateContactInfoUI();
                 }
                 
-                // Rebuild dynamic parts
+                if (data.categories) {
+                    renderCategoriesUI(data.categories);
+                } else {
+                    const defaultCategories = [
+                        { id: 'todos', name: 'Todos', icon: '🍽️' },
+                        { id: 'mais-pedidos', name: 'Mais Pedidos', icon: '🔥' },
+                        { id: 'pizzas', name: 'Pizzas', icon: '🍕' },
+                        { id: 'lanches', name: 'Lanches', icon: '🍔' },
+                        { id: 'calzones', name: 'Calzones', icon: '🥟' },
+                        { id: 'bebidas', name: 'Bebidas', icon: '🥤' },
+                        { id: 'acai', name: 'Açaís', icon: '🍧' }
+                    ];
+                    renderCategoriesUI(defaultCategories);
+                }
+                
+                if (data.banners) {
+                    renderBannersUI(data.banners);
+                } else {
+                    const defaultBanners = [
+                        { tag: 'Promoção', title: 'Pizzas Promocionais G', subtitle: 'Selecione apenas sabores promocionais e pague preço único fixo!', gradient: 'linear-gradient(135deg, #b71c1c 0%, #1a0a0a 100%)' },
+                        { tag: 'Forno de Pedra', title: 'Massa Fina & Crocante', subtitle: 'Ingredientes frescos selecionados diariamente', gradient: 'linear-gradient(135deg, #ffd600 0%, #3e2723 100%)' }
+                    ];
+                    renderBannersUI(defaultBanners);
+                }
+                
                 PIZZA_TYPES = getPizzaTypesDynamic();
                 renderMenu();
                 
-                // If customizer is open, update it
                 if (document.getElementById('customizerModal').classList.contains('active')) {
                     renderCustomizerFlavors();
                     renderCustomizerBorders();
@@ -3797,23 +4135,65 @@ function initMenuData() {
             }
         }, (error) => {
             console.error("Erro ao carregar o cardápio do Firebase:", error);
-            // Fallback para dev server local / padrões
             PIZZA_TYPES = getPizzaTypesDynamic();
             renderMenu();
         });
     } else {
-        // Fallback for local dev server
         PIZZA_TYPES = getPizzaTypesDynamic();
         renderMenu();
     }
 }
 
+function renderCategoriesUI(categories) {
+    const scrollContainer = document.getElementById('categoriesScroll');
+    if (!scrollContainer) return;
+    
+    const activeCat = typeof currentCategory !== 'undefined' ? currentCategory : 'todos';
+    scrollContainer.innerHTML = '';
+    
+    categories.forEach(cat => {
+        const btn = document.createElement('button');
+        const isActive = cat.id === activeCat;
+        btn.className = `category-chip${isActive ? ' active' : ''}`;
+        btn.onclick = () => filterCategory(cat.id, btn);
+        
+        btn.innerHTML = `
+            <div class="category-icon-circle">${cat.icon || '🍽️'}</div>
+            <span class="category-name">${cat.name}</span>
+        `;
+        scrollContainer.appendChild(btn);
+    });
+}
+
+function renderBannersUI(banners) {
+    const bannerTrack = document.getElementById('bannerTrack');
+    if (!bannerTrack) return;
+    
+    bannerTrack.innerHTML = '';
+    
+    banners.forEach(banner => {
+        const slide = document.createElement('div');
+        slide.className = 'promo-banner';
+        slide.style.background = banner.gradient || 'linear-gradient(135deg, #b71c1c 0%, #1a0a0a 100%)';
+        
+        slide.innerHTML = `
+            <div class="banner-overlay"></div>
+            <div class="banner-content">
+                <span class="banner-tag" ${banner.tagBg ? `style="background-color: ${banner.tagBg}; color: #fff;"` : ''}>${banner.tag}</span>
+                <h2 class="banner-title">${banner.title}</h2>
+                <p class="banner-subtitle">${banner.subtitle}</p>
+            </div>
+        `;
+        bannerTrack.appendChild(slide);
+    });
+}
+
 function initShopStatusListener() {
-    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-        firebase.database().ref('pizzaria_drill_status/isOpen').on('value', (snapshot) => {
-            const isOpen = snapshot.val();
-            if (isOpen !== null) {
-                isShopOpen = isOpen;
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        db.collection('pizzaria_drill_status').doc('status').onSnapshot((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                isShopOpen = data.isOpen !== undefined ? data.isOpen : true;
                 updateShopStatusUI();
             }
         }, (error) => {
@@ -3822,7 +4202,6 @@ function initShopStatusListener() {
             updateShopStatusUI();
         });
     } else {
-        // Fallback for local dev server
         isShopOpen = true;
         updateShopStatusUI();
     }
@@ -3845,8 +4224,23 @@ function updateShopStatusUI() {
 }
 
 function seedFirebaseMenu() {
-    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-        firebase.database().ref('pizzaria_drill_menu').set({
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        const defaultCategories = [
+            { id: 'todos', name: 'Todos', icon: '🍽️' },
+            { id: 'mais-pedidos', name: 'Mais Pedidos', icon: '🔥' },
+            { id: 'pizzas', name: 'Pizzas', icon: '🍕' },
+            { id: 'lanches', name: 'Lanches', icon: '🍔' },
+            { id: 'calzones', name: 'Calzones', icon: '🥟' },
+            { id: 'bebidas', name: 'Bebidas', icon: '🥤' },
+            { id: 'acai', name: 'Açaís', icon: '🍧' }
+        ];
+        
+        const defaultBanners = [
+            { tag: 'Promoção', title: 'Pizzas Promocionais G', subtitle: 'Selecione apenas sabores promocionais e pague preço único fixo!', gradient: 'linear-gradient(135deg, #b71c1c 0%, #1a0a0a 100%)' },
+            { tag: 'Forno de Pedra', title: 'Massa Fina & Crocante', subtitle: 'Ingredientes frescos selecionados diariamente', gradient: 'linear-gradient(135deg, #ffd600 0%, #3e2723 100%)' }
+        ];
+
+        db.collection('pizzaria_drill_menu').doc('main').set({
             menu_items: MENU_ITEMS,
             pizza_prices: PIZZA_PRICES,
             borders: BORDAS
