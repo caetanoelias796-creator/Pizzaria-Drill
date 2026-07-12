@@ -1,10 +1,9 @@
 // Insira as configurações do seu aplicativo web do Firebase abaixo:
 const firebaseConfig = {
-    apiKey: "AIzaSyDgRJxyKxzDpQJid7Uy5fEn2N290zeD3A4",
-    authDomain: "mundo-da-pizza-fed27-2845d.firebaseapp.com",
-    databaseURL: "https://mundo-da-pizza-fed27-2845d-default-rtdb.firebaseio.com",
-    projectId: "mundo-da-pizza-fed27-2845d",
-    storageBucket: "mundo-da-pizza-fed27-2845d.firebasestorage.app",
-    messagingSenderId: "564226245256",
-    appId: "1:564226245256:web:fd1700f825bd78fa0c153d"
+  apiKey: "AIzaSyBGN-w4EgMlxkNOz7QSj3fy26FDeAxlbk0",
+  authDomain: "pizzaria-drill.firebaseapp.com",
+  projectId: "pizzaria-drill",
+  storageBucket: "pizzaria-drill.firebasestorage.app",
+  messagingSenderId: "763411855962",
+  appId: "1:763411855962:web:a5ca715e22f0690164f663"
 };

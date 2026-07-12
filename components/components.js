@@ -5,7 +5,7 @@ const UIComponents = {
         return `
             <div class="product-card">
                 <div class="product-image-wrapper">
-                    <img class="product-img" src="${imagePath}" alt="${product.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                    <img class="product-img" src="${imagePath}" alt="${product.name}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
                     <div class="product-image-placeholder" style="display: none;">${emoji}</div>
                 </div>
                 <div class="product-body">

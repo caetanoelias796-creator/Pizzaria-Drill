@@ -62,14 +62,14 @@ const ConfigService = {
 
     saveOrder(id, order) {
         if (window.db) {
-            return db.collection('fina_massa_orders').doc(String(id)).set(order);
+            return db.collection('pedidos').doc(String(id)).set(order);
         }
         return Promise.reject("Firestore não inicializado");
     },
 
     subscribeOrders(callback) {
         if (window.db) {
-            return db.collection('fina_massa_orders').onSnapshot((querySnapshot) => {
+            return db.collection('pedidos').onSnapshot((querySnapshot) => {
                 const list = [];
                 querySnapshot.forEach(doc => {
                     list.push({ ...doc.data(), firebaseKey: doc.id });
@@ -82,14 +82,14 @@ const ConfigService = {
 
     updateOrderStatus(orderId, status) {
         if (window.db) {
-            return db.collection('fina_massa_orders').doc(String(orderId)).update({ status });
+            return db.collection('pedidos').doc(String(orderId)).update({ status });
         }
         return Promise.reject("Firestore não inicializado");
     },
 
     getOrders() {
         if (window.db) {
-            return db.collection('fina_massa_orders').get().then(querySnapshot => {
+            return db.collection('pedidos').get().then(querySnapshot => {
                 const list = [];
                 querySnapshot.forEach(doc => list.push(doc.data()));
                 return list;
@@ -100,7 +100,7 @@ const ConfigService = {
 
     clearAllOrders() {
         if (window.db) {
-            return db.collection('fina_massa_orders').get()
+            return db.collection('pedidos').get()
             .then(snapshot => {
                 const batch = db.batch();
                 snapshot.docs.forEach(doc => {

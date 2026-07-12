@@ -18,7 +18,27 @@
 </head>
 <body>
 
-
+    <!-- Login Overlay para Firebase Authentication -->
+    <div id="loginOverlay" class="modal-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-main); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+        <div class="modal-container" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: 92%; max-width: 400px; padding: 30px; box-shadow: var(--shadow-lg); text-align: center;">
+            <div style="margin-bottom: 25px;">
+                <h2 style="color: var(--text-main); font-family: var(--font-display); font-size: 24px; margin-bottom: 8px;">Acesso Restrito</h2>
+                <p style="color: var(--text-light); font-size: 14px;">Identifique-se para gerenciar a Pizzaria Drill</p>
+            </div>
+            <form id="loginForm" style="display: flex; flex-direction: column; gap: 15px;">
+                <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                    <label for="loginEmail" style="font-size: 13px; font-weight: 500; color: var(--text-light);">E-mail</label>
+                    <input type="email" id="loginEmail" required placeholder="admin@pizzariadrill.com" style="padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); font-size: 14px;">
+                </div>
+                <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                    <label for="loginPassword" style="font-size: 13px; font-weight: 500; color: var(--text-light);">Senha</label>
+                    <input type="password" id="loginPassword" required placeholder="••••••••" style="padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); font-size: 14px;">
+                </div>
+                <button type="submit" class="btn-status-next" style="border: none; border-radius: var(--radius-sm); padding: 12px; cursor: pointer; font-weight: 600; width: 100%; margin-top: 10px; font-size: 14px;">Entrar no Painel</button>
+            </form>
+            <div id="loginErrorMessage" style="color: var(--primary); font-size: 13px; margin-top: 15px; font-weight: 500; display: none;"></div>
+        </div>
+    </div>
 
     <!-- Print Only Section (Thermal Ticket) -->
     <div id="printSection" class="print-only">
@@ -58,7 +78,10 @@
                     <span class="material-symbols-rounded">store</span>
                     <span>Ver Cardápio</span>
                 </a>
-
+                <a href="#" class="menu-item" style="color: var(--primary); margin-top: auto;" onclick="handleLogout(); return false;">
+                    <span class="material-symbols-rounded">logout</span>
+                    <span>Sair</span>
+                </a>
             </nav>
             
             <div class="sidebar-footer">
@@ -588,9 +611,13 @@
                 </div>
                 
                 <div class="form-group" id="flavorImageGroup" style="display: flex; flex-direction: column; gap: 6px;">
-                    <label id="flavorImageLabel" for="flavorImage" style="font-size: 13px; font-weight: 500; color: var(--text-light);">Ilustração</label>
+                    <label id="flavorImageLabel" for="flavorImage" style="font-size: 13px; font-weight: 500; color: var(--text-light);">Ilustração (URL)</label>
                     <input type="text" id="flavorImage" required placeholder="Cole a URL da imagem ou use as sugestões abaixo" style="padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); outline: none;">
                     <div id="imageSuggestions" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; line-height: 1.6;"></div>
+                    
+                    <label for="flavorImageUpload" style="font-size: 12px; font-weight: 500; color: var(--text-light); margin-top: 8px;">Ou envie um arquivo local (Firebase Storage):</label>
+                    <input type="file" id="flavorImageUpload" accept="image/*" style="padding: 6px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); font-size: 12px; cursor: pointer;">
+                    <div id="uploadProgress" style="display: none; font-size: 12px; color: var(--primary); margin-top: 4px; font-weight: 600;">Enviando... 0%</div>
                 </div>
                 
                 <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 15px;">
@@ -707,6 +734,8 @@
     <!-- Firebase SDK (Compat version) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
     <!-- Firebase Config -->
     <script src="firebase-config.js"></script>

@@ -3,7 +3,9 @@
    ========================================================================== */
 let db = null;
 if (typeof firebase !== 'undefined' && typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey !== 'SUA_API_KEY') {
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
     db = firebase.firestore();
 }
 
@@ -30,12 +32,106 @@ let currentMenuTab = 'flavors';
    ========================================================================== */
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
+    setupImageUploadListener();
 });
 
+function setupImageUploadListener() {
+    const uploadInput = document.getElementById('flavorImageUpload');
+    if (uploadInput) {
+        uploadInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (typeof firebase === 'undefined' || !firebase.storage) {
+                console.error("Firebase Storage não está carregado.");
+                alert("Erro: O SDK do Firebase Storage não foi carregado corretamente.");
+                return;
+            }
+            
+            const storageRef = firebase.storage().ref();
+            const fileRef = storageRef.child(`produtos/${Date.now()}_${file.name}`);
+            const uploadTask = fileRef.put(file);
+            
+            const progressDiv = document.getElementById('uploadProgress');
+            if (progressDiv) {
+                progressDiv.style.display = 'block';
+                progressDiv.innerText = "Enviando... 0%";
+            }
+            
+            uploadTask.on('state_changed', 
+                (snapshot) => {
+                    const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+                    if (progressDiv) progressDiv.innerText = `Enviando... ${progress}%`;
+                }, 
+                (error) => {
+                    console.error("Erro no upload:", error);
+                    alert("Erro ao fazer upload da imagem: " + error.message);
+                    if (progressDiv) progressDiv.style.display = 'none';
+                }, 
+                () => {
+                    uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                        const imgUrlInput = document.getElementById('flavorImage');
+                        if (imgUrlInput) imgUrlInput.value = downloadURL;
+                        if (progressDiv) {
+                            progressDiv.innerText = "Upload concluído com sucesso!";
+                            setTimeout(() => { progressDiv.style.display = 'none'; }, 3000);
+                        }
+                    });
+                }
+            );
+        });
+    }
+}
+
 function checkAuth() {
-    const overlay = document.getElementById('loginOverlay'); if (!overlay) { console.log('loginOverlay element is missing'); } if (!overlay) { console.log('loginOverlay element is missing'); } if (!overlay) { console.log('loginOverlay element is missing'); }
-    if (overlay) overlay.classList.add('display-none');
-    initializeDashboard();
+    const overlay = document.getElementById('loginOverlay');
+    
+    if (typeof firebase !== 'undefined' && firebase.auth) {
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                if (overlay) overlay.classList.add('display-none');
+                initializeDashboard();
+            } else {
+                if (overlay) overlay.classList.remove('display-none');
+            }
+        });
+        
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm && !loginForm.dataset.listenerAttached) {
+            loginForm.dataset.listenerAttached = 'true';
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value.trim();
+                const pass = document.getElementById('loginPassword').value;
+                const errDiv = document.getElementById('loginErrorMessage');
+                
+                if (errDiv) errDiv.style.display = 'none';
+                
+                firebase.auth().signInWithEmailAndPassword(email, pass)
+                .catch(err => {
+                    console.error("Erro no login:", err);
+                    if (errDiv) {
+                        errDiv.innerText = "E-mail ou senha incorretos ou permissão negada.";
+                        errDiv.style.display = 'block';
+                    }
+                });
+            });
+        }
+    } else {
+        console.warn("Firebase Auth não carregado. Ignorando autenticação.");
+        if (overlay) overlay.classList.add('display-none');
+        initializeDashboard();
+    }
+}
+
+function handleLogout() {
+    if (typeof firebase !== 'undefined' && firebase.auth) {
+        firebase.auth().signOut().then(() => {
+            window.location.reload();
+        });
+    } else {
+        window.location.reload();
+    }
 }
 
 function initializeDashboard() {
@@ -2469,6 +2565,9 @@ function adjustModalFields(type, isEdit) {
         badgeGroup.style.display = 'none';
         imgLabel.innerText = 'Ilustração';
     }
+    
+    // Popular sugestões rápidas de imagens baseadas no tipo de item
+    populateImageSuggestions(type);
 }
 
 function deleteFlavor(id) {

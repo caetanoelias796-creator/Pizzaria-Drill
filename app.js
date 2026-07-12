@@ -11,7 +11,9 @@ let MENU_ITEMS = {
 let BORDAS = {};
 let db = null;
 if (typeof firebase !== 'undefined' && typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey !== 'SUA_API_KEY') {
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
     db = firebase.firestore();
 }
 
@@ -358,8 +360,7 @@ function addAcaiToOrder() {
         totalPrice: currentAcai.totalPrice
     };
     
-    cart.push(cartItem);
-    saveCartToLocalStorage();
+    cart = CartService.addToCart(cartItem);
     updateCartUI();
     closeAcaiCustomizer();
     toggleCart(true);
@@ -1390,8 +1391,7 @@ function addPizzaToOrder() {
         totalPrice: currentPizza.totalPrice
     };
     
-    cart.push(cartItem);
-    saveCartToLocalStorage();
+    cart = CartService.addToCart(cartItem);
     updateCartUI();
     closePizzaCustomizer();
     toggleCart(true);
@@ -1420,25 +1420,17 @@ function addSimpleItemToCart(itemId, category) {
     
     if (!itemData) return;
     
-    // Check if item already exists in cart to increment qty
-    const existingIndex = cart.findIndex(cItem => cItem.type === 'simple' && cItem.id === itemId);
+    const cartItem = {
+        type: 'simple',
+        id: itemId,
+        name: itemData.name,
+        category: category,
+        quantity: 1,
+        singlePrice: itemData.price,
+        totalPrice: itemData.price
+    };
     
-    if (existingIndex > -1) {
-        cart[existingIndex].quantity += 1;
-        cart[existingIndex].totalPrice = cart[existingIndex].quantity * cart[existingIndex].singlePrice;
-    } else {
-        cart.push({
-            type: 'simple',
-            id: itemId,
-            name: itemData.name,
-            category: category,
-            quantity: 1,
-            singlePrice: itemData.price,
-            totalPrice: itemData.price
-        });
-    }
-    
-    saveCartToLocalStorage();
+    cart = CartService.addToCart(cartItem);
     updateCartUI();
     toggleCart(true);
 }
