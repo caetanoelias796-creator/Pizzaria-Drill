@@ -43,10 +43,6 @@ body {
     background: radial-gradient(circle at center, #181818 0%, #050505 100%);
     color: var(--text-main);
     font-family: var(--font-main);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
     overflow-x: hidden;
 }
 
@@ -57,25 +53,35 @@ body {
     width: 100%;
     max-width: 430px; /* Largura padrão de smartphone */
     height: 100vh;
+    height: 100dvh; /* Altura dinâmica para navegadores móveis */
     min-height: 100vh;
+    min-height: 100dvh;
     background-color: var(--bg-main);
     position: relative;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden; /* Evita rolagem da casca externa no mobile */
     scrollbar-width: none; /* Hide scrollbar for Firefox */
     box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
 }
 
 /* Desktop Mockup Border */
-@media (min-width: 480px) {
+@media (min-width: 768px) {
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: radial-gradient(circle at center, #101010 0%, #020202 100%);
+    }
+
     .app-container {
-        height: 850px;
-        min-height: 850px;
+        height: calc(100vh - 40px);
+        max-height: 850px;
+        min-height: 600px;
         border-radius: 40px;
         border: 12px solid #222222;
-        margin: 20px 0;
+        margin: 20px auto; /* Centraliza horizontalmente no computador */
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9), 0 0 50px rgba(229, 57, 53, 0.15);
     }
 }
@@ -837,7 +843,7 @@ body > .floating-cart-btn {
 }
 
 /* Ensure the cart drawer matches the border radius of the app container on desktop */
-@media (min-width: 480px) {
+@media (min-width: 768px) {
     .app-container .cart-drawer-overlay,
     .app-container .cart-drawer,
     .app-container .modal-overlay {
