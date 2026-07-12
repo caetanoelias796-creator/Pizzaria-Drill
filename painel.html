@@ -91,6 +91,14 @@
 
         <!-- Main Body Content -->
         <main class="main-content">
+            <!-- Mobile Header Topbar -->
+            <div class="mobile-topbar no-print">
+                <button class="menu-toggle-btn" onclick="toggleSidebar()" type="button">
+                    <span class="material-symbols-rounded">menu</span>
+                </button>
+                <div class="mobile-brand-title">Pizzaria Drill</div>
+            </div>
+
             <!-- SECTION 1: ORDERS DASHBOARD -->
             <div id="section-orders">
                 <!-- Header -->
@@ -750,5 +758,31 @@
 
     <!-- Core Painel Logic -->
     <script src="painel.js"></script>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar Toggle Script -->
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            }
+        }
+        // Close sidebar when clicking on a menu item on mobile
+        document.querySelectorAll('.sidebar .menu-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const sidebar = document.querySelector('.sidebar');
+                const overlay = document.querySelector('.sidebar-overlay');
+                if (window.innerWidth < 992 && sidebar && overlay) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
