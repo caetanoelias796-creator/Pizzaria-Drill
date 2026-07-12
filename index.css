@@ -2510,3 +2510,318 @@ a {
 }
 
 
+
+
+/* ==========================================================================
+   ADDED FROM CATALOG.CSS FOR MOBILE APP SHELL LAYOUT
+   ========================================================================== */
+/* ==========================================================================
+   App Shell Mobile Wrapper (Mockup para Desktop)
+   ========================================================================== */
+.app-container {
+    width: 100%;
+    max-width: 430px; /* Largura padrão de smartphone */
+    height: 100vh;
+    min-height: 100vh;
+    background-color: var(--bg-main);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+}
+
+/* Desktop Mockup Border */
+@media (min-width: 480px) {
+    .app-container {
+        height: 850px;
+        min-height: 850px;
+        border-radius: 40px;
+        border: 12px solid #222222;
+        margin: 20px 0;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9), 0 0 50px rgba(229, 57, 53, 0.15);
+    }
+}
+
+.app-container::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome/Safari/Edge */
+}
+
+/* Main Content Area */
+.main-content {
+    flex: 1;
+    padding-top: 72px; /* Espaço para o Header Fixo */
+    padding-bottom: 90px; /* Espaço para a Nav Bar Fixa */
+    overflow-y: auto;
+}
+
+.main-content::-webkit-scrollbar {
+    display: none;
+}
+
+/* ==========================================================================
+   Header Component (Fixo no Topo)
+   ========================================================================== */
+.app-header {
+    position: absolute; /* Relativo ao app-container */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 72px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: rgba(17, 17, 17, 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: var(--transition);
+}
+
+.app-header.scrolled {
+    background-color: rgba(17, 17, 17, 0.95);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-logo {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.header-logo span {
+    color: var(--primary);
+}
+
+/* Address Pill Button */
+.address-pill {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 50px;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+    max-width: 180px;
+}
+
+.address-pill:hover {
+    background-color: var(--bg-surface-hover);
+    border-color: var(--primary);
+}
+
+.address-icon {
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+}
+
+.address-text {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.address-label {
+    font-size: 8px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.address-value {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-time-badge {
+    background-color: var(--primary-glow);
+    border: 1px solid rgba(229, 57, 53, 0.3);
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 10px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.header-icon-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.header-icon-btn:hover {
+    color: var(--primary);
+}
+
+/* ==========================================================================
+   Navigation Bar Component (Fixo no Rodapé)
+   ========================================================================== */
+.app-navbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 76px;
+    z-index: 100;
+    background-color: rgba(26, 26, 26, 0.9);
+    border-top: 1px solid var(--border-color);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 10px;
+}
+
+.navbar-item {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    flex: 1;
+    height: 100%;
+    position: relative;
+    transition: var(--transition);
+    text-decoration: none;
+}
+
+.navbar-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar-item svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+    transition: var(--transition);
+}
+
+.navbar-item span {
+    font-size: 10px;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+/* Active item indicator */
+.navbar-item::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 15%;
+    width: 70%;
+    height: 2px;
+    background-color: var(--primary);
+    transform: scaleX(0);
+    transition: var(--transition);
+}
+
+.navbar-item.active {
+    color: var(--primary);
+}
+
+.navbar-item.active::before {
+    transform: scaleX(1);
+}
+
+.navbar-item.active svg {
+    filter: drop-shadow(0 0 4px var(--primary));
+}
+
+/* Cart badge indicator */
+.nav-cart-badge {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background-color: var(--primary);
+    color: var(--text-main);
+    font-size: 9px;
+    font-weight: 800;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 1.5px solid var(--bg-surface);
+    box-shadow: var(--shadow-active);
+    animation: popIn 0.3s ease-out;
+
+/* Hide the old floating cart button when catalog style is active */
+.app-container ~ .floating-cart-btn,
+body > .floating-cart-btn {
+    display: none !important;
+}
+
+/* Ensure the cart drawer matches the border radius of the app container on desktop */
+@media (min-width: 480px) {
+    .app-container .cart-drawer-overlay,
+    .app-container .cart-drawer,
+    .app-container .modal-overlay {
+        position: absolute !important;
+    }
+
+    .app-container .cart-drawer-overlay,
+    .app-container .modal-overlay {
+        width: 100% !important;
+        height: 100% !important;
+        top: 0 !important;
+        left: 0 !important;
+    }
+
+    .app-container .cart-drawer {
+        border-top-right-radius: 28px;
+        border-bottom-right-radius: 28px;
+        height: 100% !important;
+        max-height: 100% !important;
+    }
+    
+    .app-container .modal-overlay {
+        border-radius: 28px;
+    }
+}
+

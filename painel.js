@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function checkAuth() {
-    const overlay = document.getElementById('loginOverlay');
+    const overlay = document.getElementById('loginOverlay'); if (!overlay) { console.log('loginOverlay element is missing'); } if (!overlay) { console.log('loginOverlay element is missing'); } if (!overlay) { console.log('loginOverlay element is missing'); }
     if (overlay) overlay.classList.add('display-none');
     initializeDashboard();
 }
@@ -66,14 +66,7 @@ function setupFirebaseRealtime() {
         }
         return;
     }
-    db.collection('fina_massa_orders').onSnapshot((querySnapshot) => {
-        let ordersArray = [];
-        querySnapshot.forEach((doc) => {
-            ordersArray.push({
-                ...doc.data(),
-                firebaseKey: doc.id
-            });
-        });
+    ConfigService.subscribeOrders((ordersArray) => {
         
         // Sort newest first
         ordersArray.sort((a, b) => b.timestamp - a.timestamp);
@@ -107,30 +100,6 @@ function setupFirebaseRealtime() {
         if (serverStatus) {
             serverStatus.className = 'server-status active';
             serverStatus.innerHTML = '<span class="dot" style="background-color: #81c784;"></span> Firebase Cloud';
-        }
-    }, (error) => {
-        console.error("Firebase read error:", error);
-        
-        // Altera o status do servidor na interface para alertar sobre a permissão
-        const statusContainer = document.querySelector('.server-status');
-        if (statusContainer) {
-            statusContainer.className = 'server-status error';
-            statusContainer.style.background = 'rgba(244, 67, 54, 0.1)';
-            statusContainer.style.border = '1px solid rgba(244, 67, 54, 0.2)';
-            statusContainer.innerHTML = '<span class="dot" style="background-color: #f44336;"></span> Firebase Bloqueado';
-            statusContainer.title = "O Firebase retornou erro de permissão. Verifique as regras do Cloud Firestore.";
-        }
-
-        // Fallback automático para a API de pedidos local
-        if (!isUsingFallback) {
-            isUsingFallback = true;
-            console.warn("Iniciando fallback para API de pedidos local...");
-            fetchOrders(true); // Primeira carga silenciosa
-            
-            // Polling local de 5 em 5 segundos
-            setInterval(() => {
-                fetchOrders(false);
-            }, 5000);
         }
     });
 }
@@ -457,7 +426,7 @@ function updateOrderStatus(id, newStatus) {
         const order = orders.find(o => o.id === id);
         const refKey = (order && order.firebaseKey) ? order.firebaseKey : id;
         
-        db.collection('fina_massa_orders').doc(String(refKey)).update({ status: newStatus })
+        ConfigService.updateOrderStatus(refKey, newStatus)
         .catch(err => {
             alert("Erro ao atualizar status no Firebase.");
             console.error(err);
@@ -917,7 +886,7 @@ function switchSection(section) {
 function setMenuTab(tab) {
     currentMenuTab = tab;
     
-    const tabs = ['Flavors', 'Calzones', 'Bebidas', 'Lanches', 'Prices'];
+    const tabs = ['Flavors', 'Calzones', 'Bebidas', 'Lanches', 'Prices', 'Categorias', 'Banners', 'Promocoes'];
     tabs.forEach(t => {
         const tabEl = document.getElementById('tab' + t);
         const contentEl = document.getElementById('menuTab' + t);
@@ -946,12 +915,25 @@ function setMenuTab(tab) {
             btnAdd.style.display = 'inline-flex';
             if (tab === 'flavors') {
                 btnText.innerText = 'Adicionar Sabor';
+                btnAdd.onclick = () => openAddMenuProductModal('pizza');
             } else if (tab === 'calzones') {
                 btnText.innerText = 'Adicionar Calzone';
+                btnAdd.onclick = () => openAddMenuProductModal('calzone');
             } else if (tab === 'bebidas') {
                 btnText.innerText = 'Adicionar Bebida';
+                btnAdd.onclick = () => openAddMenuProductModal('bebida');
             } else if (tab === 'lanches') {
                 btnText.innerText = 'Adicionar Lanche';
+                btnAdd.onclick = () => openAddMenuProductModal('lanche');
+            } else if (tab === 'categorias') {
+                btnText.innerText = 'Adicionar Categoria';
+                btnAdd.onclick = () => openCategoryModal();
+            } else if (tab === 'banners') {
+                btnText.innerText = 'Adicionar Banner';
+                btnAdd.onclick = () => openBannerModal();
+            } else if (tab === 'promocoes') {
+                btnText.innerText = 'Adicionar Combo/Promo';
+                btnAdd.onclick = () => openPromotionModal();
             }
         }
     }
@@ -963,58 +945,90 @@ function initMenuSync() {
     renderMenuManager();
 
     if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
-        db.collection('pizzaria_drill_menu').doc('main').onSnapshot((doc) => {
-            if (doc.exists) {
-                const data = doc.data();
-                if (data.settings) {
-                    CONFIG_SETTINGS = { ...CONFIG_SETTINGS, ...data.settings };
-                    tempSettings = JSON.parse(JSON.stringify(data.settings));
-                }
-                let updated = false;
-                if (data.menu_items && data.menu_items.bebidas) {
-                    const hasZero600 = data.menu_items.bebidas.some(b => b.id === 'coca_zero_600');
-                    if (!hasZero600) {
-                        const idx = data.menu_items.bebidas.findIndex(b => b.id === 'coca_600');
-                        const newItem = { id: 'coca_zero_600', name: 'Coca Cola Zero 600ml', price: 10.00, image: 'assets/coca_cola.png', available: true };
-                        if (idx !== -1) {
-                            data.menu_items.bebidas.splice(idx + 1, 0, newItem);
-                        } else {
-                            data.menu_items.bebidas.push(newItem);
-                        }
-                        updated = true;
-                    }
-                    const hasZeroLata = data.menu_items.bebidas.some(b => b.id === 'coca_zero_lata');
-                    if (!hasZeroLata) {
-                        const idx = data.menu_items.bebidas.findIndex(b => b.id === 'coca_lata');
-                        const newItem = { id: 'coca_zero_lata', name: 'Coca Cola Zero lata', price: 6.00, image: 'assets/coca_cola.png', available: true };
-                        if (idx !== -1) {
-                            data.menu_items.bebidas.splice(idx + 1, 0, newItem);
-                        } else {
-                            data.menu_items.bebidas.push(newItem);
-                        }
-                        updated = true;
-                    }
-                }
-                
-                if (updated) {
-                    db.collection('pizzaria_drill_menu').doc('main').set(data)
-                    .then(() => console.log("Cardápio do Firebase atualizado com as opções de Coca Zero no painel."))
-                    .catch(err => console.error("Erro ao atualizar Coca Zero no painel:", err));
-                    return;
-                }
+        let configSettingsLoaded = false;
+        let deliveryFeesLoaded = false;
+        let productsLoaded = false;
+        let categoriesLoaded = false;
+        let bannersLoaded = false;
+        let promotionsLoaded = false;
 
-                menuData = data;
+        const tryRender = () => {
+            if (configSettingsLoaded && deliveryFeesLoaded && productsLoaded && categoriesLoaded && bannersLoaded && promotionsLoaded) {
                 renderMenuManager();
-            } else {
-                console.log("Banco de dados do cardápio vazio. Semeando valores padrão do painel...");
-                db.collection('pizzaria_drill_menu').doc('main').set(DEFAULT_MENU_DATA)
-                .then(() => console.log("Cardápio semeado com sucesso a partir do painel."))
-                .catch(err => console.error("Erro ao semear cardápio a partir do painel:", err));
             }
-        }, (error) => {
-            console.error("Erro ao sincronizar cardápio do Firebase:", error);
-            menuData = DEFAULT_MENU_DATA;
-            renderMenuManager();
+        };
+
+        // Listen to config/settings
+        ConfigService.subscribeSettings((data) => {
+            if (data) {
+                CONFIG_SETTINGS = { ...CONFIG_SETTINGS, ...data };
+                if (!menuData) menuData = {};
+                if (!menuData.settings) menuData.settings = {};
+                Object.assign(menuData.settings, data);
+                tempSettings = JSON.parse(JSON.stringify(menuData.settings));
+            }
+            configSettingsLoaded = true;
+            tryRender();
+        });
+
+        // Listen to config/delivery_fees
+        ConfigService.subscribeDeliveryFees((data) => {
+            if (data) {
+                if (!menuData) menuData = {};
+                if (!menuData.settings) menuData.settings = {};
+                menuData.settings.deliveryFees = data;
+                if (tempSettings) tempSettings.deliveryFees = data;
+            }
+            deliveryFeesLoaded = true;
+            tryRender();
+        });
+
+        // Listen to categorias
+        ProductsService.subscribeCategories((list) => {
+            if (!menuData) menuData = {};
+            menuData.categories = list;
+            categoriesLoaded = true;
+            tryRender();
+        });
+
+        // Listen to banners
+        ProductsService.subscribeBanners((list) => {
+            if (!menuData) menuData = {};
+            menuData.banners = list;
+            bannersLoaded = true;
+            tryRender();
+        });
+
+        // Listen to promocoes (for promotion combos list)
+        ProductsService.subscribePromotions((list) => {
+            if (!menuData) menuData = {};
+            menuData.promotions = list;
+            promotionsLoaded = true;
+            tryRender();
+        });
+
+        // Listen to produtos (all items)
+        ProductsService.subscribeProducts((list) => {
+            if (!menuData) menuData = {};
+            menuData.menu_items = { pizzas: [], lanches: [], calzones: [], bebidas: [] };
+            menuData.borders = {};
+
+            list.forEach((item) => {
+                if (item.category === 'pizzas') {
+                    menuData.menu_items.pizzas.push(item);
+                } else if (item.category === 'lanches') {
+                    menuData.menu_items.lanches.push(item);
+                } else if (item.category === 'calzones') {
+                    menuData.menu_items.calzones.push(item);
+                } else if (item.category === 'bebidas') {
+                    menuData.menu_items.bebidas.push(item);
+                } else if (item.category === 'bordas') {
+                    const key = item.id.replace('borda_', '');
+                    menuData.borders[key] = { name: item.name, price: item.price, category: item.subcategory || 'ambas' };
+                }
+            });
+            productsLoaded = true;
+            tryRender();
         });
     } else {
         menuData = DEFAULT_MENU_DATA;
@@ -1048,6 +1062,9 @@ function renderMenuManager() {
     renderLanchesList();
     renderPricesMatrix();
     renderBordersTable();
+    renderCategoriasList();
+    renderBannersList();
+    renderPromocoesList();
 }
 
 function renderFlavorsList() {
@@ -1300,9 +1317,8 @@ function saveNewBorder(event) {
 }
 
 function saveMenuPrices() {
-    if (!menuData) return;
     
-    const priceInputs = document.querySelectorAll('.price-input');
+    const priceInputs = document.querySelectorAll('.price-category-input');
     const borderPriceInputs = document.querySelectorAll('.border-price-input');
     
     const updatedPrices = JSON.parse(JSON.stringify(menuData.pizza_prices || {}));
@@ -1325,12 +1341,23 @@ function saveMenuPrices() {
     });
     
     if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
-        db.collection('pizzaria_drill_menu').doc('main').update({
-            pizza_prices: updatedPrices,
-            borders: updatedBorders
-        })
+        const promises = [];
+        Object.keys(updatedBorders).forEach(key => {
+            const border = updatedBorders[key];
+            const borderPromise = ProductsService.saveProduct(`borda_${key}`, {
+                id: `borda_${key}`,
+                name: border.name,
+                price: border.price,
+                category: 'bordas',
+                subcategory: border.category || 'ambas',
+                available: true
+            });
+            promises.push(borderPromise);
+        });
+        
+        Promise.all(promises)
         .then(() => {
-            alert("Preços e bordas atualizados com sucesso no Firebase!");
+            alert("Bordas atualizadas com sucesso no Firebase!");
         })
         .catch(err => {
             console.error(err);
@@ -1344,432 +1371,13 @@ function saveMenuPrices() {
 }
 
 function toggleFlavorAvailability(id, isChecked) {
-    if (!menuData) return;
-    
-    const pizzas = menuData.menu_items?.pizzas || [];
-    const index = pizzas.findIndex(p => p.id === id);
-    if (index === -1) return;
-    
-    pizzas[index].available = isChecked;
-    
     if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
-        db.collection('pizzaria_drill_menu').doc('main').update({
-            'menu_items.pizzas': pizzas
-        })
+        ProductsService.updateProductAvailability(id, isChecked)
         .then(() => {
-            console.log(`Disponibilidade de ${pizzas[index].name} alterada para: ${isChecked}`);
+            console.log(`Disponibilidade alterada para: ${isChecked}`);
         })
         .catch(err => console.error("Erro ao alterar disponibilidade no Firebase:", err));
-    } else {
-        renderFlavorsList();
     }
-}
-
-function openAddFlavorModal() {
-    document.getElementById('flavorModalTitle').innerText = 'Adicionar Novo Sabor';
-    document.getElementById('flavorEditId').value = '';
-    document.getElementById('flavorForm').reset();
-    
-    openModal('flavorModal');
-}
-
-function openEditFlavorModal(id) {
-    openEditMenuItemModal('pizza', id);
-}
-
-function closeFlavorModal() {
-    closeModal('flavorModal');
-}
-
-function openModal(modalId) {
-    const overlay = document.getElementById(modalId);
-    overlay.classList.remove('display-none');
-    setTimeout(() => {
-        overlay.classList.add('active');
-        overlay.style.pointerEvents = 'auto';
-        overlay.style.opacity = '1';
-    }, 10);
-}
-
-function closeModal(modalId) {
-    const overlay = document.getElementById(modalId);
-    overlay.classList.remove('active');
-    overlay.style.pointerEvents = 'none';
-    overlay.style.opacity = '0';
-    setTimeout(() => {
-        overlay.classList.add('display-none');
-    }, 300);
-}
-
-function deleteFlavor(id) {
-    deleteMenuItem('pizza', id);
-}
-
-function saveFlavor(event) {
-    saveMenuItem(event);
-}
-
-function renderCalzonesList() {
-    const grid = document.getElementById('calzonesListGrid');
-    if (!grid) return;
-    
-    grid.innerHTML = '';
-    const searchVal = document.getElementById('searchCalzone')?.value.toLowerCase().trim() || '';
-    const calzones = menuData.menu_items?.calzones || [];
-    
-    calzones.forEach((calzone) => {
-        if (searchVal && !calzone.name.toLowerCase().includes(searchVal) && !calzone.description.toLowerCase().includes(searchVal)) {
-            return;
-        }
-        
-        const card = document.createElement('div');
-        card.className = 'flavor-card';
-        if (calzone.available === false) {
-            card.style.opacity = '0.6';
-        }
-        
-        const isChecked = calzone.available !== false ? 'checked' : '';
-        
-        card.innerHTML = `
-            <div class="flavor-card-header">
-                <div class="flavor-card-info">
-                    <h4 style="margin: 0; color: var(--text-main); font-size: 15px;">${calzone.name}</h4>
-                    <span class="category-tag salgada">Calzone</span>
-                </div>
-                
-                <label class="switch" title="${calzone.available !== false ? 'Disponível no Site' : 'Pausado/Indisponível'}">
-                    <input type="checkbox" ${isChecked} onchange="toggleItemAvailability('calzones', '${calzone.id}', this.checked)">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            
-            <p class="flavor-card-desc" style="margin: 0; flex: 1;">${calzone.description}</p>
-            
-            <div class="flavor-card-meta">
-                <span class="flavor-price-tier" style="font-weight: 600; color: var(--primary); font-size: 14px;">
-                    R$ ${calzone.price.toFixed(2).replace('.', ',')}
-                </span>
-            </div>
-            
-            <div class="flavor-card-actions">
-                <button class="btn-icon-action" onclick="openEditMenuItemModal('calzone', '${calzone.id}')" title="Editar Calzone">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">edit</span>
-                </button>
-                <button class="btn-icon-action delete" onclick="deleteMenuItem('calzone', '${calzone.id}')" title="Excluir Calzone">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">delete</span>
-                </button>
-            </div>
-        `;
-        
-        grid.appendChild(card);
-    });
-}
-
-function renderBebidasList() {
-    const grid = document.getElementById('bebidasListGrid');
-    if (!grid) return;
-    
-    grid.innerHTML = '';
-    const searchVal = document.getElementById('searchBebida')?.value.toLowerCase().trim() || '';
-    const bebidas = menuData.menu_items?.bebidas || [];
-    
-    bebidas.forEach((bebida) => {
-        if (searchVal && !bebida.name.toLowerCase().includes(searchVal)) {
-            return;
-        }
-        
-        const card = document.createElement('div');
-        card.className = 'flavor-card';
-        if (bebida.available === false) {
-            card.style.opacity = '0.6';
-        }
-        
-        const isChecked = bebida.available !== false ? 'checked' : '';
-        
-        card.innerHTML = `
-            <div class="flavor-card-header">
-                <div class="flavor-card-info">
-                    <h4 style="margin: 0; color: var(--text-main); font-size: 15px;">${bebida.name}</h4>
-                    <span class="category-tag doce">Bebida</span>
-                </div>
-                
-                <label class="switch" title="${bebida.available !== false ? 'Disponível no Site' : 'Pausado/Indisponível'}">
-                    <input type="checkbox" ${isChecked} onchange="toggleItemAvailability('bebidas', '${bebida.id}', this.checked)">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            
-            <p class="flavor-card-desc" style="margin: 0; flex: 1; color: var(--text-muted); font-style: italic;">Sem descrição</p>
-            
-            <div class="flavor-card-meta">
-                <span class="flavor-price-tier" style="font-weight: 600; color: var(--primary); font-size: 14px;">
-                    R$ ${bebida.price.toFixed(2).replace('.', ',')}
-                </span>
-            </div>
-            
-            <div class="flavor-card-actions">
-                <button class="btn-icon-action" onclick="openEditMenuItemModal('bebida', '${bebida.id}')" title="Editar Bebida">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">edit</span>
-                </button>
-                <button class="btn-icon-action delete" onclick="deleteMenuItem('bebida', '${bebida.id}')" title="Excluir Bebida">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">delete</span>
-                </button>
-            </div>
-        `;
-        
-        grid.appendChild(card);
-    });
-}
-
-function renderLanchesList() {
-    const grid = document.getElementById('lanchesListGrid');
-    if (!grid) return;
-    
-    grid.innerHTML = '';
-    const searchVal = document.getElementById('searchLanche')?.value.toLowerCase().trim() || '';
-    const filterCat = document.getElementById('filterLancheCategory')?.value || 'todos';
-    
-    const lanches = menuData.menu_items?.lanches || [];
-    
-    lanches.forEach((lanche) => {
-        if (searchVal && !lanche.name.toLowerCase().includes(searchVal) && !lanche.description.toLowerCase().includes(searchVal)) {
-            return;
-        }
-        
-        if (filterCat !== 'todos' && lanche.category !== filterCat) {
-            return;
-        }
-        
-        const card = document.createElement('div');
-        card.className = 'flavor-card';
-        if (lanche.available === false) {
-            card.style.opacity = '0.6';
-        }
-        
-        const isChecked = lanche.available !== false ? 'checked' : '';
-        const catNames = { 'xis': 'Xis', 'hamburgueres': 'Hambúrguer', 'barcas': 'Barca', 'porcoes': 'Porção/Fritas', 'adicionais': 'Adicional' };
-        const catLabel = catNames[lanche.category] || lanche.category;
-        
-        card.innerHTML = `
-            <div class="flavor-card-header">
-                <div class="flavor-card-info">
-                    <h4 style="margin: 0; color: var(--text-main); font-size: 15px;">${lanche.name}</h4>
-                    <span class="category-tag salgada">${catLabel}</span>
-                </div>
-                
-                <label class="switch" title="${lanche.available !== false ? 'Disponível no Site' : 'Pausado/Indisponível'}">
-                    <input type="checkbox" ${isChecked} onchange="toggleItemAvailability('lanches', '${lanche.id}', this.checked)">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            
-            <p class="flavor-card-desc" style="margin: 0; flex: 1;">${lanche.description}</p>
-            
-            <div class="flavor-card-meta">
-                <span class="flavor-price-tier" style="font-weight: 600; color: var(--primary); font-size: 14px;">
-                    R$ ${lanche.price.toFixed(2).replace('.', ',')}
-                </span>
-            </div>
-            
-            <div class="flavor-card-actions">
-                <button class="btn-icon-action" onclick="openEditMenuItemModal('lanche', '${lanche.id}')" title="Editar Lanche">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">edit</span>
-                </button>
-                <button class="btn-icon-action delete" onclick="deleteMenuItem('lanche', '${lanche.id}')" title="Excluir Lanche">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">delete</span>
-                </button>
-            </div>
-        `;
-        
-        grid.appendChild(card);
-    });
-}
-
-function openAddMenuProductModal() {
-    let type = 'pizza';
-    if (currentMenuTab === 'calzones') type = 'calzone';
-    if (currentMenuTab === 'bebidas') type = 'bebida';
-    if (currentMenuTab === 'lanches') type = 'lanche';
-    openAddMenuItemModal(type);
-}
-
-function openAddMenuItemModal(type) {
-    document.getElementById('menuItemType').value = type;
-    document.getElementById('flavorEditId').value = '';
-    document.getElementById('flavorForm').reset();
-    
-    // Reset checkbox promocional
-    const promoCheck = document.getElementById('flavorIsPromo');
-    if (promoCheck) promoCheck.checked = false;
-    
-    adjustModalFields(type, false);
-    
-    const imgInput = document.getElementById('flavorImage');
-    if (imgInput) {
-        if (type === 'bebida') {
-            imgInput.value = 'assets/agua.png';
-        } else if (type === 'lanche') {
-            imgInput.value = 'assets/lanche_hamburguer.png';
-        } else {
-            imgInput.value = 'assets/pizza_hero.png';
-        }
-    }
-    
-    openModal('flavorModal');
-}
-
-function openEditMenuItemModal(type, id) {
-    if (!menuData) return;
-    
-    document.getElementById('menuItemType').value = type;
-    document.getElementById('flavorEditId').value = id;
-    
-    const dbType = type === 'pizza' ? 'pizzas' : (type === 'calzone' ? 'calzones' : (type === 'bebida' ? 'bebidas' : 'lanches'));
-    const items = menuData.menu_items?.[dbType] || [];
-    const item = items.find(i => i.id === id);
-    if (!item) return;
-    
-    document.getElementById('flavorName').value = item.name;
-    
-    if (type === 'pizza') {
-        document.getElementById('flavorDescription').value = item.description || '';
-        document.getElementById('flavorCategory').value = item.category || 'salgadas';
-        document.getElementById('flavorCategoryType').value = item.categoryType || 'tradicional';
-        document.getElementById('flavorBadge').value = item.badge || '';
-        document.getElementById('flavorImage').value = item.image || 'assets/pizza_hero.png';
-        const promoCheck = document.getElementById('flavorIsPromo');
-        if (promoCheck) promoCheck.checked = item.isPromo || false;
-        document.getElementById('itemPrice').value = '';
-        
-        // Carrega os preços por tamanho
-        document.getElementById('priceBrotinho').value = item.prices?.B || '';
-        document.getElementById('priceMedia').value = item.prices?.M || '';
-        document.getElementById('priceGrande').value = item.prices?.G || '';
-        document.getElementById('priceFamilia').value = item.prices?.F || '';
-    } else if (type === 'calzone' || type === 'lanche') {
-        document.getElementById('flavorDescription').value = item.description || '';
-        document.getElementById('itemPrice').value = item.price || 0;
-        document.getElementById('flavorImage').value = item.image || (type === 'lanche' ? 'assets/lanche_hamburguer.png' : 'assets/pizza_hero.png');
-        
-        // Se for lanche, podemos ter categoria secundária no modal? Lanches no Firebase salvam a subcategoria no campo category.
-        // Vamos permitir salvar/editar.
-        if (type === 'lanche' && document.getElementById('flavorCategory')) {
-            document.getElementById('flavorCategory').value = item.category || 'xis';
-        }
-    } else if (type === 'bebida') {
-        document.getElementById('itemPrice').value = item.price || 0;
-        document.getElementById('flavorImage').value = item.image || 'assets/agua.png';
-    }
-    
-    adjustModalFields(type, true);
-    openModal('flavorModal');
-}
-
-function adjustModalFields(type, isEdit) {
-    const promoGroup = document.getElementById('flavorPromoGroup');
-    if (promoGroup) {
-        promoGroup.style.display = (type === 'pizza') ? 'flex' : 'none';
-    }
-    
-    const title = document.getElementById('flavorModalTitle');
-    const nameLabel = document.getElementById('flavorNameLabel');
-    const descGroup = document.getElementById('flavorDescriptionGroup');
-    const priceGroup = document.getElementById('itemPriceGroup');
-    const pizzaPricesGroup = document.getElementById('pizzaPricesGroup');
-    const catsGroup = document.getElementById('flavorCategoriesGroup');
-    const badgeGroup = document.getElementById('flavorBadgeGroup');
-    const imgLabel = document.getElementById('flavorImageLabel');
-    
-    const descInput = document.getElementById('flavorDescription');
-    const priceInput = document.getElementById('itemPrice');
-    
-    const priceB = document.getElementById('priceBrotinho');
-    const priceM = document.getElementById('priceMedia');
-    const priceG = document.getElementById('priceGrande');
-    const priceF = document.getElementById('priceFamilia');
-    
-    if (type === 'pizza') {
-        title.innerText = isEdit ? 'Editar Sabor de Pizza' : 'Adicionar Novo Sabor de Pizza';
-        nameLabel.innerText = 'Nome do Sabor';
-        descGroup.style.display = 'flex';
-        descInput.required = true;
-        
-        priceGroup.style.display = 'none';
-        priceInput.required = false;
-        
-        pizzaPricesGroup.style.display = 'flex';
-        priceB.required = true;
-        priceM.required = true;
-        priceG.required = true;
-        priceF.required = true;
-        
-        catsGroup.style.display = 'flex';
-        const catSelect = document.getElementById('flavorCategory');
-        if (catSelect) {
-            catSelect.innerHTML = `
-                <option value="salgadas">Salgadas</option>
-                <option value="doces">Doces</option>
-            `;
-        }
-        badgeGroup.style.display = 'flex';
-        imgLabel.innerText = 'Ilustração da Pizza';
-    } else if (type === 'calzone' || type === 'lanche') {
-        title.innerText = isEdit ? `Editar ${type === 'calzone' ? 'Calzone' : 'Lanche'}` : `Adicionar Novo ${type === 'calzone' ? 'Calzone' : 'Lanche'}`;
-        nameLabel.innerText = type === 'calzone' ? 'Nome do Calzone' : 'Nome do Lanche';
-        descGroup.style.display = 'flex';
-        descInput.required = true;
-        
-        priceGroup.style.display = 'flex';
-        priceInput.required = true;
-        
-        pizzaPricesGroup.style.display = 'none';
-        priceB.required = false;
-        priceM.required = false;
-        priceG.required = false;
-        priceF.required = false;
-        
-        // Se for lanche, podemos exibir uma categoria simples para escolher qual subcategoria de lanche é (xis, etc)
-        // Vamos reutilizar catsGroup? O catsGroup tem opções salgadas/doces. Para lanche, vamos reconfigurar suas opções se for lanche!
-        if (type === 'lanche') {
-            catsGroup.style.display = 'flex';
-            const catSelect = document.getElementById('flavorCategory');
-            if (catSelect) {
-                catSelect.innerHTML = `
-                    <option value="xis">Xis</option>
-                    <option value="hamburgueres">Hambúrgueres</option>
-                    <option value="barcas">Barcas</option>
-                    <option value="porcoes">Fritas e Porções</option>
-                    <option value="adicionais">Adicionais</option>
-                `;
-            }
-            // Oculta badge e altera label da imagem
-            badgeGroup.style.display = 'none';
-            imgLabel.innerText = 'Ilustração do Lanche';
-        } else {
-            catsGroup.style.display = 'none';
-            badgeGroup.style.display = 'none';
-            imgLabel.innerText = 'Ilustração do Calzone';
-        }
-    } else if (type === 'bebida') {
-        title.innerText = isEdit ? 'Editar Bebida' : 'Adicionar Nova Bebida';
-        nameLabel.innerText = 'Nome da Bebida';
-        descGroup.style.display = 'none';
-        descInput.required = false;
-        
-        priceGroup.style.display = 'flex';
-        priceInput.required = true;
-        
-        pizzaPricesGroup.style.display = 'none';
-        priceB.required = false;
-        priceM.required = false;
-        priceG.required = false;
-        priceF.required = false;
-        
-        catsGroup.style.display = 'none';
-        badgeGroup.style.display = 'none';
-        imgLabel.innerText = 'Ilustração da Bebida';
-    }
-    populateImageSuggestions(type);
 }
 
 function saveMenuItem(event) {
@@ -1782,84 +1390,48 @@ function saveMenuItem(event) {
     const image = document.getElementById('flavorImage').value;
     
     const dbType = type === 'pizza' ? 'pizzas' : (type === 'calzone' ? 'calzones' : (type === 'bebida' ? 'bebidas' : 'lanches'));
-    const items = menuData.menu_items?.[dbType] || [];
+    
+    let targetItem = {};
+    let id = idField;
     
     if (idField) {
-        const index = items.findIndex(i => i.id === idField);
-        if (index !== -1) {
-            items[index].name = name;
-            items[index].image = image;
-            
-            if (type === 'pizza') {
-                items[index].description = document.getElementById('flavorDescription').value.trim();
-                items[index].category = document.getElementById('flavorCategory').value;
-                items[index].categoryType = document.getElementById('flavorCategoryType').value;
-                items[index].badge = document.getElementById('flavorBadge').value.trim();
-                items[index].isPromo = document.getElementById('flavorIsPromo')?.checked || false;
-                
-                // Salva os preços por tamanho
-                items[index].prices = {
-                    B: parseFloat(document.getElementById('priceBrotinho').value) || 0,
-                    M: parseFloat(document.getElementById('priceMedia').value) || 0,
-                    G: parseFloat(document.getElementById('priceGrande').value) || 0,
-                    F: parseFloat(document.getElementById('priceFamilia').value) || 0
-                };
-            } else {
-                items[index].price = parseFloat(document.getElementById('itemPrice').value) || 0;
-                if (type === 'calzone' || type === 'lanche') {
-                    items[index].description = document.getElementById('flavorDescription').value.trim();
-                }
-                if (type === 'lanche') {
-                    items[index].category = document.getElementById('flavorCategory').value;
-                }
-            }
-        }
+        const items = menuData.menu_items?.[dbType] || [];
+        const existing = items.find(i => i.id === idField);
+        targetItem = existing ? { ...existing } : { id: idField };
     } else {
-        const id = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
-        
-        if (items.some(i => i.id === id)) {
-            alert("Já existe um item cadastrado com um nome muito parecido. Por favor, use um nome diferente.");
-            return;
-        }
-        
-        const newItem = {
-            id: id,
-            name: name,
-            image: image,
-            available: true
-        };
-        
-        if (type === 'pizza') {
-            newItem.description = document.getElementById('flavorDescription').value.trim();
-            newItem.category = document.getElementById('flavorCategory').value;
-            newItem.categoryType = document.getElementById('flavorCategoryType').value;
-            newItem.badge = document.getElementById('flavorBadge').value.trim();
-            newItem.isPromo = document.getElementById('flavorIsPromo')?.checked || false;
-            
-            // Salva os preços por tamanho
-            newItem.prices = {
-                B: parseFloat(document.getElementById('priceBrotinho').value) || 0,
-                M: parseFloat(document.getElementById('priceMedia').value) || 0,
-                G: parseFloat(document.getElementById('priceGrande').value) || 0,
-                F: parseFloat(document.getElementById('priceFamilia').value) || 0
-            };
-        } else {
-            newItem.price = parseFloat(document.getElementById('itemPrice').value) || 0;
-            if (type === 'calzone' || type === 'lanche') {
-                newItem.description = document.getElementById('flavorDescription').value.trim();
-            }
-            if (type === 'lanche') {
-                newItem.category = document.getElementById('flavorCategory').value;
-            }
-        }
-        
-        items.push(newItem);
+        id = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+        targetItem = { id: id, available: true };
     }
     
+    targetItem.name = name;
+    targetItem.image = image;
+    targetItem.category = dbType;
+    
+    if (type === 'pizza') {
+        targetItem.description = document.getElementById('flavorDescription').value.trim();
+        targetItem.subcategory = document.getElementById('flavorCategory').value;
+        targetItem.categoryType = document.getElementById('flavorCategoryType').value;
+        targetItem.badge = document.getElementById('flavorBadge').value.trim();
+        targetItem.isPromo = document.getElementById('flavorIsPromo')?.checked || false;
+        targetItem.prices = {
+            B: parseFloat(document.getElementById('priceBrotinho').value) || 0,
+            M: parseFloat(document.getElementById('priceMedia').value) || 0,
+            G: parseFloat(document.getElementById('priceGrande').value) || 0,
+            F: parseFloat(document.getElementById('priceFamilia').value) || 0
+        };
+    } else {
+        targetItem.price = parseFloat(document.getElementById('itemPrice').value) || 0;
+        if (type === 'calzone' || type === 'lanche') {
+            targetItem.description = document.getElementById('flavorDescription').value.trim();
+        }
+        if (type === 'lanche') {
+            targetItem.subcategory = document.getElementById('flavorCategory').value;
+        }
+    }
+    targetItem.isPromo = document.getElementById('flavorIsPromo')?.checked || false;
+    
     if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
-        db.collection('pizzaria_drill_menu').doc('main').update({
-            [`menu_items.${dbType}`]: items
-        })
+        ProductsService.saveProduct(id, targetItem)
         .then(() => {
             closeFlavorModal();
             alert("Item gravado com sucesso!");
@@ -1870,73 +1442,34 @@ function saveMenuItem(event) {
         });
     } else {
         closeFlavorModal();
-        if (type === 'pizza') renderFlavorsList();
-        else if (type === 'calzone') renderCalzonesList();
-        else if (type === 'bebida') renderBebidasList();
-        else if (type === 'lanche') renderLanchesList();
+        alert("Gravado localmente (sem Firebase).");
     }
 }
 
 function deleteMenuItem(type, id) {
-    if (!menuData) return;
-    
-    const dbType = type === 'pizza' ? 'pizzas' : (type === 'calzone' ? 'calzones' : (type === 'bebida' ? 'bebidas' : 'lanches'));
-    const items = menuData.menu_items?.[dbType] || [];
-    const item = items.find(i => i.id === id);
-    if (!item) return;
-    
-    if (!confirm(`Tem certeza que deseja excluir o item "${item.name}" permanentemente?`)) return;
-    
-    const updatedItems = items.filter(i => i.id !== id);
-    
+    if (!confirm(`Tem certeza que deseja excluir este item permanentemente?`)) return;
     if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
-        db.collection('pizzaria_drill_menu').doc('main').update({
-            [`menu_items.${dbType}`]: updatedItems
-        })
+        ProductsService.deleteProduct(id)
         .then(() => {
-            alert(`Item "${item.name}" excluído com sucesso!`);
+            alert("Item excluído com sucesso!");
         })
         .catch(err => {
             console.error(err);
             alert("Erro ao excluir item no Firebase.");
         });
-    } else {
-        menuData.menu_items[dbType] = updatedItems;
-        if (type === 'pizza') renderFlavorsList();
-        else if (type === 'calzone') renderCalzonesList();
-        else if (type === 'bebida') renderBebidasList();
-        else if (type === 'lanche') renderLanchesList();
     }
 }
 
 function toggleItemAvailability(type, id, isChecked) {
-    if (!menuData) return;
-    
-    const items = menuData.menu_items?.[type] || [];
-    const index = items.findIndex(item => item.id === id);
-    if (index === -1) return;
-    
-    items[index].available = isChecked;
-    
     if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
-        db.collection('pizzaria_drill_menu').doc('main').update({
-            [`menu_items.${type}`]: items
-        })
+        ProductsService.updateProductAvailability(id, isChecked)
         .then(() => {
-            console.log(`Disponibilidade de ${items[index].name} alterada para: ${isChecked}`);
+            console.log(`Disponibilidade alterada para: ${isChecked}`);
         })
         .catch(err => console.error("Erro ao alterar disponibilidade no Firebase:", err));
-    } else {
-        if (type === 'pizzas') renderFlavorsList();
-        else if (type === 'calzones') renderCalzonesList();
-        else if (type === 'bebidas') renderBebidasList();
-        else if (type === 'lanches') renderLanchesList();
     }
 }
 
-/* ==========================================================================
-   Clear/Reset All Orders Functionality
-   ========================================================================== */
 function confirmClearAllOrders() {
     const confirmation = confirm("⚠️ ATENÇÃO: Tem certeza absoluta de que deseja ZERAR todos os pedidos do painel? \n\nEsta ação apagará permanentemente todos os registros de pedidos e é irreversível!");
     
@@ -1951,14 +1484,7 @@ function confirmClearAllOrders() {
 
 function clearAllOrders() {
     if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
-        db.collection('fina_massa_orders').get()
-        .then(snapshot => {
-            const batch = db.batch();
-            snapshot.docs.forEach(doc => {
-                batch.delete(doc.ref);
-            });
-            return batch.commit();
-        })
+        ConfigService.clearAllOrders()
         .then(() => {
             alert("Sucesso: Todos os pedidos foram apagados no Firebase!");
             orders = [];
@@ -2220,32 +1746,30 @@ function addBairroRow() {
 }
 
 function saveSettings() {
-    if (!tempSettings) return;
     
-    const whatsapp = document.getElementById('settingsWhatsapp').value.trim();
-    const whatsappFormatted = document.getElementById('settingsWhatsappFormatted').value.trim();
-    const promoActive = document.getElementById('settingsPromoActive').checked;
-    const promoPrice = parseFloat(document.getElementById('settingsPromoPrice').value) || 95.00;
-    const promoSize = document.getElementById('settingsPromoSize').value;
+    const whatsapp = document.getElementById('settingWhatsapp').value.trim();
+    const whatsappFormatted = document.getElementById('settingWhatsappFormatted').value.trim();
+    const promoActive = document.getElementById('settingPromoActive')?.checked || false;
+    const promoPrice = parseFloat(document.getElementById('settingPromoPrice')?.value) || 0;
+    const promoSize = document.getElementById('settingPromoSize')?.value || 'G';
     
     if (!whatsapp) {
         alert("O número do WhatsApp é obrigatório.");
         return;
     }
     
-    tempSettings.whatsapp = whatsapp;
-    tempSettings.whatsappFormatted = whatsappFormatted;
-    tempSettings.promoActive = promoActive;
-    tempSettings.promoPrice = promoPrice;
-    tempSettings.promoSize = promoSize;
-    
-    if (!menuData) menuData = {};
-    menuData.settings = tempSettings;
-    
     if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
-        db.collection('pizzaria_drill_menu').doc('main').update({
-            settings: tempSettings
-        })
+        const settingsPromise = ConfigService.saveSettings({
+            whatsapp: whatsapp,
+            whatsappFormatted: whatsappFormatted,
+            promoActive: promoActive,
+            promoPrice: promoPrice,
+            promoSize: promoSize
+        });
+        
+        const feesPromise = ConfigService.saveDeliveryFees(tempSettings.deliveryFees || {});
+        
+        Promise.all([settingsPromise, feesPromise])
         .then(() => {
             alert("Configurações salvas no banco de dados com sucesso!");
         })
@@ -2345,37 +1869,18 @@ function populateImageSuggestions(type) {
    ========================================================================== */
 function initShopStatus() {
     if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
-        db.collection('pizzaria_drill_status').doc('status').onSnapshot((doc) => {
-            if (doc.exists) {
-                const isOpen = doc.data().isOpen;
+        ConfigService.subscribeShopStatus((data) => {
+            if (data) {
+                const isOpen = data.isOpen !== undefined ? data.isOpen : (data.open !== undefined ? data.open : true);
                 const toggle = document.getElementById('shopStatusToggle');
                 const label = document.getElementById('shopStatusLabel');
                 
-                if (isOpen !== null && isOpen !== undefined) {
-                    if (toggle) toggle.checked = isOpen;
-                    if (label) {
-                        label.innerText = isOpen ? "Aberto" : "Fechado";
-                        label.style.color = isOpen ? "#81c784" : "#ef5350";
-                    }
+                if (toggle) toggle.checked = isOpen;
+                if (label) {
+                    label.innerText = isOpen ? "Aberto" : "Fechado";
+                    label.style.color = isOpen ? "#81c784" : "#ef5350";
                 }
             }
-        }, (error) => {
-            console.error("Erro ao obter status de funcionamento do Firebase:", error);
-            // Fallback ao status local
-            fetch('/api/status')
-                .then(res => res.json())
-                .then(data => {
-                    const toggle = document.getElementById('shopStatusToggle');
-                    const label = document.getElementById('shopStatusLabel');
-                    if (data && typeof data.isOpen === 'boolean') {
-                        if (toggle) toggle.checked = data.isOpen;
-                        if (label) {
-                            label.innerText = data.isOpen ? "Aberto" : "Fechado";
-                            label.style.color = data.isOpen ? "#81c784" : "#ef5350";
-                        }
-                    }
-                })
-                .catch(err => console.error("Erro ao carregar status local pós falha do Firebase:", err));
         });
     } else {
         fetch('/api/status')
@@ -2397,7 +1902,7 @@ function initShopStatus() {
 
 function toggleShopStatus(isOpen) {
     if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
-        db.collection('pizzaria_drill_status').doc('status').set({ isOpen: isOpen })
+        ConfigService.saveShopStatus(isOpen)
         .then(() => {
             console.log(`Status de funcionamento da Pizzaria Drill alterado para: ${isOpen ? 'Aberto' : 'Fechado'}`);
         })
@@ -2418,4 +1923,568 @@ function toggleShopStatus(isOpen) {
         })
         .catch(err => console.error("Erro ao alterar status local:", err));
     }
+}
+
+
+/* ==========================================================================
+   Modals Helpers (Restored & New)
+   ========================================================================== */
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    modal.classList.remove('display-none');
+    setTimeout(() => {
+        modal.style.opacity = '1';
+        modal.style.pointerEvents = 'auto';
+    }, 10);
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    modal.style.opacity = '0';
+    modal.style.pointerEvents = 'none';
+    setTimeout(() => {
+        modal.classList.add('display-none');
+    }, 300);
+}
+
+function openCategoryModal(cat = null) {
+    const modal = document.getElementById('categoryModal');
+    if (!modal) return;
+    
+    if (cat) {
+        document.getElementById('categoryModalTitle').innerText = 'Editar Categoria';
+        document.getElementById('categoryEditId').value = cat.id;
+        document.getElementById('categoryName').value = cat.name || '';
+        document.getElementById('categoryIcon').value = cat.icon || '';
+        document.getElementById('categoryOrder').value = cat.order || '';
+    } else {
+        document.getElementById('categoryModalTitle').innerText = 'Adicionar Nova Categoria';
+        document.getElementById('categoryEditId').value = '';
+        document.getElementById('categoryName').value = '';
+        document.getElementById('categoryIcon').value = '';
+        document.getElementById('categoryOrder').value = '';
+    }
+    
+    openModal('categoryModal');
+}
+
+function closeCategoryModal() {
+    closeModal('categoryModal');
+}
+
+function openBannerModal(banner = null) {
+    const modal = document.getElementById('bannerModal');
+    if (!modal) return;
+    
+    if (banner) {
+        document.getElementById('bannerModalTitle').innerText = 'Editar Banner';
+        document.getElementById('bannerEditId').value = banner.id;
+        document.getElementById('bannerTag').value = banner.tag || '';
+        document.getElementById('bannerTitleText').value = banner.title || '';
+        document.getElementById('bannerSubtitle').value = banner.subtitle || '';
+        document.getElementById('bannerGradient').value = banner.gradient || '';
+    } else {
+        document.getElementById('bannerModalTitle').innerText = 'Adicionar Novo Banner';
+        document.getElementById('bannerEditId').value = '';
+        document.getElementById('bannerTag').value = '';
+        document.getElementById('bannerTitleText').value = '';
+        document.getElementById('bannerSubtitle').value = '';
+        document.getElementById('bannerGradient').value = 'linear-gradient(135deg, #b71c1c 0%, #1a0a0a 100%)';
+    }
+    
+    openModal('bannerModal');
+}
+
+function closeBannerModal() {
+    closeModal('bannerModal');
+}
+
+function openPromotionModal(promo = null) {
+    // We open flavorModal (which is product modal) with isPromo forced to true,
+    // because promo item is just a product in Firestore!
+    if (promo) {
+        openEditFlavorModal(promo.id);
+    } else {
+        // Clear flavorModal and preset type to pizza, but with isPromo checked
+        openAddMenuProductModal('pizza');
+        const isPromoChk = document.getElementById('flavorIsPromo');
+        if (isPromoChk) isPromoChk.checked = true;
+    }
+}
+
+function closePromotionModal() {
+    closeModal('promotionModal');
+}
+
+/* ==========================================================================
+   CRUD Handlers for Categories, Banners, Promotions
+   ========================================================================== */
+function saveCategoryItem(event) {
+    event.preventDefault();
+    const idField = document.getElementById('categoryEditId').value;
+    const name = document.getElementById('categoryName').value.trim();
+    const icon = document.getElementById('categoryIcon').value.trim();
+    const order = parseInt(document.getElementById('categoryOrder').value) || 0;
+    
+    let id = idField;
+    if (!idField) {
+        id = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+    }
+    
+    const categoryDoc = { id, name, icon, order };
+    
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        ProductsService.saveCategory(id, categoryDoc)
+        .then(() => {
+            closeCategoryModal();
+            alert("Categoria salva com sucesso!");
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Erro ao salvar categoria.");
+        });
+    }
+}
+
+function deleteCategory(id) {
+    if (!confirm("Tem certeza que deseja excluir esta categoria permanentemente?")) return;
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        ProductsService.deleteCategory(id)
+        .then(() => {
+            alert("Categoria excluída com sucesso!");
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Erro ao excluir categoria.");
+        });
+    }
+}
+
+function saveBannerItem(event) {
+    event.preventDefault();
+    const idField = document.getElementById('bannerEditId').value;
+    const tag = document.getElementById('bannerTag').value.trim();
+    const title = document.getElementById('bannerTitleText').value.trim();
+    const subtitle = document.getElementById('bannerSubtitle').value.trim();
+    const gradient = document.getElementById('bannerGradient').value.trim();
+    
+    let id = idField;
+    if (!idField) {
+        id = 'banner_' + Date.now();
+    }
+    
+    const bannerDoc = { id, tag, title, subtitle, gradient };
+    
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        ProductsService.saveBanner(id, bannerDoc)
+        .then(() => {
+            closeBannerModal();
+            alert("Banner salvo com sucesso!");
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Erro ao salvar banner.");
+        });
+    }
+}
+
+function deleteBanner(id) {
+    if (!confirm("Tem certeza que deseja excluir este banner?")) return;
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        ProductsService.deleteBanner(id)
+        .then(() => {
+            alert("Banner excluído com sucesso!");
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Erro ao excluir banner.");
+        });
+    }
+}
+
+/* ==========================================================================
+   Dynamic Render Lists for Categories, Banners, Promotions
+   ========================================================================== */
+function renderCategoriasList() {
+    const grid = document.getElementById('categoriasListGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    
+    const cats = menuData.categories || [];
+    cats.sort((a, b) => (a.order || 0) - (b.order || 0));
+    
+    cats.forEach(cat => {
+        const card = document.createElement('div');
+        card.className = 'flavor-card';
+        
+        card.innerHTML = `
+            <div class="flavor-card-header">
+                <div class="flavor-card-info">
+                    <h4 style="margin: 0; color: var(--text-main); font-size: 15px;">${cat.icon || '🍽️'} ${cat.name}</h4>
+                </div>
+            </div>
+            <p class="flavor-card-desc" style="margin: 0; flex: 1;">Ordem de exibição: <strong>#${cat.order || 0}</strong></p>
+            <div class="flavor-card-actions" style="margin-top: 15px;">
+                <button class="btn-icon-action" onclick="openEditCategory('${cat.id}')" title="Editar Categoria">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">edit</span>
+                </button>
+                <button class="btn-icon-action delete" onclick="deleteCategory('${cat.id}')" title="Excluir Categoria">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">delete</span>
+                </button>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function openEditCategory(id) {
+    const cats = menuData.categories || [];
+    const cat = cats.find(c => c.id === id);
+    if (cat) openCategoryModal(cat);
+}
+
+function renderBannersList() {
+    const grid = document.getElementById('bannersListGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    
+    const banners = menuData.banners || [];
+    
+    banners.forEach(banner => {
+        const card = document.createElement('div');
+        card.className = 'flavor-card';
+        card.style.background = banner.gradient || 'var(--bg-card)';
+        
+        card.innerHTML = `
+            <div class="flavor-card-header">
+                <div class="flavor-card-info">
+                    <h4 style="margin: 0; color: #fff; font-size: 16px; font-family: var(--font-display);">${banner.title}</h4>
+                    <span style="font-size: 11px; background: rgba(255,255,255,0.2); color: #fff; padding: 2px 6px; border-radius: 4px; margin-top: 4px; display: inline-block;">${banner.tag}</span>
+                </div>
+            </div>
+            <p style="margin: 10px 0; color: rgba(255,255,255,0.8); font-size: 13px; flex: 1;">${banner.subtitle}</p>
+            <div class="flavor-card-actions" style="margin-top: 15px;">
+                <button class="btn-icon-action" onclick="openEditBanner('${banner.id}')" title="Editar Banner" style="background: rgba(255,255,255,0.1); color: #fff;">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">edit</span>
+                </button>
+                <button class="btn-icon-action delete" onclick="deleteBanner('${banner.id}')" title="Excluir Banner" style="background: rgba(255,255,255,0.1); color: #fff;">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">delete</span>
+                </button>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function openEditBanner(id) {
+    const banners = menuData.banners || [];
+    const banner = banners.find(b => b.id === id);
+    if (banner) openBannerModal(banner);
+}
+
+function renderPromocoesList() {
+    const grid = document.getElementById('promocoesListGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    
+    // In our system, promotions are loaded from MENU_ITEMS where isPromo is true
+    const promos = [];
+    const dbTypes = ['pizzas', 'lanches', 'calzones', 'bebidas'];
+    dbTypes.forEach(type => {
+        const list = menuData.menu_items?.[type] || [];
+        list.forEach(item => {
+            if (item.isPromo) {
+                promos.push({ ...item, type });
+            }
+        });
+    });
+    
+    promos.forEach(promo => {
+        const card = document.createElement('div');
+        card.className = 'flavor-card';
+        if (promo.available === false) {
+            card.style.opacity = '0.6';
+        }
+        
+        const badgeHTML = promo.badge ? `<span class="flavor-badge-label" style="background: #b71c1c; color: #fff;">${promo.badge}</span>` : '';
+        const isChecked = promo.available !== false ? 'checked' : '';
+        
+        let priceText = '';
+        if (promo.type === 'pizza') {
+            priceText = `B: R$ ${promo.prices?.B || 0} / M: R$ ${promo.prices?.M || 0} / G: R$ ${promo.prices?.G || 0} / F: R$ ${promo.prices?.F || 0}`;
+        } else {
+            priceText = `R$ ${(promo.price || 0).toFixed(2).replace('.', ',')}`;
+        }
+        
+        card.innerHTML = `
+            <div class="flavor-card-header">
+                <div class="flavor-card-info">
+                    <h4 style="margin: 0; color: var(--text-main); font-size: 15px;">${promo.name}</h4>
+                    <div style="margin-top: 4px; display: flex; gap: 4px;">
+                        <span class="category-tag salgada" style="text-transform: uppercase;">${promo.type}</span>
+                        ${badgeHTML}
+                    </div>
+                </div>
+                <label class="switch" title="${promo.available !== false ? 'Disponível no Site' : 'Pausado/Indisponível'}">
+                    <input type="checkbox" ${isChecked} onchange="toggleFlavorAvailability('${promo.id}', this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <p class="flavor-card-desc" style="margin: 0; flex: 1;">${promo.description || ''}</p>
+            <div style="font-size: 12px; font-weight: bold; color: var(--primary); margin: 8px 0;">
+                ${priceText}
+            </div>
+            <div class="flavor-card-actions">
+                <button class="btn-icon-action" onclick="openEditFlavorModal('${promo.id}')" title="Editar Promoção">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">edit</span>
+                </button>
+                <button class="btn-icon-action delete" onclick="deletePromotionFromList('${promo.id}', '${promo.type}')" title="Remover das Promoções">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">delete</span>
+                </button>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function deletePromotionFromList(id, type) {
+    if (!confirm("Tem certeza que deseja remover este item das promoções? (Ele continuará cadastrado no cardápio)")) return;
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        ProductsService.updateProduct(id, { isPromo: false })
+        .then(() => {
+            alert("Item removido das promoções com sucesso!");
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Erro ao remover promoção.");
+        });
+    }
+}
+
+
+/* ==========================================================================
+   Product Modal Add/Edit/Adjust Functions (Restored)
+   ========================================================================== */
+function openAddMenuProductModal(type) {
+    if (currentMenuTab === 'categorias') {
+        openCategoryModal();
+        return;
+    }
+    if (currentMenuTab === 'banners') {
+        openBannerModal();
+        return;
+    }
+    if (currentMenuTab === 'promocoes') {
+        openPromotionModal();
+        return;
+    }
+    let finalType = type || 'pizza';
+    if (!type) {
+        if (currentMenuTab === 'calzones') finalType = 'calzone';
+        if (currentMenuTab === 'bebidas') finalType = 'bebida';
+        if (currentMenuTab === 'lanches') finalType = 'lanche';
+    }
+    openAddMenuItemModal(finalType);
+}
+
+function openAddMenuItemModal(type) {
+    document.getElementById('menuItemType').value = type;
+    document.getElementById('flavorEditId').value = '';
+    document.getElementById('flavorForm').reset();
+    
+    // Reset checkbox promocional
+    const promoCheck = document.getElementById('flavorIsPromo');
+    if (promoCheck) promoCheck.checked = false;
+    
+    adjustModalFields(type, false);
+    
+    const imgInput = document.getElementById('flavorImage');
+    if (imgInput) {
+        if (type === 'bebida') {
+            imgInput.value = 'assets/agua.png';
+        } else if (type === 'lanche') {
+            imgInput.value = 'assets/lanche_hamburguer.png';
+        } else {
+            imgInput.value = 'assets/pizza_hero.png';
+        }
+    }
+    
+    openModal('flavorModal');
+}
+
+function openEditFlavorModal(id) {
+    // Detect item type based on id and database type
+    if (!menuData) return;
+    let foundType = 'pizza';
+    let item = null;
+    
+    const dbTypes = { pizzas: 'pizza', calzones: 'calzone', lanches: 'lanche', bebidas: 'bebida' };
+    Object.keys(dbTypes).forEach(dbKey => {
+        const list = menuData.menu_items?.[dbKey] || [];
+        const found = list.find(i => i.id === id);
+        if (found) {
+            item = found;
+            foundType = dbTypes[dbKey];
+        }
+    });
+    
+    if (item) {
+        openEditMenuItemModal(foundType, id);
+    }
+}
+
+function openEditMenuItemModal(type, id) {
+    if (!menuData) return;
+    
+    document.getElementById('menuItemType').value = type;
+    document.getElementById('flavorEditId').value = id;
+    
+    const dbType = type === 'pizza' ? 'pizzas' : (type === 'calzone' ? 'calzones' : (type === 'bebida' ? 'bebidas' : 'lanches'));
+    const items = menuData.menu_items?.[dbType] || [];
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    
+    document.getElementById('flavorName').value = item.name;
+    
+    if (type === 'pizza') {
+        document.getElementById('flavorDescription').value = item.description || '';
+        document.getElementById('flavorCategory').value = item.category || 'salgadas';
+        document.getElementById('flavorCategoryType').value = item.categoryType || 'tradicional';
+        document.getElementById('flavorBadge').value = item.badge || '';
+        document.getElementById('flavorImage').value = item.image || 'assets/pizza_hero.png';
+        const promoCheck = document.getElementById('flavorIsPromo');
+        if (promoCheck) promoCheck.checked = item.isPromo || false;
+        document.getElementById('itemPrice').value = '';
+        
+        // Carrega os preços por tamanho
+        document.getElementById('priceBrotinho').value = item.prices?.B || '';
+        document.getElementById('priceMedia').value = item.prices?.M || '';
+        document.getElementById('priceGrande').value = item.prices?.G || '';
+        document.getElementById('priceFamilia').value = item.prices?.F || '';
+    } else {
+        document.getElementById('flavorDescription').value = item.description || '';
+        document.getElementById('itemPrice').value = item.price || 0;
+        document.getElementById('flavorImage').value = item.image || '';
+        const promoCheck = document.getElementById('flavorIsPromo');
+        if (promoCheck) promoCheck.checked = item.isPromo || false;
+        
+        // Wait briefly for categories dropdown to populate, then select current item category
+        setTimeout(() => {
+            const catSelect = document.getElementById('flavorCategory');
+            if (catSelect) {
+                catSelect.value = item.category || '';
+            }
+        }, 50);
+    }
+    
+    adjustModalFields(type, true);
+    openModal('flavorModal');
+}
+
+function adjustModalFields(type, isEdit) {
+    const promoGroup = document.getElementById('flavorPromoGroup');
+    if (promoGroup) {
+        promoGroup.style.display = 'flex'; // ALWAYS show promo checkbox!
+    }
+    
+    const title = document.getElementById('flavorModalTitle');
+    const nameLabel = document.getElementById('flavorNameLabel');
+    const descGroup = document.getElementById('flavorDescriptionGroup');
+    const priceGroup = document.getElementById('itemPriceGroup');
+    const pizzaPricesGroup = document.getElementById('pizzaPricesGroup');
+    const catsGroup = document.getElementById('flavorCategoriesGroup');
+    const badgeGroup = document.getElementById('flavorBadgeGroup');
+    const imgLabel = document.getElementById('flavorImageLabel');
+    
+    const descInput = document.getElementById('flavorDescription');
+    const priceInput = document.getElementById('itemPrice');
+    
+    const priceB = document.getElementById('priceBrotinho');
+    const priceM = document.getElementById('priceMedia');
+    const priceG = document.getElementById('priceGrande');
+    const priceF = document.getElementById('priceFamilia');
+    
+    if (type === 'pizza') {
+        title.innerText = isEdit ? 'Editar Sabor de Pizza' : 'Adicionar Novo Sabor de Pizza';
+        nameLabel.innerText = 'Nome do Sabor';
+        descGroup.style.display = 'flex';
+        descInput.required = true;
+        
+        priceGroup.style.display = 'none';
+        priceInput.required = false;
+        
+        pizzaPricesGroup.style.display = 'flex';
+        priceB.required = true;
+        priceM.required = true;
+        priceG.required = true;
+        priceF.required = true;
+        
+        catsGroup.style.display = 'flex';
+        const catSelect = document.getElementById('flavorCategory');
+        if (catSelect) {
+            catSelect.innerHTML = `
+                <option value="salgadas">Salgadas</option>
+                <option value="doces">Doces</option>
+            `;
+        }
+        badgeGroup.style.display = 'flex';
+        imgLabel.innerText = 'Ilustração da Pizza';
+    } else {
+        // Calzone, lanche, bebida, etc.
+        title.innerText = isEdit ? `Editar ${type.toUpperCase()}` : `Adicionar Novo ${type.toUpperCase()}`;
+        nameLabel.innerText = `Nome do Item`;
+        descGroup.style.display = (type === 'bebida') ? 'none' : 'flex';
+        descInput.required = (type !== 'bebida');
+        
+        priceGroup.style.display = 'flex';
+        priceInput.required = true;
+        
+        pizzaPricesGroup.style.display = 'none';
+        priceB.required = false;
+        priceM.required = false;
+        priceG.required = false;
+        priceF.required = false;
+        
+        catsGroup.style.display = 'flex';
+        const catSelect = document.getElementById('flavorCategory');
+        if (catSelect) {
+            const categories = menuData.categories || [];
+            // Load all categories except pizzas and bordas
+            const filtered = categories.filter(c => c.id !== 'pizzas' && c.id !== 'bordas');
+            catSelect.innerHTML = filtered.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            
+            if (!isEdit) {
+                // Set default matching category value
+                if (type === 'calzone' && filtered.some(c => c.id === 'calzones')) {
+                    catSelect.value = 'calzones';
+                } else if (type === 'bebida' && filtered.some(c => c.id === 'bebidas')) {
+                    catSelect.value = 'bebidas';
+                } else if (type === 'lanche' && filtered.some(c => c.id === 'lanches')) {
+                    catSelect.value = 'lanches';
+                }
+            }
+        }
+        badgeGroup.style.display = 'none';
+        imgLabel.innerText = 'Ilustração';
+    }
+}
+
+function deleteFlavor(id) {
+    // Map flavor id to its type
+    if (!menuData) return;
+    let foundType = 'pizza';
+    const dbTypes = ['pizzas', 'calzones', 'lanches', 'bebidas'];
+    dbTypes.forEach(dbKey => {
+        const list = menuData.menu_items?.[dbKey] || [];
+        if (list.some(i => i.id === id)) {
+            foundType = dbKey;
+        }
+    });
+    deleteMenuItem(foundType, id);
+}
+
+function closeFlavorModal() {
+    closeModal('flavorModal');
 }

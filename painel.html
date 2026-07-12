@@ -200,6 +200,12 @@
                         <button class="filter-tab" id="tabBebidas" onclick="setMenuTab('bebidas')">Bebidas</button>
                         <button class="filter-tab" id="tabLanches" onclick="setMenuTab('lanches')">Lanches</button>
                         <button class="filter-tab" id="tabPrices" onclick="setMenuTab('prices')">Tabela de Preços e Bordas</button>
+                        <button class="filter-tab" id="tabCategorias" onclick="setMenuTab('categorias')">Categorias</button>
+                        <button class="filter-tab" id="tabBanners" onclick="setMenuTab('banners')">Banners</button>
+                        <button class="filter-tab" id="tabPromocoes" onclick="setMenuTab('promocoes')">Promoções</button>
+                        <button class="filter-tab" id="tabCategorias" onclick="setMenuTab('categorias')">Categorias</button>
+                        <button class="filter-tab" id="tabBanners" onclick="setMenuTab('banners')">Banners</button>
+                        <button class="filter-tab" id="tabPromocoes" onclick="setMenuTab('promocoes')">Promoções</button>
                     </nav>
                 </div>
 
@@ -311,6 +317,27 @@
                                 <span class="material-symbols-rounded">save</span> Salvar Alterações
                             </button>
                         </div>
+                    </div>
+                </div>
+                
+                <!-- Tab content: Categorias Grid -->
+                <div id="menuTabCategorias" class="menu-tab-content display-none">
+                    <div class="flavors-list-grid" id="categoriasListGrid">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Tab content: Banners Grid -->
+                <div id="menuTabBanners" class="menu-tab-content display-none">
+                    <div class="flavors-list-grid" id="bannersListGrid">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Tab content: Promocoes Grid -->
+                <div id="menuTabPromocoes" class="menu-tab-content display-none">
+                    <div class="flavors-list-grid" id="promocoesListGrid">
+                        <!-- Loaded dynamically -->
                     </div>
                 </div>
             </div>
@@ -611,12 +638,86 @@
         </div>
     </div>
 
+    <!-- Category Add/Edit Modal Overlay -->
+    <div class="modal-overlay display-none" id="categoryModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 1100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: var(--transition);">
+        <div class="modal-container" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: 92%; max-width: 500px; padding: 25px; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 id="categoryModalTitle" style="color: var(--text-main); font-family: var(--font-display); font-size: 18px;">Adicionar Nova Categoria</h3>
+                <button class="btn-close-modal" onclick="closeCategoryModal()" style="border: none; background: transparent; color: var(--text-light); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%;">
+                    <span class="material-symbols-rounded">close</span>
+                </button>
+            </div>
+            <form id="categoryForm" onsubmit="saveCategoryItem(event)" style="display: flex; flex-direction: column; gap: 15px;">
+                <input type="hidden" id="categoryEditId">
+                <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                    <label for="categoryName" style="font-size: 13px; font-weight: 500; color: var(--text-light);">Nome da Categoria</label>
+                    <input type="text" id="categoryName" required placeholder="Ex: Pizzas, Lanches" style="padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main);">
+                </div>
+                <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                    <label for="categoryIcon" style="font-size: 13px; font-weight: 500; color: var(--text-light);">Emoji / Ícone</label>
+                    <input type="text" id="categoryIcon" required placeholder="Ex: 🍕, 🍔, 🥤" style="padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main);">
+                </div>
+                <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                    <label for="categoryOrder" style="font-size: 13px; font-weight: 500; color: var(--text-light);">Ordem de Exibição</label>
+                    <input type="number" id="categoryOrder" required placeholder="Ex: 1, 2, 3" style="padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main);">
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 15px;">
+                    <button type="button" class="btn-refresh" onclick="closeCategoryModal()" style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 16px; cursor: pointer;">Cancelar</button>
+                    <button type="submit" class="btn-status-next" style="border: none; border-radius: var(--radius-sm); padding: 8px 24px; cursor: pointer; font-weight: 600;">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Banner Add/Edit Modal Overlay -->
+    <div class="modal-overlay display-none" id="bannerModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 1100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: var(--transition);">
+        <div class="modal-container" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: 92%; max-width: 500px; padding: 25px; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 id="bannerModalTitle" style="color: var(--text-main); font-family: var(--font-display); font-size: 18px;">Adicionar Novo Banner</h3>
+                <button class="btn-close-modal" onclick="closeBannerModal()" style="border: none; background: transparent; color: var(--text-light); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%;">
+                    <span class="material-symbols-rounded">close</span>
+                </button>
+            </div>
+            <form id="bannerForm" onsubmit="saveBannerItem(event)" style="display: flex; flex-direction: column; gap: 15px;">
+                <input type="hidden" id="bannerEditId">
+                <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                    <label for="bannerTag" style="font-size: 13px; font-weight: 500; color: var(--text-light);">Etiqueta (Tag)</label>
+                    <input type="text" id="bannerTag" required placeholder="Ex: Promoção, Destaque" style="padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main);">
+                </div>
+                <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                    <label for="bannerTitleText" style="font-size: 13px; font-weight: 500; color: var(--text-light);">Título</label>
+                    <input type="text" id="bannerTitleText" required placeholder="Ex: Pizzas Promocionais G" style="padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main);">
+                </div>
+                <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                    <label for="bannerSubtitle" style="font-size: 13px; font-weight: 500; color: var(--text-light);">Subtítulo</label>
+                    <input type="text" id="bannerSubtitle" required placeholder="Ex: Escolha até 3 sabores..." style="padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main);">
+                </div>
+                <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                    <label for="bannerGradient" style="font-size: 13px; font-weight: 500; color: var(--text-light);">Gradiente de Fundo (CSS)</label>
+                    <input type="text" id="bannerGradient" required placeholder="Ex: linear-gradient(135deg, #b71c1c 0%, #1a0a0a 100%)" style="padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main);">
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 15px;">
+                    <button type="button" class="btn-refresh" onclick="closeBannerModal()" style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 16px; cursor: pointer;">Cancelar</button>
+                    <button type="submit" class="btn-status-next" style="border: none; border-radius: var(--radius-sm); padding: 8px 24px; cursor: pointer; font-weight: 600;">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Firebase SDK (Compat version) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
     <!-- Firebase Config -->
     <script src="firebase-config.js"></script>
+    <script src="firebase/firebase.js"></script>
+    
+    <!-- Utils & Services -->
+    <script src="utils/utils.js"></script>
+    <script src="services/config.service.js"></script>
+    <script src="services/products.service.js"></script>
+    <script src="services/cart.service.js"></script>
+    <script src="components/components.js"></script>
 
     <!-- Core Painel Logic -->
     <script src="painel.js"></script>

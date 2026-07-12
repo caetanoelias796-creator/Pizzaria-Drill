@@ -2,2105 +2,13 @@
    Cardápio Data Structure - Pizzaria Drill
    ========================================================================== */
 let MENU_ITEMS = {
-    "pizzas": [
-        {
-            "id": "mussarela",
-            "name": "Mussarela",
-            "description": "Molhodetomate,mussarela e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 82,
-                "G": 115,
-                "F": 150
-            }
-        },
-        {
-            "id": "2_queijos",
-            "name": "2 Queijos",
-            "description": "Molho de tomate, mussarela,cheddar e orégano.",
-            "image": "assets/pizza_quatro_queijos.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 82,
-                "G": 115,
-                "F": 150
-            }
-        },
-        {
-            "id": "3_queijos",
-            "name": "3 Queijos",
-            "description": "Molho de tomate, mussarela,catupiry,cheddar e orégano.",
-            "image": "assets/pizza_quatro_queijos.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 82,
-                "G": 115,
-                "F": 150
-            }
-        },
-        {
-            "id": "marguerita",
-            "name": "Marguerita",
-            "description": "Molho de tomate,mussarela, parmessão,tomate em rodelas, manjericão e orégano.",
-            "image": "assets/pizza_margherita.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 115,
-                "F": 150
-            }
-        },
-        {
-            "id": "alho_e_oleo",
-            "name": "Alho e Óleo",
-            "description": "Molho de tomate,mussarela,salsa, alho frito e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 115,
-                "F": 145
-            }
-        },
-        {
-            "id": "portuguesa",
-            "name": "Portuguesa",
-            "description": "Molho de tomate,mussarela,presunto,ervilha,tomate picado,azeitona,ovo,pimentão,cebola e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 90,
-                "G": 120,
-                "F": 155
-            }
-        },
-        {
-            "id": "4_queijos",
-            "name": "4 Queijos",
-            "description": "Molho de tomate, mussarela,parmessão,provolone,catupiry e orégano.",
-            "image": "assets/pizza_quatro_queijos.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 152
-            }
-        },
-        {
-            "id": "5_queijos",
-            "name": "5 Queijos",
-            "description": "Molho de tomate, mussarela,parmessão,provolone,catupiry, cheddar e orégano.",
-            "image": "assets/pizza_quatro_queijos.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 155
-            }
-        },
-        {
-            "id": "6_queijos",
-            "name": "6 Queijos",
-            "description": "Molho de tomate, mussarela,parmessão,provolone,catupiry, cheddar,gorgonzola e orégano.",
-            "image": "assets/pizza_quatro_queijos.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 155
-            }
-        },
-        {
-            "id": "napolitana",
-            "name": "Napolitana",
-            "description": "Molho de tomate,mussarela,tomate em rodelas,alho frito e orégano.",
-            "image": "assets/pizza_margherita.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 115,
-                "F": 150
-            }
-        },
-        {
-            "id": "acebolada",
-            "name": "Acebolada",
-            "description": "Molho de tomate,mussarela,cebola frita,alho poró,gorgonzola e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 115,
-                "F": 150
-            }
-        },
-        {
-            "id": "tomate_seco_com_rucula",
-            "name": "Tomate Seco com Rucúla",
-            "description": "Molho de tomate,mussarela,tomate seco,rucúla eorégano.",
-            "image": "assets/pizza_margherita.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 155
-            }
-        },
-        {
-            "id": "atum",
-            "name": "Atum",
-            "description": "Molho de tomate, mussarela, atum e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 150
-            }
-        },
-        {
-            "id": "sardinha",
-            "name": "Sardinha",
-            "description": "Molho de tomate, mussarela,sardinha e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 150
-            }
-        },
-        {
-            "id": "camarao",
-            "name": "Camarão",
-            "description": "Molho de tomate, mussarela,camarão e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 60,
-                "M": 90,
-                "G": 140,
-                "F": 165
-            }
-        },
-        {
-            "id": "camarao_alho_e_oleo",
-            "name": "Camarão Alho e Óleo",
-            "description": "Molho de tomate, mussarela,camarão, alho frito,salsa e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 60,
-                "M": 90,
-                "G": 140,
-                "F": 165
-            }
-        },
-        {
-            "id": "strogonoff_de_frango",
-            "name": "Strogonoff de Frango",
-            "description": "Molho de tomate,mussarela,frango em cubos,creme de leite,molho vermelho,champignon,batata palha e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 150
-            }
-        },
-        {
-            "id": "strogonoff_de_carne",
-            "name": "Strogonoff de Carne",
-            "description": "Molho de tomate,mussarela,iscas de carne,creme de leite,molho vermelho,champignon,batata palha e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 90,
-                "G": 125,
-                "F": 160
-            }
-        },
-        {
-            "id": "frango_e_catupiry",
-            "name": "Frango e Catupiry",
-            "description": "Molho de tomate,mussarela,frango desfiado,creme de leite,catupiry e orégano.",
-            "image": "assets/pizza_quatro_queijos.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 150
-            }
-        },
-        {
-            "id": "camarao_ao_molho_rose",
-            "name": "Camarão ao Molho Rose",
-            "description": "Molho de tomate, mussarela,camarão,creme de leite,molho vermelho e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 60,
-                "M": 90,
-                "G": 140,
-                "F": 165
-            }
-        },
-        {
-            "id": "quintana",
-            "name": "Quintana",
-            "description": "Molho de tomate, mussarela,sardinha,cebola,azeitona,gorgonzola e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 135,
-                "F": 150
-            }
-        },
-        {
-            "id": "maresia",
-            "name": "Maresia",
-            "description": "Molho de tomate,mussarela,atum,presunto,tomate picado, cream cheese e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 135,
-                "F": 150
-            }
-        },
-        {
-            "id": "strogonoff_de_camarao",
-            "name": "Strogonoff de Camarão",
-            "description": "Molho de tomate,mussarela,camarão,creme de leite,molho vermelho,champignon e orégano",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 60,
-                "M": 90,
-                "G": 140,
-                "F": 165
-            }
-        },
-        {
-            "id": "fricasse",
-            "name": "Fricasse",
-            "description": "Molho de tomate,mussarela,frango em cubos,molho vermelho,catupiry e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 150
-            }
-        },
-        {
-            "id": "costela_uruguaia",
-            "name": "Costela Uruguaia",
-            "description": "Molho de tomate,mussarela,cubos de costela,cerveja preta,chumichurri,cebola e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 90,
-                "G": 125,
-                "F": 160
-            }
-        },
-        {
-            "id": "file_com_mostarda",
-            "name": "Filé com Mostarda",
-            "description": "Molho de tomate,mussarela,isca de filé,molho vermelho,mostarda e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 90,
-                "G": 130,
-                "F": 160
-            }
-        },
-        {
-            "id": "file_ao_molho",
-            "name": "Filé ao Molho",
-            "description": "Molho detomate,mussarela,iscas de filé ao molho vermelho,orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 90,
-                "G": 130,
-                "F": 160
-            }
-        },
-        {
-            "id": "file_com_fritas",
-            "name": "Filé com Fritas",
-            "description": "Molho de tomate, mussarela,iscas de filé ao molho vermelho, batata frita,orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 95,
-                "G": 130,
-                "F": 160
-            }
-        },
-        {
-            "id": "primazia",
-            "name": "Primazia",
-            "description": "Molho de tomate, mussarela,iscas de filé ao molho vermelho, cheddar,orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 90,
-                "G": 130,
-                "F": 160
-            }
-        },
-        {
-            "id": "coracao_ao_molho",
-            "name": "Coração ao Molho",
-            "description": "Molho de tomate, mussarela,coração em rodelas,molho vermelho,orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 87,
-                "G": 125,
-                "F": 150
-            }
-        },
-        {
-            "id": "coracao_gratinado",
-            "name": "Coração Gratinado",
-            "description": "Molho de tomate,mussarela,coração ao meio,bacom em cubos, orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 92,
-                "G": 125,
-                "F": 152
-            }
-        },
-        {
-            "id": "emporio",
-            "name": "Empório",
-            "description": "Molho de tomate,mussarela,iscas de filé,manjericão,cheddar, orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 92,
-                "G": 130,
-                "F": 160
-            }
-        },
-        {
-            "id": "medalhao",
-            "name": "Medalhão",
-            "description": "Molho de tomate,mussarela,medalhão de filé, orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 60,
-                "M": 95,
-                "G": 130,
-                "F": 165
-            }
-        },
-        {
-            "id": "mista",
-            "name": "Mista",
-            "description": "Molho de tomate,mussera,peito de peru,cebola,brócolis,catupiry,cat chup,orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 120,
-                "F": 155
-            }
-        },
-        {
-            "id": "magestosa",
-            "name": "Magestosa",
-            "description": "Molho de tomate, mussarela,iscas de filé,catupiry, cheddar, parmesão, cebola ,provolone, gorgonzola, orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 95,
-                "G": 130,
-                "F": 160
-            }
-        },
-        {
-            "id": "frango_com_mostarda",
-            "name": "Frango com Mostarda",
-            "description": "Molho detomate,mussarela,frango em cubos, mostarda,orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 87,
-                "G": 125,
-                "F": 150
-            }
-        },
-        {
-            "id": "frango_com_barbecue",
-            "name": "Frango com Barbecue",
-            "description": "Molho de tomate, mussarela,frango em cubos, barbecue, orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 150
-            }
-        },
-        {
-            "id": "frango_com_legumes",
-            "name": "Frango com Legumes",
-            "description": "Molho de tomate,mussarela,frango, milho, ervilha,tomate picado,catupiry,orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 150
-            }
-        },
-        {
-            "id": "alcatra_em_cubos",
-            "name": "Alcatra em Cubos",
-            "description": "Molho de tomate,mussarela,alcatra em cubos,pimentão colorido em cubos,manjericão, orégano",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 95,
-                "G": 125,
-                "F": 155
-            }
-        },
-        {
-            "id": "bacon",
-            "name": "Bacon",
-            "description": "Molho de tomate,mussarela,bacon frito,catupiry, orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 120,
-                "F": 150
-            }
-        },
-        {
-            "id": "bacon_milho",
-            "name": "Bacon Milho",
-            "description": "Molho de tomate, mussarela, bacon, catupiry,milho,orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 87,
-                "G": 125,
-                "F": 157
-            }
-        },
-        {
-            "id": "paulista",
-            "name": "Paulista",
-            "description": "Molho de tomate, mussarela,presunto, bacon palmito,alho frito,orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 120,
-                "F": 155
-            }
-        },
-        {
-            "id": "do_gaucho",
-            "name": "do Gaúcho",
-            "description": "Molho detomate, mussarela,calabresa ,bacon em cubos,orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 120,
-                "F": 155
-            }
-        },
-        {
-            "id": "da_casa",
-            "name": "da Casa",
-            "description": "Molho mussarela,calabresa,presunto,bacon, pimentão,cebola,manjericão,orégano",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 122,
-                "F": 155
-            }
-        },
-        {
-            "id": "tropeira",
-            "name": "Tropeira",
-            "description": "Molho de tomate,mussarela,alcatra em cubos, frango em cubos, carne de porco, corção, chumichurri, pimenta, cheiro verde e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 90,
-                "G": 125,
-                "F": 158
-            }
-        },
-        {
-            "id": "entreveiro",
-            "name": "Entreveiro",
-            "description": "Molho de tomate,mussarela, alcatra em cubos, frango em cubos, coração, carne de porco, calabresinha, pimentão colorido, cebola, mostarda, alho frito, salsa e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 90,
-                "G": 125,
-                "F": 158
-            }
-        },
-        {
-            "id": "da_pinheira",
-            "name": "da Pinheira",
-            "description": "Molho de tomate,mussarela, bacon, tomate picado, azeitona, manjericão e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 155
-            }
-        },
-        {
-            "id": "peperoni",
-            "name": "Peperoni",
-            "description": "Molho de tomate,mussera, peperoni, tomate picado, azeitona e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 120,
-                "F": 150
-            }
-        },
-        {
-            "id": "parma",
-            "name": "Parma",
-            "description": "Molho de tomate,mussarela, medalhão de filé, presunto, queijo, cat chup e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 60,
-                "M": 95,
-                "G": 130,
-                "F": 160
-            }
-        },
-        {
-            "id": "picanha_barbecue",
-            "name": "Picanha Barbecue",
-            "description": "Molho de tomate,mussarela, medalhão de picanha, molho Barbacue, pimenta de bico e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 60,
-                "M": 95,
-                "G": 130,
-                "F": 160
-            }
-        },
-        {
-            "id": "calabresa",
-            "name": "Calabresa",
-            "description": "Molho de tomate,mussarela, calabresa e orégano.",
-            "image": "assets/pizza_calabresa.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 115,
-                "F": 135
-            }
-        },
-        {
-            "id": "calabresa_com_cebola",
-            "name": "Calabresa com Cebola",
-            "description": "Molho de tomate,mussarela, calabresa, rodelas de cebola e orégano.",
-            "image": "assets/pizza_calabresa.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 87,
-                "G": 117,
-                "F": 135
-            }
-        },
-        {
-            "id": "lombo_catupiry",
-            "name": "Lombo Catupiry",
-            "description": "Molho de tomate,mussarela, lombo canadense, catupiry e orégano.",
-            "image": "assets/pizza_quatro_queijos.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 115,
-                "F": 135
-            }
-        },
-        {
-            "id": "lombo_com_abacaxi",
-            "name": "Lombo com Abacaxi",
-            "description": "Molho de tomate,mussarela, lombo canadense, abacaxi, catupiry, manjericão e orégano.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 120,
-                "F": 140
-            }
-        },
-        {
-            "id": "canadense",
-            "name": "Canadense",
-            "description": "Molho de tomate,mussarela, lombo canadense, bacon, tomate picado, cebola, manjericão e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 155
-            }
-        },
-        {
-            "id": "calabresa_com_pessego",
-            "name": "Calabresa com Pessêgo",
-            "description": "Molho de tomate, mussarela, calabresa, pessêgo em tiras e orégano.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 115,
-                "F": 135
-            }
-        },
-        {
-            "id": "italiana",
-            "name": "Italiana",
-            "description": "Molhodetomate, mussarela, salame italiano, figo ao meio e ore ǵ ano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 115,
-                "F": 135
-            }
-        },
-        {
-            "id": "chilena",
-            "name": "Chilena",
-            "description": "Molho de tomate, mussarela, salame italiano, catupiry e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 115,
-                "F": 135
-            }
-        },
-        {
-            "id": "colonial",
-            "name": "Colonial",
-            "description": "Molho de tomate, mussarela, carne desfiada, cebola roxa, pimentão vermelho, azeitona preta, catupiry e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 90,
-                "G": 125,
-                "F": 165
-            }
-        },
-        {
-            "id": "doritos",
-            "name": "Doritos",
-            "description": "Molho de tomate,mussarela, iscas de filé ao molho vermelho, Doritos e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 60,
-                "M": 95,
-                "G": 135,
-                "F": 160
-            }
-        },
-        {
-            "id": "ruffles_com_cheddar",
-            "name": "Ruffles com Cheddar",
-            "description": "Molho de tomate,mussarela, iscas de filé ao molho vermelho, batata Chips, gotas de cheddar e orégano.",
-            "image": "assets/pizza_quatro_queijos.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 60,
-                "M": 95,
-                "G": 135,
-                "F": 160
-            }
-        },
-        {
-            "id": "soberana",
-            "name": "Soberana",
-            "description": "Molho de tomate,mussera, carne de panela desfiada, catupiry e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 90,
-                "G": 125,
-                "F": 160
-            }
-        },
-        {
-            "id": "baronessa",
-            "name": "Baronessa",
-            "description": "Molho de tomate,mussarela, carne desfiada, rodelas de cebola, pimenta de bico, creem chesse e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 90,
-                "G": 130,
-                "F": 160
-            }
-        },
-        {
-            "id": "4_queijos_com_bacon",
-            "name": "4 Queijos com Bacon",
-            "description": "Molho de tomate,mussarela, parmesão, provolone, catupiry, bacon e orégano.",
-            "image": "assets/pizza_quatro_queijos.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 155
-            }
-        },
-        {
-            "id": "suprema",
-            "name": "Suprema",
-            "description": "Molho de tomate,mussarela, bacon, palmito, alho frito, orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 155
-            }
-        },
-        {
-            "id": "brocolis_e_bacon",
-            "name": "Brocólis e Bacon",
-            "description": "Molho de tomate,mussarela, brocólis, bacon, catupiry e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 155
-            }
-        },
-        {
-            "id": "toscana",
-            "name": "Toscana",
-            "description": "Molho de tomate,mussarela, tomate em rodelas, bacon, azeitona , alho frito e orégano.",
-            "image": "assets/pizza_calabresa.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 155
-            }
-        },
-        {
-            "id": "calabresa_chilena",
-            "name": "Calabresa Chilena",
-            "description": "Molho de tomate,mussarela, calabresa moída, cheddar, orégano.",
-            "image": "assets/pizza_calabresa.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 115,
-                "F": 135
-            }
-        },
-        {
-            "id": "carbonara",
-            "name": "Carbonara",
-            "description": "Molho de tomate, mussarela, bacon, ovo,creme de leite e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 120,
-                "F": 150
-            }
-        },
-        {
-            "id": "palestina",
-            "name": "Palestina",
-            "description": "Molho detomate, mussarela, rúcula, iscas de filé e ore",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 82,
-                "G": 120,
-                "F": 155
-            }
-        },
-        {
-            "id": "frango_mel_e_mostarda",
-            "name": "Frango Mel e Mostarda",
-            "description": "Molho de tomate, mussarela, frango desfiado, mel, mostarda e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 150
-            }
-        },
-        {
-            "id": "siciliana",
-            "name": "Siciliana",
-            "description": "Molho de tomate, mussarela, bacon, champignons , azeitona e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 87,
-                "G": 125,
-                "F": 157
-            }
-        },
-        {
-            "id": "turquesa",
-            "name": "Turquesa",
-            "description": "Molho de tomate,mussarela, picanha, palmito, alho frito e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 60,
-                "M": 95,
-                "G": 130,
-                "F": 160
-            }
-        },
-        {
-            "id": "rustica",
-            "name": "Rústica",
-            "description": "Molho de tomate,mussarela, lombo canadense, champignon, tomate seco, cebola e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 87,
-                "G": 120,
-                "F": 137
-            }
-        },
-        {
-            "id": "havaiana",
-            "name": "Havaiana",
-            "description": "Molho de tomate,mussarela, salame italiano, figo, pêssego, abacaxi e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 52,
-                "M": 85,
-                "G": 120,
-                "F": 140
-            }
-        },
-        {
-            "id": "alpesto",
-            "name": "Alpesto",
-            "description": "Molho de tomate,mussarela, peito de peru, tomate cereja, manjericão, molho pesto e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 125,
-                "F": 155
-            }
-        },
-        {
-            "id": "chicana",
-            "name": "Chicana",
-            "description": "Molho de tomate,mussarela, linguiça Toscana, cebola roxa, azeitona, pimenta e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 87,
-                "G": 125,
-                "F": 150
-            }
-        },
-        {
-            "id": "baiana",
-            "name": "Baiana",
-            "description": "Molho de tomate,mussarela, calabresa moída, ovo, cebola,pimenta e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 82,
-                "G": 120,
-                "F": 145
-            }
-        },
-        {
-            "id": "americana",
-            "name": "Americana",
-            "description": "Molho de tomate,mussarela, presunto, bacon, champignons, cebola e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 47,
-                "M": 80,
-                "G": 115,
-                "F": 145
-            }
-        },
-        {
-            "id": "roma",
-            "name": "Roma",
-            "description": "Molho de tomate,mussarela, frango em cubos,cheddar, bacon e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 150
-            }
-        },
-        {
-            "id": "francesa",
-            "name": "Francesa",
-            "description": "Molho de tomate,mussarela, carne desfiada, gorgonzola, Catupiry, cebola e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 87,
-                "G": 125,
-                "F": 155
-            }
-        },
-        {
-            "id": "cremosa",
-            "name": "Cremosa",
-            "description": "Molho de tomate, mussarela, carne desfiada, molho grego e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 60,
-                "M": 88,
-                "G": 125,
-                "F": 155
-            }
-        },
-        {
-            "id": "galderio",
-            "name": "Galderio",
-            "description": "Molhode tomate, mussarela, linguiça, pimentão verde, cebola, catupiry e ore ǵ ano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 125,
-                "F": 150
-            }
-        },
-        {
-            "id": "frango_com_cheddar",
-            "name": "Frango com Cheddar",
-            "description": "Molho de tomate, mussarela, frango em cubos, cheddar e orégano.",
-            "image": "assets/pizza_quatro_queijos.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 82,
-                "G": 120,
-                "F": 150
-            }
-        },
-        {
-            "id": "divina",
-            "name": "Divina",
-            "description": "Molho de tomate, mussarela, bacon, cebola caramelizada, queijo bri, pimenta de bico e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 60,
-                "M": 88,
-                "G": 130,
-                "F": 160
-            }
-        },
-        {
-            "id": "prisioneira",
-            "name": "Prisioneira",
-            "description": "Molho de tomate,mussarela, provolone, carne desfiada, Catupiry, bacon, azeitona e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 125,
-                "F": 155
-            }
-        },
-        {
-            "id": "gaucha",
-            "name": "Gaucha",
-            "description": "Molho de tomate,mussarela, costela desfiada, barbecue, cebolinha e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 87,
-                "G": 127,
-                "F": 155
-            }
-        },
-        {
-            "id": "alcatra_mel_e_mostarda",
-            "name": "Alcatra Mel e Mostarda",
-            "description": "Molho de tomate,mussarela, alcatra, mel, mostarda e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 125,
-                "F": 150
-            }
-        },
-        {
-            "id": "frango_xadrez",
-            "name": "Frango Xadrez",
-            "description": "Molho de tomate,mussarela, frango em cubos, pimentão colorido, gergelim e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 82,
-                "G": 120,
-                "F": 150
-            }
-        },
-        {
-            "id": "basca",
-            "name": "Basca",
-            "description": "Molho de tomate,mussarela, lombo canadense, Catupiry, tomate picado, azeitona, manjericão e orégano.",
-            "image": "assets/pizza_hero.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 150
-            }
-        },
-        {
-            "id": "file_ao_molho_4_queijos",
-            "name": "Filé ao Molho 4 Queijos",
-            "description": "Molho de tomate,mussarela, iscas de filé, pimentão, catupiry, cheddar, gorgonzola, alho poró e orégano.",
-            "image": "assets/pizza_quatro_queijos.png",
-            "category": "salgadas",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 60,
-                "M": 87,
-                "G": 130,
-                "F": 155
-            }
-        },
-        {
-            "id": "classica",
-            "name": "Clássica",
-            "description": "Leite condensado, abacaxi picado, chocolate branco e gemada.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 120,
-                "F": 145
-            }
-        },
-        {
-            "id": "mm_s",
-            "name": "MM's",
-            "description": "Leite condensado, chocolate preto e MM's.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 90,
-                "G": 125,
-                "F": 158
-            }
-        },
-        {
-            "id": "prestigio",
-            "name": "Prestigio",
-            "description": "Leite condensado, chocolate preto, prestigio e coco ralado.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 82,
-                "G": 125,
-                "F": 158
-            }
-        },
-        {
-            "id": "stikadinho",
-            "name": "Stikadinho",
-            "description": "Leite condensado, morango em rodelas, chocolate branco e stikadinho.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 125,
-                "F": 155
-            }
-        },
-        {
-            "id": "banoff",
-            "name": "Banoff",
-            "description": "Doce de leite, banana, Negresco e leite condensado.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 120,
-                "F": 151
-            }
-        },
-        {
-            "id": "nutella_com_morango",
-            "name": "Nutella com Morango",
-            "description": "Leite condensado, nutella e morango ao meio.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 60,
-                "M": 92,
-                "G": 130,
-                "F": 170
-            }
-        },
-        {
-            "id": "banana_nevada",
-            "name": "Banana Nevada",
-            "description": "Doce de leite, banana, canela e chocolate branco.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 120,
-                "F": 151
-            }
-        },
-        {
-            "id": "pistache",
-            "name": "Pistache",
-            "description": "Doce de leite, chocolate branco ou preto e creme de pistache.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 90,
-                "G": 130,
-                "F": 170
-            }
-        },
-        {
-            "id": "romeu_e_julieta",
-            "name": "Romeu e Julieta",
-            "description": "Leitecondensado,goiabada e queijo. Nostalgia Leite condensado, chocolate preto e branco, kit Kat preto e branco.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 125,
-                "F": 160
-            }
-        },
-        {
-            "id": "paixao",
-            "name": "Paixão",
-            "description": "Leite condensado, morango, bombom ouro branco e chocolate branco.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 125,
-                "F": 158
-            }
-        },
-        {
-            "id": "dois_amores",
-            "name": "Dois Amores",
-            "description": "Leite condensado, morango, chocolate preto e bombom ouro branco.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 85,
-                "G": 125,
-                "F": 158
-            }
-        },
-        {
-            "id": "banana_gemada",
-            "name": "Banana Gemada",
-            "description": "Leite condensado, banana, chocolate branco e gemada.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 55,
-                "M": 80,
-                "G": 115,
-                "F": 145
-            }
-        },
-        {
-            "id": "chocodelicia",
-            "name": "Chocodelícia",
-            "description": "Leite condensado, uva verde, figo, pessêgo e ganache.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 85,
-                "G": 125,
-                "F": 155
-            }
-        },
-        {
-            "id": "nutella",
-            "name": "Nutella",
-            "description": "Doce de leite e Nutella.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 60,
-                "M": 95,
-                "G": 130,
-                "F": 170
-            }
-        },
-        {
-            "id": "choco_branco_com_nozes",
-            "name": "Choco Branco com Nozes",
-            "description": "Leite condensado, chocolate branco e nozes.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 60,
-                "M": 90,
-                "G": 130,
-                "F": 160
-            }
-        },
-        {
-            "id": "stikadinho_cremoso",
-            "name": "Stikadinho Cremoso",
-            "description": "Leite condensado, creme de choco preto e creme de morango.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 57,
-                "M": 87,
-                "G": 125,
-                "F": 150
-            }
-        },
-        {
-            "id": "charge",
-            "name": "Charge",
-            "description": "Leite condensado, chocolate preto, charge e amendoim.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 82,
-                "G": 120,
-                "F": 150
-            }
-        },
-        {
-            "id": "chocolate_com_pimenta",
-            "name": "Chocolate com Pimenta",
-            "description": "Leite condensado, chocolate preto, cereja e pimenta.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 57,
-                "M": 85,
-                "G": 125,
-                "F": 155
-            }
-        },
-        {
-            "id": "dona_bela",
-            "name": "Dona Bela",
-            "description": "Leitecondensado, Nutella, uva verde e creme de leite ninho",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 60,
-                "M": 90,
-                "G": 130,
-                "F": 160
-            }
-        },
-        {
-            "id": "nevada",
-            "name": "Nevada",
-            "description": "Doce de leite, banana, choco branco cremoso.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 80,
-                "G": 120,
-                "F": 0
-            }
-        },
-        {
-            "id": "morango_moreno",
-            "name": "Morango Moreno",
-            "description": "leite condensado, chocolate preto ralado, morango e creme de leite.",
-            "image": "assets/pizza_chocolate.png",
-            "category": "doces",
-            "categoryType": "tradicional",
-            "prices": {
-                "B": 50,
-                "M": 82,
-                "G": 110,
-                "F": 145
-            }
-        }
-    ],
-
-    "bebidas": [
-        {
-            "id": "coca_2l",
-            "name": "Coca Cola 2l",
-            "price": 16,
-            "image": "assets/coca_cola.png"
-        },
-        {
-            "id": "guarana_2l",
-            "name": "Guarana 2l",
-            "price": 15,
-            "image": "assets/guarana.png"
-        },
-        {
-            "id": "coca_600",
-            "name": "Coca Cola 600ml",
-            "price": 10,
-            "image": "assets/coca_cola.png"
-        },
-        {
-            "id": "coca_zero_600",
-            "name": "Coca Cola Zero 600ml",
-            "price": 10,
-            "image": "assets/coca_cola.png"
-        },
-        {
-            "id": "guarana_600",
-            "name": "Guarana 600ml",
-            "price": 9,
-            "image": "assets/guarana.png"
-        },
-        {
-            "id": "coca_lata",
-            "name": "Coca Cola lata",
-            "price": 6,
-            "image": "assets/coca_cola.png"
-        },
-        {
-            "id": "coca_zero_lata",
-            "name": "Coca Cola Zero lata",
-            "price": 6,
-            "image": "assets/coca_cola.png"
-        },
-        {
-            "id": "guarana_lata",
-            "name": "Guarana lata",
-            "price": 6,
-            "image": "assets/guarana.png"
-        },
-        {
-            "id": "agua",
-            "name": "Agua com ou s/ gás",
-            "price": 4,
-            "image": "assets/agua.png"
-        },
-        {
-            "id": "vinho_seco",
-            "name": "Vinho Seco",
-            "price": 35,
-            "image": "assets/vinho.png"
-        },
-        {
-            "id": "vinho_suave",
-            "name": "Vinho Suave",
-            "price": 35,
-            "image": "assets/vinho.png"
-        }
-    ],
-    "lanches": [
-        {
-            "id": "xis_salada",
-            "name": "Xis Salada",
-            "description": "Maionese, ketchup, milho, ervilha, alface, tomate, ovo, hambúrguer, queijo e presunto.",
-            "price": 25,
-            "image": "assets/lanche_xis.png",
-            "category": "xis"
-        },
-        {
-            "id": "xis_frango",
-            "name": "Xis Frango",
-            "description": "Maionese, ketchup, milho, ervilha, alface, tomate, queijo, presunto, ovo, hambúrguer, frango desfiado.",
-            "price": 28,
-            "image": "assets/lanche_xis.png",
-            "category": "xis"
-        },
-        {
-            "id": "xis_calabresa",
-            "name": "Xis Calabresa",
-            "description": "Maionese, ketchup, milho, ervilha, alface, tomate, queijo, presunto, ovo, hambúrguer, calabresa.",
-            "price": 30,
-            "image": "assets/lanche_xis.png",
-            "category": "xis"
-        },
-        {
-            "id": "xis_frango_bacon",
-            "name": "Xis Frango com Bacon",
-            "description": "Maionese, ketchup, milho, ervilha, tomate, alface, queijo, presunto, ovo, frango desfiado e bacon.",
-            "price": 30,
-            "image": "assets/lanche_xis.png",
-            "category": "xis"
-        },
-        {
-            "id": "xis_frango_acebolado",
-            "name": "Xis Frango Acebolado",
-            "description": "Maionese, ketchup, milho, ervilha, tomate, alface, queijo, presunto, ovo e frango em cubos acebolado.",
-            "price": 31,
-            "image": "assets/lanche_xis.png",
-            "category": "xis"
-        },
-        {
-            "id": "xis_bacon",
-            "name": "Xis Bacon",
-            "description": "Maionese, ketchup, milho, ervilha, alface, tomate, queijo, presunto, ovo, hambúrguer e bacon.",
-            "price": 32,
-            "image": "assets/lanche_xis.png",
-            "category": "xis"
-        },
-        {
-            "id": "xis_bacon_cebola",
-            "name": "Xis Bacon com Cebola Caramelizada",
-            "description": "Maionese, ketchup, milho, ervilha, tomate, alface, ovo, cebola caramelizada, bacon, hambúrguer, presunto e queijo cheddar.",
-            "price": 32,
-            "image": "assets/lanche_xis.png",
-            "category": "xis"
-        },
-        {
-            "id": "xis_portuguesa",
-            "name": "Xis Portuguesa",
-            "description": "Maionese, ketchup, milho, ervilha, tomate, alface, azeitona, presunto, ovo e queijos.",
-            "price": 32,
-            "image": "assets/lanche_xis.png",
-            "category": "xis"
-        },
-        {
-            "id": "xis_file_acebolado",
-            "name": "Xis Filé Acebolado",
-            "description": "Maionese, ketchup, milho, ervilha, tomate, alface, queijo, presunto, ovo e filé acebolado.",
-            "price": 34,
-            "image": "assets/lanche_xis.png",
-            "category": "xis"
-        },
-        {
-            "id": "xis_strogonoff_carne",
-            "name": "Xis Strogonoff de Carne",
-            "description": "Maionese, ketchup, milho, ervilha, tomate, alface, strogonoff de carne, batata palha e ovo.",
-            "price": 35,
-            "image": "assets/lanche_xis.png",
-            "category": "xis"
-        },
-        {
-            "id": "xis_costela",
-            "name": "Xis Costela",
-            "description": "Maionese, ketchup, milho, ervilha, tomate, alface, queijo, presunto, ovo e costela desfiada.",
-            "price": 35,
-            "image": "assets/lanche_xis.png",
-            "category": "xis"
-        },
-        {
-            "id": "xis_carne_panela",
-            "name": "Xis Carne de Panela",
-            "description": "Maionese, ketchup, milho, ervilha, tomate, alface, queijo, presunto, ovo, carne desfiada e molho de gorgonzola.",
-            "price": 36,
-            "image": "assets/lanche_xis.png",
-            "category": "xis"
-        },
-        {
-            "id": "xis_coracao",
-            "name": "Xis Coração",
-            "description": "Maionese, ketchup, milho, ervilha, tomate, alface, queijo, presunto, ovo e coração.",
-            "price": 38,
-            "image": "assets/lanche_xis.png",
-            "category": "xis"
-        },
-        {
-            "id": "xis_picanha",
-            "name": "Xis Picanha",
-            "description": "Maionese, ketchup, milho, ervilha, tomate, alface, queijo, presunto, picanha e ovo.",
-            "price": 38,
-            "image": "assets/lanche_xis.png",
-            "category": "xis"
-        },
-        {
-            "id": "xis_entrevero",
-            "name": "Xis Entrevero",
-            "description": "Maionese, ketchup, milho, ervilha, tomate, alface, frango, coração, calabresa, alcatra, porco, hambúrguer, ovo, queijo e presunto.",
-            "price": 38,
-            "image": "assets/lanche_xis.png",
-            "category": "xis"
-        },
-        {
-            "id": "xis_file_fritas",
-            "name": "Xis Filé com Fritas",
-            "description": "Maionese, ketchup, milho, ervilha, tomate, alface, queijo, presunto, ovo, filé e fritas.",
-            "price": 43,
-            "image": "assets/lanche_xis.png",
-            "category": "xis"
-        },
-        {
-            "id": "hamb_tradicional",
-            "name": "Hambúrguer Tradicional",
-            "description": "Pão, carne, queijo cheddar e batata de rostinho.",
-            "price": 25,
-            "image": "assets/lanche_hamburguer.png",
-            "category": "hamburgueres"
-        },
-        {
-            "id": "hamb_bacon",
-            "name": "Hambúrguer Bacon",
-            "description": "Pão, creme de gorgonzola, carne, queijo cheddar, bacon e fritas.",
-            "price": 30,
-            "image": "assets/lanche_hamburguer.png",
-            "category": "hamburgueres"
-        },
-        {
-            "id": "hamb_classico",
-            "name": "Hambúrguer Clássico",
-            "description": "Pão, molho americano, carne, queijo cheddar, alface, tomate e fritas.",
-            "price": 30,
-            "image": "assets/lanche_hamburguer.png",
-            "category": "hamburgueres"
-        },
-        {
-            "id": "hamb_kids",
-            "name": "Hambúrguer Kids",
-            "description": "Pão, molho americano, carne, queijo cheddar e fritas.",
-            "price": 32,
-            "image": "assets/lanche_hamburguer.png",
-            "category": "hamburgueres"
-        },
-        {
-            "id": "hamb_cheddar_duplo",
-            "name": "Hambúrguer Cheddar Duplo",
-            "description": "Pão, molho americano, duas carnes, queijo cheddar, cebola caramelizada e fritas.",
-            "price": 40,
-            "image": "assets/lanche_hamburguer.png",
-            "category": "hamburgueres"
-        },
-        {
-            "id": "hamb_costela_desfiada",
-            "name": "Hambúrguer Costela Desfiada",
-            "description": "Pão, maionese verde, carne, queijo mussarela, carne desfiada, cebola caramelizada e fritas.",
-            "price": 40,
-            "image": "assets/lanche_hamburguer.png",
-            "category": "hamburgueres"
-        },
-        {
-            "id": "barca_1",
-            "name": "Barca Nº 1",
-            "description": "2 hambúrgueres, fritas, anéis de cebola e mini tichens.",
-            "price": 65,
-            "image": "assets/lanche_barca.png",
-            "category": "barcas"
-        },
-        {
-            "id": "barca_2",
-            "name": "Barca Nº 2",
-            "description": "2 hambúrgueres, fritas com cheddar e bacon e calabresa gratinada.",
-            "price": 70,
-            "image": "assets/lanche_barca.png",
-            "category": "barcas"
-        },
-        {
-            "id": "barca_3",
-            "name": "Barca Nº 3",
-            "description": "2 hambúrgueres, fritas com cheddar e bacon, calabresa gratinada, frango em cubos e iscas de carne.",
-            "price": 80,
-            "image": "assets/lanche_barca.png",
-            "category": "barcas"
-        },
-        {
-            "id": "fritas_trad_p",
-            "name": "Fritas Tradicional P (250g)",
-            "description": "Porção de batata frita tradicional tamanho P.",
-            "price": 16,
-            "image": "assets/lanche_fritas.png",
-            "category": "porcoes"
-        },
-        {
-            "id": "fritas_trad_m",
-            "name": "Fritas Tradicional M (350g)",
-            "description": "Porção de batata frita tradicional tamanho M.",
-            "price": 20,
-            "image": "assets/lanche_fritas.png",
-            "category": "porcoes"
-        },
-        {
-            "id": "fritas_trad_g",
-            "name": "Fritas Tradicional G (450g)",
-            "description": "Porção de batata frita tradicional tamanho G.",
-            "price": 24,
-            "image": "assets/lanche_fritas.png",
-            "category": "porcoes"
-        },
-        {
-            "id": "fritas_cheddar_bacon_p",
-            "name": "Fritas com Cheddar e Bacon P (250g)",
-            "description": "Batata frita com cobertura de queijo cheddar e bacon tamanho P.",
-            "price": 20,
-            "image": "assets/lanche_fritas.png",
-            "category": "porcoes"
-        },
-        {
-            "id": "fritas_cheddar_bacon_m",
-            "name": "Fritas com Cheddar e Bacon M (350g)",
-            "description": "Batata frita com cobertura de queijo cheddar e bacon tamanho M.",
-            "price": 26,
-            "image": "assets/lanche_fritas.png",
-            "category": "porcoes"
-        },
-        {
-            "id": "fritas_cheddar_bacon_g",
-            "name": "Fritas com Cheddar e Bacon G (450g)",
-            "description": "Batata frita com cobertura de queijo cheddar e bacon tamanho G.",
-            "price": 30,
-            "image": "assets/lanche_fritas.png",
-            "category": "porcoes"
-        },
-        {
-            "id": "fritas_verde_p",
-            "name": "Fritas com Maionese Verde P (250g)",
-            "description": "Batata frita acompanhada de maionese verde tamanho P.",
-            "price": 20,
-            "image": "assets/lanche_fritas.png",
-            "category": "porcoes"
-        },
-        {
-            "id": "fritas_verde_m",
-            "name": "Fritas com Maionese Verde M (350g)",
-            "description": "Batata frita acompanhada de maionese verde tamanho M.",
-            "price": 26,
-            "image": "assets/lanche_fritas.png",
-            "category": "porcoes"
-        },
-        {
-            "id": "fritas_verde_g",
-            "name": "Fritas com Maionese Verde G (450g)",
-            "description": "Batata frita acompanhada de maionese verde tamanho G.",
-            "price": 30,
-            "image": "assets/lanche_fritas.png",
-            "category": "porcoes"
-        },
-        {
-            "id": "fritas_4queijos_p",
-            "name": "Fritas 4 Queijos e Carne Desfiada P (250g)",
-            "description": "Batata frita com molho quatro queijos e carne desfiada tamanho P.",
-            "price": 24,
-            "image": "assets/lanche_fritas.png",
-            "category": "porcoes"
-        },
-        {
-            "id": "fritas_4queijos_m",
-            "name": "Fritas 4 Queijos e Carne Desfiada M (350g)",
-            "description": "Batata frita com molho quatro queijos e carne desfiada tamanho M.",
-            "price": 30,
-            "image": "assets/lanche_fritas.png",
-            "category": "porcoes"
-        },
-        {
-            "id": "fritas_4queijos_g",
-            "name": "Fritas 4 Queijos e Carne Desfiada G (450g)",
-            "description": "Batata frita com molho quatro queijos e carne desfiada tamanho G.",
-            "price": 34,
-            "image": "assets/lanche_fritas.png",
-            "category": "porcoes"
-        },
-        {
-            "id": "porcao_cebola_p",
-            "name": "Porção de Anéis de Cebola P",
-            "description": "Anéis de cebola empanados e fritos tamanho P.",
-            "price": 16,
-            "image": "assets/lanche_fritas.png",
-            "category": "porcoes"
-        },
-        {
-            "id": "porcao_cebola_m",
-            "name": "Porção de Anéis de Cebola M",
-            "description": "Anéis de cebola empanados e fritos tamanho M.",
-            "price": 26,
-            "image": "assets/lanche_fritas.png",
-            "category": "porcoes"
-        },
-        {
-            "id": "porcao_cebola_g",
-            "name": "Porção de Anéis de Cebola G",
-            "description": "Anéis de cebola empanados e fritos tamanho G.",
-            "price": 32,
-            "image": "assets/lanche_fritas.png",
-            "category": "porcoes"
-        },
-        {
-            "id": "porcao_frango_p",
-            "name": "Porção de Frango Empanado P",
-            "description": "Iscas de frango empanadas e fritas crocantes tamanho P.",
-            "price": 35,
-            "image": "assets/lanche_fritas.png",
-            "category": "porcoes"
-        },
-        {
-            "id": "porcao_frango_m",
-            "name": "Porção de Frango Empanado M",
-            "description": "Iscas de frango empanadas e fritas crocantes tamanho M.",
-            "price": 55,
-            "image": "assets/lanche_fritas.png",
-            "category": "porcoes"
-        },
-        {
-            "id": "porcao_frango_g",
-            "name": "Porção de Frango Empanado G",
-            "description": "Iscas de frango empanadas e fritas crocantes tamanho G.",
-            "price": 70,
-            "image": "assets/lanche_fritas.png",
-            "category": "porcoes"
-        },
-        {
-            "id": "extra_maionese_trad",
-            "name": "Maionese Tradicional (Pote Extra)",
-            "description": "Pote adicional de maionese caseira tradicional.",
-            "price": 2,
-            "image": "assets/lanche_fritas.png",
-            "category": "adicionais"
-        },
-        {
-            "id": "extra_maionese_verde",
-            "name": "Maionese Verde (Pote Extra)",
-            "description": "Pote adicional de maionese caseira temperada verde.",
-            "price": 2,
-            "image": "assets/lanche_fritas.png",
-            "category": "adicionais"
-        },
-        {
-            "id": "extra_barbecue",
-            "name": "Molho Barbecue (Pote Extra)",
-            "description": "Pote adicional de molho barbecue defumado.",
-            "price": 2.5,
-            "image": "assets/lanche_fritas.png",
-            "category": "adicionais"
-        },
-        {
-            "id": "extra_molho_americano",
-            "name": "Molho Americano (Pote Extra)",
-            "description": "Pote adicional de molho especial americano.",
-            "price": 4,
-            "image": "assets/lanche_fritas.png",
-            "category": "adicionais"
-        },
-        {
-            "id": "extra_ketchup",
-            "name": "Sachê de Ketchup Extra",
-            "description": "Sachês adicionais de ketchup de alta qualidade.",
-            "price": 1.5,
-            "image": "assets/lanche_fritas.png",
-            "category": "adicionais"
-        },
-        {
-            "id": "extra_mostarda",
-            "name": "Sachê de Mostarda Extra",
-            "description": "Sachês adicionais de mostarda de alta qualidade.",
-            "price": 1.5,
-            "image": "assets/lanche_fritas.png",
-            "category": "adicionais"
-        }
-    ],
-    "acais": [
-        {
-            "id": "acai_300ml",
-            "name": "Açaí 300ml",
-            "description": "Escolha até 3 adicionais grátis inclusos no copo.",
-            "price": 17.00,
-            "image": "assets/acai_hero.png",
-            "size": "300ml",
-            "maxFree": 3
-        },
-        {
-            "id": "acai_500ml",
-            "name": "Açaí 500ml",
-            "description": "Escolha até 4 adicionais grátis inclusos no copo.",
-            "price": 24.00,
-            "image": "assets/acai_hero.png",
-            "size": "500ml",
-            "maxFree": 4
-        },
-        {
-            "id": "acai_700ml",
-            "name": "Açaí 700ml",
-            "description": "Escolha até 5 adicionais grátis inclusos no copo.",
-            "price": 30.00,
-            "image": "assets/acai_hero.png",
-            "size": "700ml",
-            "maxFree": 5
-        }
-    ],
-    "calzones": []
+    pizzas: [],
+    lanches: [],
+    calzones: [],
+    bebidas: [],
+    acais: []
 };
-let PIZZA_PRICES = {}; // No longer used, but kept for compatibility
-
-const SIZE_MAP = {
-    'brotinho': 'B',
-    'media': 'M',
-    'grande': 'G',
-    'familia': 'F'
-};
-
-const TAMANHO_NOMES = {
-    'brotinho': 'Brotinho (20cm)',
-    'media': 'Média (25cm)',
-    'grande': 'Grande (35cm)',
-    'familia': 'Família (40cm)'
-};
-
-const TAMANHO_REGRAS = {
-    'brotinho': { maxFlavors: 1, slices: 4, name: 'Brotinho' },
-    'media': { maxFlavors: 2, slices: 6, name: 'Média' },
-    'grande': { maxFlavors: 3, slices: 12, name: 'Grande' },
-    'familia': { maxFlavors: 4, slices: 16, name: 'Família' }
-};
-
-let BORDAS = {
-    'sem-borda': { name: 'Sem Borda', price: 0.00, category: 'ambas' },
-    'catupiry': { name: 'Borda de Catupiry', price: 5.00, category: 'salgadas' },
-    'cheddar': { name: 'Borda de Cheddar', price: 5.00, category: 'salgadas' },
-    'quatro-queijos': { name: 'Borda 4 Queijos', price: 5.00, category: 'salgadas' },
-    'calabresa': { name: 'Borda de Calabresa', price: 5.00, category: 'salgadas' },
-    'doce-de-leite': { name: 'Borda de Doce de Leite', price: 5.00, category: 'doces' },
-'choco-branco': { name: 'Borda de Chocolate Branco', price: 5.00, category: 'doces' },
-    'choco-preto': { name: 'Borda de Chocolate Preto', price: 5.00, category: 'doces' },
-    'gergelim': { name: 'Borda com Gergelim Branco', price: 5.00, category: 'ambas' }
-};
-
+let BORDAS = {};
 let db = null;
 if (typeof firebase !== 'undefined' && typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey !== 'SUA_API_KEY') {
     firebase.initializeApp(firebaseConfig);
@@ -2121,22 +29,7 @@ let CONFIG_SETTINGS = {
     whatsappFormatted: '(54) 99670-4189'
 };
 
-let TAXAS_ENTREGA = {
-    'centro': { name: 'Centro', fee: 10.00 },
-    'logradouro': { name: 'Logradouro', fee: 10.00 },
-    'juriti': { name: 'Juriti', fee: 10.00 },
-    'pousada': { name: 'Pousada', fee: 15.00 },
-    'bavaria': { name: 'Bavária', fee: 15.00 },
-    'pia': { name: 'Pia', fee: 15.00 },
-    'vila-rica': { name: 'Vila Rica', fee: 18.00 },
-    'vale-verde': { name: 'Vale Verde', fee: 18.00 },
-    'vila-germania': { name: 'Vila Germânia', fee: 18.00 },
-    'linha-imperial': { name: 'Linha Imperial', fee: 22.00 },
-    'vila-olinda': { name: 'Vila Olinda', fee: 25.00 },
-    'linha-olinda': { name: 'Linha Olinda', fee: 30.00 },
-    'pinhal': { name: 'Pinhal', fee: 40.00 }
-};
-
+let TAXAS_ENTREGA = {};
 function getDeliveryFeeForBairro(bairroName) {
     if (!bairroName) return 10.00;
     const key = bairroName.toLowerCase().trim().replace(/\s+/g, '-').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -2182,24 +75,9 @@ let currentAcai = {
     totalPrice: 17
 };
 
-const ACAI_FREE_ADDITIONS = [
-    "Chocoboll", "Leite condensado", "Paçoca", "Disket", "Negresco", 
-    "Banana", "Morango", "Uva", "Abacaxi", "Pêssego", "Kiwi", 
-    "Leite em pó", "Calda de morango", "Calda de chocolate", 
-    "Chocolate branco", "Chocolate preto", "Chocolate meio amargo", 
-    "Marshmallow", "Granola", "Granola caseira", "Calda de caramelo"
-];
-
-const ACAI_PAID_5 = [
-    "MM's", "Ouro Branco", "Creme de Choco Preto", "Creme de Choco Branco", 
-    "Nutella", "Pistache", "Kit Kat", "Creme de Kinder Bueno", 
-    "Creme Leite Ninho", "Creme Capuccino", "Creme Coco Cremoso"
-];
-
-const ACAI_PAID_2_5 = [
-    "Stikadinho", "Prestigio", "Doce de Leite"
-];
-
+let ACAI_FREE_ADDITIONS = [];
+let ACAI_PAID_5 = [];
+let ACAI_PAID_2_5 = [];
 function renderAcais() {
     const acaisGrid = document.getElementById('acaisGrid');
     if (!acaisGrid) return;
@@ -2255,7 +133,7 @@ function openAcaiCustomizer(sizeId) {
     const radio = document.querySelector(`input[name="acai-size"][value="${currentAcai.size}"]`);
     if (radio) radio.checked = true;
     
-    document.getElementById('acaiNotes').value = '';
+    const acaiNotesEl = document.getElementById('acaiNotes'); if (acaiNotesEl) acaiNotesEl.value = '';
     document.getElementById('acaiCustomizerQty').innerText = '1';
     
     renderAcaiAdditionsLists();
@@ -2275,7 +153,7 @@ function onAcaiSizeChange() {
     const checkedRadio = document.querySelector('input[name="acai-size"]:checked');
     if (!checkedRadio) return;
     
-    const size = checkedRadio.value;
+    const size = checkedRadio ? checkedRadio.value : '300ml';
     const maxFree = parseInt(checkedRadio.getAttribute('data-max-free'));
     
     currentAcai.size = size;
@@ -2465,7 +343,7 @@ function calculateAcaiPrice() {
 }
 
 function addAcaiToOrder() {
-    currentAcai.notes = document.getElementById('acaiNotes').value.trim();
+    const acaiNotesEl = document.getElementById('acaiNotes'); currentAcai.notes = acaiNotesEl ? acaiNotesEl.value.trim() : '';
     
     const cartItem = {
         type: 'acai',
@@ -2576,7 +454,7 @@ function setupSubcategoryTabs() {
                 pizzaSubtabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 const sub = tab.getAttribute('data-sub');
-                renderPizzas(sub);
+                if (typeof renderPizzasFlavorsGrid === 'function') renderPizzasFlavorsGrid(sub);
             });
         });
     } else {
@@ -2587,7 +465,7 @@ function setupSubcategoryTabs() {
                 subtabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 const sub = tab.getAttribute('data-sub');
-                renderPizzas(sub);
+                if (typeof renderPizzasFlavorsGrid === 'function') renderPizzasFlavorsGrid(sub);
             });
         });
     }
@@ -2599,7 +477,7 @@ function setupSubcategoryTabs() {
             lanchesSubtabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
             const sub = tab.getAttribute('data-sub');
-            renderLanches(sub);
+            if (typeof renderMenu === 'function') renderMenu();
         });
     });
 }
@@ -3063,7 +941,7 @@ function openPizzaCustomizer(sizeId) {
     if (radio) radio.checked = true;
     
     // Reset inputs
-    document.getElementById('pizzaNotes').value = '';
+    const pizzaNotesEl = document.getElementById('pizzaNotes'); if (pizzaNotesEl) pizzaNotesEl.value = '';
     document.getElementById('customizerQty').innerText = '1';
     
     // Reset carousel filter
@@ -3082,7 +960,7 @@ function closePizzaCustomizer() {
 }
 
 function onSizeChange() {
-    const size = document.querySelector('input[name="pizza-size"]:checked').value;
+    const sizeRadio = document.querySelector('input[name="pizza-size"]:checked'); const size = sizeRadio ? sizeRadio.value : 'media';
     currentPizza.size = size;
     
     // Clear selected flavors when size changes
@@ -3493,7 +1371,7 @@ function calculateCustomizerPrice() {
 function addPizzaToOrder() {
     if (currentPizza.selectedFlavors.length === 0) return;
     
-    currentPizza.notes = document.getElementById('pizzaNotes').value.trim();
+    const pizzaNotesEl = document.getElementById('pizzaNotes'); currentPizza.notes = pizzaNotesEl ? pizzaNotesEl.value.trim() : '';
     
     const cartItem = {
         type: 'pizza',
@@ -3503,7 +1381,8 @@ function addPizzaToOrder() {
         borderName: BORDAS[currentPizza.border] ? (BORDAS[currentPizza.border].price === 0 ? BORDAS[currentPizza.border].name : `${BORDAS[currentPizza.border].name} (+ R$ ${BORDAS[currentPizza.border].price.toFixed(2).replace('.', ',')})`) : 'Sem Borda',
         flavors: [...currentPizza.selectedFlavors],
         flavorNames: currentPizza.selectedFlavors.map(fId => {
-            return MENU_ITEMS.pizzas.find(p => p.id === fId).name;
+            const pizzaObj = (MENU_ITEMS.pizzas || []).find(p => p.id === fId);
+            return pizzaObj ? pizzaObj.name : fId;
         }),
         notes: currentPizza.notes,
         quantity: currentPizza.quantity,
@@ -3531,9 +1410,9 @@ function addPizzaToOrder() {
 function addSimpleItemToCart(itemId, category) {
     let list = [];
     if (category === 'bebidas') {
-        list = MENU_ITEMS.bebidas;
+        list = MENU_ITEMS.bebidas || [];
     } else if (category === 'lanches') {
-        list = MENU_ITEMS.lanches;
+        list = MENU_ITEMS.lanches || [];
     } else if (category === 'calzones') {
         list = MENU_ITEMS.calzones || [];
     }
@@ -3581,33 +1460,23 @@ function toggleCart(isOpen) {
 }
 
 function updateCartQty(index, delta) {
-    if (index >= cart.length) return;
-    
-    cart[index].quantity += delta;
-    
-    if (cart[index].quantity <= 0) {
-        cart.splice(index, 1); // remove
-    } else {
-        cart[index].totalPrice = cart[index].quantity * cart[index].singlePrice;
-    }
-    
-    saveCartToLocalStorage();
+    cart = CartService.updateCartQty(index, delta);
     updateCartUI();
 }
 
 function updateCartUI() {
     const emptyState = document.getElementById('cartEmptyState');
-    const content = document.getElementById('cartContent');
+    const contentDiv = document.getElementById('cartContent');
     const itemsList = document.getElementById('cartItemsList');
     
     let totalItems = 0;
     let subtotal = 0;
     
-    itemsList.innerHTML = '';
+    if (itemsList) itemsList.innerHTML = '';
     
     if (cart.length === 0) {
-        emptyState.classList.remove('display-none');
-        content.classList.add('display-none');
+        if (emptyState) emptyState.classList.remove('display-none');
+        if (contentDiv) contentDiv.classList.add('display-none');
         const badgeCount = document.getElementById('cartBadgeCount');
         if (badgeCount) {
             badgeCount.innerText = '0';
@@ -3616,67 +1485,69 @@ function updateCartUI() {
         return;
     }
     
-    emptyState.classList.add('display-none');
-    content.classList.remove('display-none');
+    if (emptyState) emptyState.classList.add('display-none');
+    if (contentDiv) contentDiv.classList.remove('display-none');
     
     cart.forEach((item, index) => {
         totalItems += item.quantity;
         subtotal += item.totalPrice;
         
-        const itemRow = document.createElement('div');
-        itemRow.className = 'cart-item';
-        
-        let detailsHTML = '';
-        let titleHTML = '';
-        
-        if (item.type === 'pizza') {
-            titleHTML = `Pizza ${item.sizeName}`;
-            detailsHTML = `
-                <div class="cart-item-subtitle">
-                    <strong>Sabores:</strong> ${item.flavorNames.join(' / ')}<br>
-                    <strong>Borda:</strong> ${item.borderName}
-                </div>
-            `;
-            if (item.notes) {
-                detailsHTML += `<div class="cart-item-notes">Obs: ${item.notes}</div>`;
+        if (itemsList) {
+            const itemRow = document.createElement('div');
+            itemRow.className = 'cart-item';
+            
+            let detailsHTML = '';
+            let titleHTML = '';
+            
+            if (item.type === 'pizza') {
+                titleHTML = `Pizza ${item.sizeName}`;
+                detailsHTML = `
+                    <div class="cart-item-subtitle">
+                        <strong>Sabores:</strong> ${item.flavorNames.join(' / ')}<br>
+                        <strong>Borda:</strong> ${item.borderName}
+                    </div>
+                `;
+                if (item.notes) {
+                    detailsHTML += `<div class="cart-item-notes">Obs: ${item.notes}</div>`;
+                }
+            } else if (item.type === 'acai') {
+                titleHTML = `Açaí ${item.size}`;
+                let adds = [];
+                if (item.freeAdditions && item.freeAdditions.length > 0) {
+                    adds.push(`Grátis: ${item.freeAdditions.join(', ')}`);
+                }
+                if (item.paidAdditions && item.paidAdditions.length > 0) {
+                    adds.push(`Pagos: ${item.paidAdditions.map(a => a.name).join(', ')}`);
+                }
+                detailsHTML = `
+                    <div class="cart-item-subtitle">
+                        ${adds.length > 0 ? `<strong>Adicionais:</strong> ${adds.join('<br>')}` : 'Sem adicionais'}
+                    </div>
+                `;
+                if (item.notes) {
+                    detailsHTML += `<div class="cart-item-notes">Obs: ${item.notes}</div>`;
+                }
+            } else {
+                titleHTML = item.name;
             }
-        } else if (item.type === 'acai') {
-            titleHTML = `Açaí ${item.size}`;
-            let adds = [];
-            if (item.freeAdditions && item.freeAdditions.length > 0) {
-                adds.push(`Grátis: ${item.freeAdditions.join(', ')}`);
-            }
-            if (item.paidAdditions && item.paidAdditions.length > 0) {
-                adds.push(`Pagos: ${item.paidAdditions.map(a => a.name).join(', ')}`);
-            }
-            detailsHTML = `
-                <div class="cart-item-subtitle">
-                    ${adds.length > 0 ? `<strong>Adicionais:</strong> ${adds.join('<br>')}` : 'Sem adicionais'}
-                </div>
-            `;
-            if (item.notes) {
-                detailsHTML += `<div class="cart-item-notes">Obs: ${item.notes}</div>`;
-            }
-        } else {
-            titleHTML = item.name;
-        }
-        
-        itemRow.innerHTML = `
-            <div class="cart-item-details">
-                <h4 class="cart-item-title">${titleHTML}</h4>
-                ${detailsHTML}
-                <div class="cart-item-action">
-                    <span class="cart-item-price">R$ ${item.totalPrice.toFixed(2).replace('.', ',')}</span>
-                    <div class="item-qty-adjuster">
-                        <button onclick="updateCartQty(${index}, -1)"><span class="material-symbols-rounded">remove</span></button>
-                        <span>${item.quantity}</span>
-                        <button onclick="updateCartQty(${index}, 1)"><span class="material-symbols-rounded">add</span></button>
+            
+            itemRow.innerHTML = `
+                <div class="cart-item-details">
+                    <h4 class="cart-item-title">${titleHTML}</h4>
+                    ${detailsHTML}
+                    <div class="cart-item-action">
+                        <span class="cart-item-price">R$ ${item.totalPrice.toFixed(2).replace('.', ',')}</span>
+                        <div class="item-qty-adjuster">
+                            <button onclick="updateCartQty(${index}, -1)"><span class="material-symbols-rounded">remove</span></button>
+                            <span>${item.quantity}</span>
+                            <button onclick="updateCartQty(${index}, 1)"><span class="material-symbols-rounded">add</span></button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
-        
-        itemsList.appendChild(itemRow);
+            `;
+            
+            itemsList.appendChild(itemRow);
+        }
     });
     
     // Values Summary
@@ -3684,13 +1555,19 @@ function updateCartUI() {
     if (checkoutType === 'delivery') {
         const bairroSelect = document.getElementById('addressBairro');
         const selectedBairro = bairroSelect ? bairroSelect.value : '';
-        deliveryFee = selectedBairro ? getDeliveryFeeForBairro(selectedBairro) : DELIVERY_FEE;
+        deliveryFee = selectedBairro ? getDeliveryFeeForBairro(selectedBairro) : 10.00;
     }
     const finalTotal = subtotal + deliveryFee;
     
-    document.getElementById('cartSubtotal').innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
-    document.getElementById('cartDeliveryFee').innerText = deliveryFee === 0 ? 'Grátis' : `R$ ${deliveryFee.toFixed(2).replace('.', ',')}`;
-    document.getElementById('cartTotal').innerText = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
+    const subtotalEl = document.getElementById('cartSubtotal');
+    if (subtotalEl) subtotalEl.innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+    
+    const deliveryFeeEl = document.getElementById('cartDeliveryFee');
+    if (deliveryFeeEl) deliveryFeeEl.innerText = deliveryFee === 0 ? 'Grátis' : `R$ ${deliveryFee.toFixed(2).replace('.', ',')}`;
+    
+    const totalEl = document.getElementById('cartTotal');
+    if (totalEl) totalEl.innerText = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
+    
     const badgeCount = document.getElementById('cartBadgeCount');
     if (badgeCount) {
         badgeCount.innerText = totalItems;
@@ -3719,19 +1596,12 @@ function updateCartUI() {
 }
 
 function saveCartToLocalStorage() {
-    localStorage.setItem('fina_massa_cart', JSON.stringify(cart));
+    CartService.setCart(cart);
 }
 
 function loadCartFromLocalStorage() {
-    const stored = localStorage.getItem('fina_massa_cart');
-    if (stored) {
-        try {
-            cart = JSON.parse(stored);
-            updateCartUI();
-        } catch (e) {
-            cart = [];
-        }
-    }
+    cart = CartService.loadCartFromLocalStorage();
+    updateCartUI();
 }
 
 /* ==========================================================================
@@ -3745,7 +1615,7 @@ function openCheckoutModal() {
     toggleCart(false); // Close cart sidebar
     const modal = document.getElementById('checkoutModal');
     
-    let subtotal = cart.reduce((sum, item) => sum + item.totalPrice, 0);
+    let subtotal = CartService.calculateSubtotal();
     let fee = 0;
     if (checkoutType === 'delivery') {
         const bairroSelect = document.getElementById('addressBairro');
@@ -3754,13 +1624,13 @@ function openCheckoutModal() {
     }
     
     // Handle Cash 5% discount
-    const isCash = document.querySelector('input[name="payment-method"]:checked').value === 'cash';
+    const payMethodRadio = document.querySelector('input[name="payment-method"]:checked'); const isCash = payMethodRadio ? payMethodRadio.value === 'cash' : false;
     let total = subtotal + fee;
     if (isCash) {
         total = (subtotal * 0.95) + fee;
     }
     
-    document.getElementById('checkoutTotalValue').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+    const checkoutTotalValueEl = document.getElementById('checkoutTotalValue'); if (checkoutTotalValueEl) checkoutTotalValueEl.innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
     
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -3840,7 +1710,7 @@ function setCheckoutType(type) {
 }
 
 function togglePaymentFields() {
-    const selectedMethod = document.querySelector('input[name="payment-method"]:checked').value;
+    const payMethodRadio = document.querySelector('input[name="payment-method"]:checked'); const selectedMethod = payMethodRadio ? payMethodRadio.value : 'pix';
     const cashChangeGroup = document.getElementById('cashChangeGroup');
     const pixInstructions = document.getElementById('pixInstructions');
     
@@ -3859,7 +1729,7 @@ function togglePaymentFields() {
 }
 
 function updateCheckoutPrice() {
-    let subtotal = cart.reduce((sum, item) => sum + item.totalPrice, 0);
+    let subtotal = CartService.calculateSubtotal();
     let fee = 0;
     if (checkoutType === 'delivery') {
         const bairroSelect = document.getElementById('addressBairro');
@@ -3868,13 +1738,13 @@ function updateCheckoutPrice() {
     }
     
     // 5% discount on subtotal if payment is Cash
-    const selectedMethod = document.querySelector('input[name="payment-method"]:checked').value;
+    const payMethodRadio = document.querySelector('input[name="payment-method"]:checked'); const selectedMethod = payMethodRadio ? payMethodRadio.value : 'pix';
     let total = subtotal + fee;
     if (selectedMethod === 'cash') {
         total = (subtotal * 0.95) + fee;
     }
     
-    document.getElementById('checkoutTotalValue').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+    const checkoutTotalValueEl = document.getElementById('checkoutTotalValue'); if (checkoutTotalValueEl) checkoutTotalValueEl.innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
 }
 
 function submitOrder() {
@@ -3886,11 +1756,11 @@ function submitOrder() {
         return;
     }
     
-    const clientName = document.getElementById('clientName').value.trim();
-    const clientPhone = document.getElementById('clientPhone').value.trim();
-    const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+    const clientNameEl = document.getElementById('clientName'); const clientName = clientNameEl ? clientNameEl.value.trim() : '';
+    const clientPhoneEl = document.getElementById('clientPhone'); const clientPhone = clientPhoneEl ? clientPhoneEl.value.trim() : '';
+    const payMethodRadio = document.querySelector('input[name="payment-method"]:checked'); const paymentMethod = payMethodRadio ? payMethodRadio.value : 'pix';
     
-    let subtotal = cart.reduce((sum, item) => sum + item.totalPrice, 0);
+    let subtotal = CartService.calculateSubtotal();
     let fee = 0;
     if (checkoutType === 'delivery') {
         const bairroSelect = document.getElementById('addressBairro');
@@ -3914,10 +1784,10 @@ function submitOrder() {
     msg += `📦 *Tipo:* ${checkoutType === 'delivery' ? '🚗 Entrega (Delivery)' : '🏪 Retirada no Balcão'}\n\n`;
     
     if (checkoutType === 'delivery') {
-        const street = document.getElementById('addressStreet').value.trim();
-        const number = document.getElementById('addressNumber').value.trim();
-        const neighborhood = document.getElementById('addressBairro').value.trim();
-        const ref = document.getElementById('addressRef').value.trim();
+        const streetEl = document.getElementById('addressStreet'); const street = streetEl ? streetEl.value.trim() : '';
+        const numberEl = document.getElementById('addressNumber'); const number = numberEl ? numberEl.value.trim() : '';
+        const neighborhoodEl = document.getElementById('addressBairro'); const neighborhood = neighborhoodEl ? neighborhoodEl.value.trim() : '';
+        const refEl = document.getElementById('addressRef'); const ref = refEl ? refEl.value.trim() : '';
         
         msg += `📍 *Endereço de Entrega:*\n`;
         msg += `${street}, nº ${number}\n`;
@@ -3965,7 +1835,7 @@ function submitOrder() {
     } else if (paymentMethod === 'card') {
         msg += `Cartão (Levar Maquininha)`;
     } else {
-        const change = document.getElementById('cashChange').value.trim();
+        const changeEl = document.getElementById('cashChange'); const change = changeEl ? changeEl.value.trim() : '';
         msg += `Dinheiro`;
         if (change) msg += ` (Troco para R$ ${change})`;
     }
@@ -3981,13 +1851,13 @@ function submitOrder() {
         clientPhone: clientPhone,
         checkoutType: checkoutType,
         address: checkoutType === 'delivery' ? {
-            street: document.getElementById('addressStreet').value.trim(),
-            number: document.getElementById('addressNumber').value.trim(),
-            neighborhood: document.getElementById('addressBairro').value.trim(),
-            reference: document.getElementById('addressRef').value.trim()
+            street: (document.getElementById('addressStreet') ? document.getElementById('addressStreet').value.trim() : ''),
+            number: (document.getElementById('addressNumber') ? document.getElementById('addressNumber').value.trim() : ''),
+            neighborhood: (document.getElementById('addressBairro') ? document.getElementById('addressBairro').value.trim() : ''),
+            reference: (document.getElementById('addressRef') ? document.getElementById('addressRef').value.trim() : '')
         } : null,
         paymentMethod: paymentMethod,
-        cashChange: paymentMethod === 'cash' ? document.getElementById('cashChange').value.trim() : null,
+        cashChange: paymentMethod === 'cash' ? (document.getElementById('cashChange') ? document.getElementById('cashChange').value.trim() : '') : null,
         cart: cart,
         subtotal: subtotal,
         deliveryFee: fee,
@@ -4008,7 +1878,7 @@ function submitOrder() {
             date: dateFormatted
         };
 
-        db.collection('fina_massa_orders').doc(String(orderId)).set(firebaseOrder)
+        ConfigService.saveOrder(orderId, firebaseOrder)
         .catch(err => {
             console.error("Erro ao enviar para o Firebase, enviando para o servidor local:", err);
             fetch('/api/orders', {
@@ -4041,107 +1911,89 @@ function submitOrder() {
 }
 
 function initMenuData() {
-    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
-        db.collection('pizzaria_drill_menu').doc('main').onSnapshot((doc) => {
-            if (doc.exists) {
-                const data = doc.data();
-                let updated = false;
-                if (data.menu_items && data.menu_items.bebidas) {
-                    const hasZero600 = data.menu_items.bebidas.some(b => b.id === 'coca_zero_600');
-                    if (!hasZero600) {
-                        const idx = data.menu_items.bebidas.findIndex(b => b.id === 'coca_600');
-                        const newItem = { id: 'coca_zero_600', name: 'Coca Cola Zero 600ml', price: 10.00, image: 'assets/coca_cola.png', available: true };
-                        if (idx !== -1) {
-                            data.menu_items.bebidas.splice(idx + 1, 0, newItem);
-                        } else {
-                            data.menu_items.bebidas.push(newItem);
-                        }
-                        updated = true;
-                    }
-                    const hasZeroLata = data.menu_items.bebidas.some(b => b.id === 'coca_zero_lata');
-                    if (!hasZeroLata) {
-                        const idx = data.menu_items.bebidas.findIndex(b => b.id === 'coca_lata');
-                        const newItem = { id: 'coca_zero_lata', name: 'Coca Cola Zero lata', price: 6.00, image: 'assets/coca_cola.png', available: true };
-                        if (idx !== -1) {
-                            data.menu_items.bebidas.splice(idx + 1, 0, newItem);
-                        } else {
-                            data.menu_items.bebidas.push(newItem);
-                        }
-                        updated = true;
-                    }
+    // 1. Listen to config/settings
+    ConfigService.subscribeSettings((data) => {
+        if (data) {
+            CONFIG_SETTINGS = { ...CONFIG_SETTINGS, ...data };
+            updateContactInfoUI();
+        }
+    });
+    
+    // 2. Listen to config/delivery_fees
+    ConfigService.subscribeDeliveryFees((data) => {
+        if (data) {
+            TAXAS_ENTREGA = data;
+            populateNeighborhoodDropdown();
+            updateCartUI();
+        }
+    });
+    
+    // 3. Listen to categorias
+    ProductsService.subscribeCategories((categoriesList) => {
+        if (categoriesList && categoriesList.length > 0) {
+            renderCategoriesUI(categoriesList);
+        }
+    });
+    
+    // 4. Listen to banners
+    ProductsService.subscribeBanners((bannersList) => {
+        if (bannersList && bannersList.length > 0) {
+            renderBannersUI(bannersList);
+        }
+    });
+    
+    // 5. Listen to produtos (all items)
+    ProductsService.subscribeProducts((productsList) => {
+        MENU_ITEMS = { pizzas: [], lanches: [], calzones: [], bebidas: [], acais: [] };
+        BORDAS = {};
+        const freeAdds = [];
+        const paid5 = [];
+        const paid25 = [];
+        
+        productsList.forEach((item) => {
+            if (item.category === 'pizzas') {
+                MENU_ITEMS.pizzas.push(item);
+            } else if (item.category === 'bordas') {
+                const key = item.id.replace('borda_', '');
+                BORDAS[key] = { name: item.name, price: item.price, category: item.subcategory || 'ambas' };
+            } else if (item.category === 'acai_adicionais') {
+                if (item.type === 'free') {
+                    freeAdds.push(item.name);
+                } else if (item.type === 'paid_5') {
+                    paid5.push(item.name);
+                } else if (item.type === 'paid_2.5') {
+                    paid25.push(item.name);
                 }
-                
-                if (updated) {
-                    db.collection('pizzaria_drill_menu').doc('main').set(data)
-                    .then(() => console.log("Cardápio atualizado no Firestore com as opções de Coca Zero."))
-                    .catch(err => console.error("Erro ao atualizar Coca Zero:", err));
-                    return;
+            } else if (item.category) {
+                if (!MENU_ITEMS[item.category]) {
+                    MENU_ITEMS[item.category] = [];
                 }
-
-                if (data.menu_items) {
-                    MENU_ITEMS = data.menu_items;
-                    if (!MENU_ITEMS.acais) {
-                        MENU_ITEMS.acais = [
-                            { id: "acai_300ml", name: "Açaí 300ml", description: "Escolha até 3 adicionais grátis inclusos no copo.", price: 17.00, image: "assets/acai_hero.png", size: "300ml", maxFree: 3 },
-                            { id: "acai_500ml", name: "Açaí 500ml", description: "Escolha até 4 adicionais grátis inclusos no copo.", price: 24.00, image: "assets/acai_hero.png", size: "500ml", maxFree: 4 },
-                            { id: "acai_700ml", name: "Açaí 700ml", description: "Escolha até 5 adicionais grátis inclusos no copo.", price: 30.00, image: "assets/acai_hero.png", size: "700ml", maxFree: 5 }
-                        ];
-                    }
-                }
-                if (data.pizza_prices) PIZZA_PRICES = data.pizza_prices;
-                if (data.borders) BORDAS = data.borders;
-                if (data.settings) {
-                    CONFIG_SETTINGS = { ...CONFIG_SETTINGS, ...data.settings };
-                    if (data.settings.deliveryFees) TAXAS_ENTREGA = data.settings.deliveryFees;
-                    populateNeighborhoodDropdown();
-                    updateContactInfoUI();
-                }
-                
-                if (data.categories) {
-                    renderCategoriesUI(data.categories);
-                } else {
-                    const defaultCategories = [
-                        { id: 'todos', name: 'Todos', icon: '🍽️' },
-                        { id: 'mais-pedidos', name: 'Mais Pedidos', icon: '🔥' },
-                        { id: 'pizzas', name: 'Pizzas', icon: '🍕' },
-                        { id: 'lanches', name: 'Lanches', icon: '🍔' },
-                        { id: 'calzones', name: 'Calzones', icon: '🥟' },
-                        { id: 'bebidas', name: 'Bebidas', icon: '🥤' },
-                        { id: 'acai', name: 'Açaís', icon: '🍧' }
-                    ];
-                    renderCategoriesUI(defaultCategories);
-                }
-                
-                if (data.banners) {
-                    renderBannersUI(data.banners);
-                } else {
-                    const defaultBanners = [
-                        { tag: 'Promoção', title: 'Pizzas Promocionais G', subtitle: 'Selecione apenas sabores promocionais e pague preço único fixo!', gradient: 'linear-gradient(135deg, #b71c1c 0%, #1a0a0a 100%)' },
-                        { tag: 'Forno de Pedra', title: 'Massa Fina & Crocante', subtitle: 'Ingredientes frescos selecionados diariamente', gradient: 'linear-gradient(135deg, #ffd600 0%, #3e2723 100%)' }
-                    ];
-                    renderBannersUI(defaultBanners);
-                }
-                
-                PIZZA_TYPES = getPizzaTypesDynamic();
-                renderMenu();
-                
-                if (document.getElementById('customizerModal').classList.contains('active')) {
-                    renderCustomizerFlavors();
-                    renderCustomizerBorders();
-                    calculateCustomizerPrice();
-                }
-            } else {
-                seedFirebaseMenu();
+                MENU_ITEMS[item.category].push(item);
             }
-        }, (error) => {
-            console.error("Erro ao carregar o cardápio do Firebase:", error);
-            PIZZA_TYPES = getPizzaTypesDynamic();
-            renderMenu();
         });
-    } else {
+        
+        ACAI_FREE_ADDITIONS = freeAdds;
+        ACAI_PAID_5 = paid5;
+        ACAI_PAID_2_5 = paid25;
+        
         PIZZA_TYPES = getPizzaTypesDynamic();
         renderMenu();
-    }
+        
+        const customizerModal = document.getElementById('customizerModal');
+        if (customizerModal && customizerModal.classList.contains('active')) {
+            renderCustomizerFlavors();
+            renderCustomizerBorders();
+            calculateCustomizerPrice();
+        }
+        
+        const acaiCustomizerModal = document.getElementById('acaiCustomizerModal');
+        if (acaiCustomizerModal && acaiCustomizerModal.classList.contains('active')) {
+            renderAcaiAdditionsLists();
+            calculateAcaiPrice();
+        }
+        
+        updateCartUI();
+    });
 }
 
 function renderCategoriesUI(categories) {
@@ -4189,22 +2041,10 @@ function renderBannersUI(banners) {
 }
 
 function initShopStatusListener() {
-    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
-        db.collection('pizzaria_drill_status').doc('status').onSnapshot((doc) => {
-            if (doc.exists) {
-                const data = doc.data();
-                isShopOpen = data.isOpen !== undefined ? data.isOpen : true;
-                updateShopStatusUI();
-            }
-        }, (error) => {
-            console.error("Erro ao obter status de funcionamento do Firebase:", error);
-            isShopOpen = true;
-            updateShopStatusUI();
-        });
-    } else {
-        isShopOpen = true;
+    ConfigService.subscribeShopStatus((data) => {
+        isShopOpen = data ? (data.isOpen !== undefined ? data.isOpen : (data.open !== undefined ? data.open : true)) : true;
         updateShopStatusUI();
-    }
+    });
 }
 
 function updateShopStatusUI() {
@@ -4223,33 +2063,7 @@ function updateShopStatusUI() {
     updateCartUI();
 }
 
-function seedFirebaseMenu() {
-    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
-        const defaultCategories = [
-            { id: 'todos', name: 'Todos', icon: '🍽️' },
-            { id: 'mais-pedidos', name: 'Mais Pedidos', icon: '🔥' },
-            { id: 'pizzas', name: 'Pizzas', icon: '🍕' },
-            { id: 'lanches', name: 'Lanches', icon: '🍔' },
-            { id: 'calzones', name: 'Calzones', icon: '🥟' },
-            { id: 'bebidas', name: 'Bebidas', icon: '🥤' },
-            { id: 'acai', name: 'Açaís', icon: '🍧' }
-        ];
-        
-        const defaultBanners = [
-            { tag: 'Promoção', title: 'Pizzas Promocionais G', subtitle: 'Selecione apenas sabores promocionais e pague preço único fixo!', gradient: 'linear-gradient(135deg, #b71c1c 0%, #1a0a0a 100%)' },
-            { tag: 'Forno de Pedra', title: 'Massa Fina & Crocante', subtitle: 'Ingredientes frescos selecionados diariamente', gradient: 'linear-gradient(135deg, #ffd600 0%, #3e2723 100%)' }
-        ];
-
-        db.collection('pizzaria_drill_menu').doc('main').set({
-            menu_items: MENU_ITEMS,
-            pizza_prices: PIZZA_PRICES,
-            borders: BORDAS
-        })
-        .then(() => console.log("Cardápio semeado no Firebase com sucesso."))
-        .catch(err => console.error("Erro ao semear o cardápio no Firebase:", err));
-    }
-}
-
+function seedFirebaseMenu() {}
 function getMinPriceForSize(sizeKey) {
     let min = Infinity;
     const pizzas = MENU_ITEMS.pizzas || [];
