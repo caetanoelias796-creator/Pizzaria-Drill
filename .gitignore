@@ -3,3 +3,7 @@ orders.json
 .system_generated/
 *.log
 scratch/
+*adminsdk*.json
+*.zip
+.firebase/
+backup_pizzaria_drill/
