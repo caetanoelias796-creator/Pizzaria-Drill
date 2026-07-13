@@ -1137,12 +1137,145 @@ function filterFlavorsList() {
     renderFlavorsList();
 }
 
+function renderCalzonesList() {
+    const grid = document.getElementById('calzonesListGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    const searchVal = document.getElementById('searchCalzone') ? document.getElementById('searchCalzone').value.toLowerCase().trim() : '';
+    const calzones = menuData.menu_items?.calzones || [];
+    calzones.forEach((calzone) => {
+        if (searchVal && !calzone.name.toLowerCase().includes(searchVal) && !(calzone.description || '').toLowerCase().includes(searchVal)) {
+            return;
+        }
+        const card = document.createElement('div');
+        card.className = 'flavor-card';
+        if (calzone.available === false) card.style.opacity = '0.6';
+        const isChecked = calzone.available !== false ? 'checked' : '';
+        
+        card.innerHTML = `
+            <div class="flavor-card-header">
+                <div class="flavor-card-info">
+                    <h4 style="margin: 0; color: var(--text-main); font-size: 15px;">${calzone.name}</h4>
+                </div>
+                <label class="switch" title="${calzone.available !== false ? 'Disponível no Site' : 'Pausado/Indisponível'}">
+                    <input type="checkbox" ${isChecked} onchange="toggleFlavorAvailability('${calzone.id}', this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <p class="flavor-card-desc" style="margin: 0; flex: 1;">${calzone.description || 'Sem descrição.'}</p>
+            <div style="font-size: 13px; color: var(--primary); font-weight: 700; margin-top: 8px;">
+                Preço: R$ ${(calzone.price || 0).toFixed(2).replace('.', ',')}
+            </div>
+            <div class="flavor-card-actions">
+                <button class="btn-icon-action" onclick="openEditFlavorModal('${calzone.id}')" title="Editar Calzone">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">edit</span>
+                </button>
+                <button class="btn-icon-action delete" onclick="deleteFlavor('${calzone.id}')" title="Excluir Calzone">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">delete</span>
+                </button>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
 function filterCalzonesList() {
     renderCalzonesList();
 }
 
+function renderBebidasList() {
+    const grid = document.getElementById('bebidasListGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    const searchVal = document.getElementById('searchBebida') ? document.getElementById('searchBebida').value.toLowerCase().trim() : '';
+    const bebidas = menuData.menu_items?.bebidas || [];
+    bebidas.forEach((bebida) => {
+        if (searchVal && !bebida.name.toLowerCase().includes(searchVal) && !(bebida.description || '').toLowerCase().includes(searchVal)) {
+            return;
+        }
+        const card = document.createElement('div');
+        card.className = 'flavor-card';
+        if (bebida.available === false) card.style.opacity = '0.6';
+        const isChecked = bebida.available !== false ? 'checked' : '';
+        
+        card.innerHTML = `
+            <div class="flavor-card-header">
+                <div class="flavor-card-info">
+                    <h4 style="margin: 0; color: var(--text-main); font-size: 15px;">${bebida.name}</h4>
+                </div>
+                <label class="switch" title="${bebida.available !== false ? 'Disponível no Site' : 'Pausado/Indisponível'}">
+                    <input type="checkbox" ${isChecked} onchange="toggleFlavorAvailability('${bebida.id}', this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <p class="flavor-card-desc" style="margin: 0; flex: 1;">${bebida.description || 'Sem descrição.'}</p>
+            <div style="font-size: 13px; color: var(--primary); font-weight: 700; margin-top: 8px;">
+                Preço: R$ ${(bebida.price || 0).toFixed(2).replace('.', ',')}
+            </div>
+            <div class="flavor-card-actions">
+                <button class="btn-icon-action" onclick="openEditFlavorModal('${bebida.id}')" title="Editar Bebida">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">edit</span>
+                </button>
+                <button class="btn-icon-action delete" onclick="deleteFlavor('${bebida.id}')" title="Excluir Bebida">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">delete</span>
+                </button>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
 function filterBebidasList() {
     renderBebidasList();
+}
+
+function renderLanchesList() {
+    const grid = document.getElementById('lanchesListGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    const searchVal = document.getElementById('searchLanche') ? document.getElementById('searchLanche').value.toLowerCase().trim() : '';
+    const filterCat = document.getElementById('filterLancheCategory') ? document.getElementById('filterLancheCategory').value : 'todos';
+    const lanches = menuData.menu_items?.lanches || [];
+    lanches.forEach((lanche) => {
+        if (searchVal && !lanche.name.toLowerCase().includes(searchVal) && !(lanche.description || '').toLowerCase().includes(searchVal)) {
+            return;
+        }
+        if (filterCat !== 'todos' && lanche.subcategory !== filterCat) {
+            return;
+        }
+        const card = document.createElement('div');
+        card.className = 'flavor-card';
+        if (lanche.available === false) card.style.opacity = '0.6';
+        const isChecked = lanche.available !== false ? 'checked' : '';
+        
+        card.innerHTML = `
+            <div class="flavor-card-header">
+                <div class="flavor-card-info">
+                    <h4 style="margin: 0; color: var(--text-main); font-size: 15px;">${lanche.name}</h4>
+                    <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px;">
+                        <span class="category-tag salgada" style="text-transform: capitalize;">${lanche.subcategory || 'lanche'}</span>
+                    </div>
+                </div>
+                <label class="switch" title="${lanche.available !== false ? 'Disponível no Site' : 'Pausado/Indisponível'}">
+                    <input type="checkbox" ${isChecked} onchange="toggleFlavorAvailability('${lanche.id}', this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <p class="flavor-card-desc" style="margin: 0; flex: 1;">${lanche.description || 'Sem descrição.'}</p>
+            <div style="font-size: 13px; color: var(--primary); font-weight: 700; margin-top: 8px;">
+                Preço: R$ ${(lanche.price || 0).toFixed(2).replace('.', ',')}
+            </div>
+            <div class="flavor-card-actions">
+                <button class="btn-icon-action" onclick="openEditFlavorModal('${lanche.id}')" title="Editar Lanche">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">edit</span>
+                </button>
+                <button class="btn-icon-action delete" onclick="deleteFlavor('${lanche.id}')" title="Excluir Lanche">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">delete</span>
+                </button>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
 }
 
 function filterLanchesList() {
