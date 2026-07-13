@@ -26,33 +26,10 @@
     <div class="app-container">
         
         <!-- HEADER FIXO (Topo) -->
-        <header class="app-header" id="appHeader">
-            <div class="header-left">
-                <div class="header-logo">
-                    <span>🍕</span> Drill
-                </div>
-            </div>
-            
-            <div class="header-center">
-                <!-- Address Selection Pill -->
-                <button class="address-pill" onclick="openAddressModal()" id="addressBtn">
-                    <span class="material-symbols-rounded address-icon" style="font-size: 16px;">location_on</span>
-                    <div class="address-text">
-                        <span class="address-label">Entregar em...</span>
-                        <span class="address-value" id="addressDisplay">Av. Principal, 100</span>
-                    </div>
-                </button>
-            </div>
-            
-            <div class="header-right">
-                <div class="header-time-badge">
-                    <span class="material-symbols-rounded" style="font-size: 14px;">schedule</span>
-                    <span>35–45 min</span>
-                </div>
-                
-                <button class="header-icon-btn" onclick="showToast('Busca rápida ativa!')">
-                    <span class="material-symbols-rounded" style="font-size: 20px;">search</span>
-                </button>
+        <header class="app-header" id="appHeader" style="justify-content: center;">
+            <div class="header-logo" style="font-size: 20px; gap: 8px; justify-content: center; width: 100%;">
+                <img src="assets/logo.png" alt="Pizzaria Drill Logo" class="brand-logo" style="height: 40px; width: 40px; object-fit: contain; border-radius: 50%;">
+                <span>Pizzaria Drill</span>
             </div>
         </header>
 
