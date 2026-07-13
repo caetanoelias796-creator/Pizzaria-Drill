@@ -1,7 +1,7 @@
 /* ==========================================================================
    Firebase Initialization
    ========================================================================== */
-let db = null;
+db = window.db || null;
 if (typeof firebase !== 'undefined' && typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey !== 'SUA_API_KEY') {
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
