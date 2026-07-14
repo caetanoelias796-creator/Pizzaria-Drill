@@ -1976,11 +1976,11 @@ function addBairroRow() {
 
 function saveSettings() {
     
-    const whatsapp = document.getElementById('settingWhatsapp').value.trim();
-    const whatsappFormatted = document.getElementById('settingWhatsappFormatted').value.trim();
-    const promoActive = document.getElementById('settingPromoActive')?.checked || false;
-    const promoPrice = parseFloat(document.getElementById('settingPromoPrice')?.value) || 0;
-    const promoSize = document.getElementById('settingPromoSize')?.value || 'G';
+    const whatsapp = document.getElementById('settingsWhatsapp').value.trim();
+    const whatsappFormatted = document.getElementById('settingsWhatsappFormatted').value.trim();
+    const promoActive = document.getElementById('settingsPromoActive')?.checked || false;
+    const promoPrice = parseFloat(document.getElementById('settingsPromoPrice')?.value) || 0;
+    const promoSize = document.getElementById('settingsPromoSize')?.value || 'G';
     
     if (!whatsapp) {
         alert("O número do WhatsApp é obrigatório.");
