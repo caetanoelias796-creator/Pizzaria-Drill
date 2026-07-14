@@ -2214,6 +2214,7 @@ function openBannerModal(banner = null) {
         document.getElementById('bannerTitleText').value = banner.title || '';
         document.getElementById('bannerSubtitle').value = banner.subtitle || '';
         document.getElementById('bannerGradient').value = banner.gradient || '';
+        document.getElementById('bannerImage').value = banner.image || '';
     } else {
         document.getElementById('bannerModalTitle').innerText = 'Adicionar Novo Banner';
         document.getElementById('bannerEditId').value = '';
@@ -2221,8 +2222,10 @@ function openBannerModal(banner = null) {
         document.getElementById('bannerTitleText').value = '';
         document.getElementById('bannerSubtitle').value = '';
         document.getElementById('bannerGradient').value = 'linear-gradient(135deg, #b71c1c 0%, #1a0a0a 100%)';
+        document.getElementById('bannerImage').value = '';
     }
     
+    populateBannerImageSuggestions();
     openModal('bannerModal');
 }
 
@@ -2298,13 +2301,14 @@ function saveBannerItem(event) {
     const title = document.getElementById('bannerTitleText').value.trim();
     const subtitle = document.getElementById('bannerSubtitle').value.trim();
     const gradient = document.getElementById('bannerGradient').value.trim();
+    const image = document.getElementById('bannerImage').value.trim();
     
     let id = idField;
     if (!idField) {
         id = 'banner_' + Date.now();
     }
     
-    const bannerDoc = { id, tag, title, subtitle, gradient };
+    const bannerDoc = { id, tag, title, subtitle, gradient, image };
     
     if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
         ProductsService.saveBanner(id, bannerDoc)
@@ -2385,20 +2389,23 @@ function renderBannersList() {
         const card = document.createElement('div');
         card.className = 'flavor-card';
         card.style.background = banner.gradient || 'var(--bg-card)';
+        card.style.position = 'relative';
+        card.style.overflow = 'hidden';
         
         card.innerHTML = `
-            <div class="flavor-card-header">
+            <div class="flavor-card-header" style="position: relative; z-index: 2;">
                 <div class="flavor-card-info">
                     <h4 style="margin: 0; color: #fff; font-size: 16px; font-family: var(--font-display);">${banner.title}</h4>
-                    <span style="font-size: 11px; background: rgba(255,255,255,0.2); color: #fff; padding: 2px 6px; border-radius: 4px; margin-top: 4px; display: inline-block;">${banner.tag}</span>
+                    <span style="font-size: 11px; background: rgba(255,255,255,0.25); color: #fff; padding: 2px 6px; border-radius: 4px; margin-top: 4px; display: inline-block;">${banner.tag}</span>
                 </div>
             </div>
-            <p style="margin: 10px 0; color: rgba(255,255,255,0.8); font-size: 13px; flex: 1;">${banner.subtitle}</p>
-            <div class="flavor-card-actions" style="margin-top: 15px;">
-                <button class="btn-icon-action" onclick="openEditBanner('${banner.id}')" title="Editar Banner" style="background: rgba(255,255,255,0.1); color: #fff;">
+            <p style="margin: 10px 0; color: rgba(255,255,255,0.9); font-size: 13px; flex: 1; position: relative; z-index: 2; max-width: 70%;">${banner.subtitle}</p>
+            ${banner.image ? `<img src="${banner.image}" style="position: absolute; right: 10px; bottom: 10px; width: 60px; height: 60px; object-fit: contain; opacity: 0.8; z-index: 1;" />` : ''}
+            <div class="flavor-card-actions" style="margin-top: 15px; position: relative; z-index: 2;">
+                <button class="btn-icon-action" onclick="openEditBanner('${banner.id}')" title="Editar Banner" style="background: rgba(255,255,255,0.25); color: #fff;">
                     <span class="material-symbols-rounded" style="font-size: 18px;">edit</span>
                 </button>
-                <button class="btn-icon-action delete" onclick="deleteBanner('${banner.id}')" title="Excluir Banner" style="background: rgba(255,255,255,0.1); color: #fff;">
+                <button class="btn-icon-action delete" onclick="deleteBanner('${banner.id}')" title="Excluir Banner" style="background: rgba(255,255,255,0.25); color: #fff;">
                     <span class="material-symbols-rounded" style="font-size: 18px;">delete</span>
                 </button>
             </div>
@@ -2719,4 +2726,52 @@ function deleteFlavor(id) {
 
 function closeFlavorModal() {
     closeModal('flavorModal');
+}
+
+function populateBannerImageSuggestions() {
+    const container = document.getElementById('bannerImageSuggestions');
+    if (!container) return;
+    container.innerHTML = '';
+    
+    const suggestions = [
+        { label: 'Pizza Destaque', value: 'assets/pizza_hero.png' },
+        { label: 'Açaí Destaque', value: 'assets/acai_hero.png' },
+        { label: 'Lanches Destaque', value: 'assets/lanche_hamburguer.png' },
+        { label: 'Bebidas Destaque', value: 'assets/coca_cola.png' },
+        { label: 'Calabresa', value: 'assets/pizza_calabresa.png' },
+        { label: 'Chocolate Doce', value: 'assets/pizza_chocolate.png' }
+    ];
+    
+    const label = document.createElement('span');
+    label.textContent = 'Sugestões rápidas: ';
+    label.style.fontSize = '12px';
+    label.style.color = 'var(--text-muted)';
+    label.style.marginRight = '4px';
+    container.appendChild(label);
+    
+    suggestions.forEach(sug => {
+        const link = document.createElement('a');
+        link.href = '#';
+        link.textContent = sug.label;
+        link.style.fontSize = '12px';
+        link.style.color = '#ffc107';
+        link.style.textDecoration = 'none';
+        link.style.marginRight = '8px';
+        link.style.cursor = 'pointer';
+        link.style.background = 'rgba(255, 193, 7, 0.1)';
+        link.style.padding = '2px 6px';
+        link.style.borderRadius = '4px';
+        link.style.border = '1px solid rgba(255, 193, 7, 0.2)';
+        link.style.transition = 'all var(--transition)';
+        
+        link.addEventListener('mouseenter', () => { link.style.background = 'rgba(255, 193, 7, 0.2)'; });
+        link.addEventListener('mouseleave', () => { link.style.background = 'rgba(255, 193, 7, 0.1)'; });
+        
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const input = document.getElementById('bannerImage');
+            if (input) input.value = sug.value;
+        });
+        container.appendChild(link);
+    });
 }

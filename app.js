@@ -2072,6 +2072,7 @@ function renderBannersUI(banners) {
                 <h2 class="banner-title">${banner.title}</h2>
                 <p class="banner-subtitle">${banner.subtitle}</p>
             </div>
+            ${banner.image ? `<img src="${banner.image}" alt="${banner.title}" class="banner-image">` : ''}
         `;
         bannerTrack.appendChild(slide);
     });

@@ -728,6 +728,11 @@
                     <label for="bannerGradient" style="font-size: 13px; font-weight: 500; color: var(--text-light);">Gradiente de Fundo (CSS)</label>
                     <input type="text" id="bannerGradient" required placeholder="Ex: linear-gradient(135deg, #b71c1c 0%, #1a0a0a 100%)" style="padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main);">
                 </div>
+                <div class="form-group" id="bannerImageGroup" style="display: flex; flex-direction: column; gap: 6px;">
+                    <label for="bannerImage" style="font-size: 13px; font-weight: 500; color: var(--text-light);">URL da Imagem do Banner</label>
+                    <input type="text" id="bannerImage" placeholder="Cole a URL da imagem (ou use as sugestões abaixo)" style="padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main);">
+                    <div id="bannerImageSuggestions" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; line-height: 1.6;"></div>
+                </div>
                 <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 15px;">
                     <button type="button" class="btn-refresh" onclick="closeBannerModal()" style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 16px; cursor: pointer;">Cancelar</button>
                     <button type="submit" class="btn-status-next" style="border: none; border-radius: var(--radius-sm); padding: 8px 24px; cursor: pointer; font-weight: 600;">Salvar</button>

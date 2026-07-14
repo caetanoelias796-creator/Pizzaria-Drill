@@ -101,8 +101,8 @@ async function runMigration() {
     // 3. Write BANNERS
     console.log('Writing banners...');
     const banners = [
-        { id: 'banner1', tag: 'Promoção', title: 'Pizzas Promocionais G', subtitle: 'Selecione apenas sabores promocionais e pague preço único fixo!', gradient: 'linear-gradient(135deg, #b71c1c 0%, #1a0a0a 100%)' },
-        { id: 'banner2', tag: 'Forno de Pedra', title: 'Massa Fina & Crocante', subtitle: 'Ingredientes frescos selecionados diariamente', gradient: 'linear-gradient(135deg, #ffd600 0%, #3e2723 100%)' }
+        { id: 'banner1', tag: 'Promoção', title: 'Pizzas Promocionais G', subtitle: 'Selecione apenas sabores promocionais e pague preço único fixo!', gradient: 'linear-gradient(135deg, #b71c1c 0%, #1a0a0a 100%)', image: 'assets/pizza_hero.png' },
+        { id: 'banner2', tag: 'Forno de Pedra', title: 'Massa Fina & Crocante', subtitle: 'Ingredientes frescos selecionados diariamente', gradient: 'linear-gradient(135deg, #ffd600 0%, #3e2723 100%)', image: 'assets/pizza_calabresa.png' }
     ];
     for (const b of banners) {
         await writeDocument('banners', b.id, b);
