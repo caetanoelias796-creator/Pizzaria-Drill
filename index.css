@@ -697,27 +697,32 @@ a {
 }
 
 .item-card .btn-add {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: var(--primary-light);
-    color: var(--primary);
+    padding: 8px 14px;
+    border-radius: 30px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    color: #000000;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 6px;
     transition: var(--transition);
+    box-shadow: 0 4px 10px rgba(212, 175, 55, 0.25);
+    font-weight: 700;
+    font-size: 13px;
+    width: auto;
+    height: auto;
 }
 
 .item-card .btn-add:hover {
-    background-color: var(--primary);
-    color: #ffffff;
-    transform: scale(1.1) rotate(90deg);
+    background: var(--primary);
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 14px rgba(212, 175, 55, 0.4);
 }
 
 .item-card .btn-add .material-symbols-rounded {
-    font-size: 22px;
+    font-size: 16px;
 }
 
 /* ==========================================================================
@@ -2695,6 +2700,8 @@ a {
     transition: var(--transition);
 }
 
+/* Estilos do botão add centralizados no bloco principal */
+
 .header-icon-btn:hover {
     color: var(--primary);
 }
@@ -2800,6 +2807,71 @@ a {
     border: 1.5px solid var(--bg-surface);
     box-shadow: var(--shadow-active);
     animation: popIn 0.3s ease-out;
+}
+
+/* Horizontal scroll utility */
+.scroll-x-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    margin-right: -16px; /* Expand scrolling area to screen edge */
+    padding-right: 16px;
+}
+
+.scroll-x-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* Category Circle Chips Component */
+.category-chip {
+    flex: 0 0 72px;
+    width: 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.category-icon-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: var(--transition);
+    box-shadow: var(--shadow-premium);
+}
+
+.category-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: center;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.category-chip.active .category-icon-circle {
+    background-color: var(--primary-glow);
+    border-color: var(--primary);
+    transform: scale(1.05);
+    box-shadow: var(--shadow-active);
+}
+
+.category-chip.active .category-name {
+    color: var(--primary);
+    font-weight: 700;
+}
 
 /* Hide the old floating cart button when catalog style is active */
 .app-container ~ .floating-cart-btn,

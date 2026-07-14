@@ -17,15 +17,21 @@ document.addEventListener("DOMContentLoaded", () => {
         ProductsService.subscribeProducts((productsList) => {
             CATALOG_PRODUCTS = productsList.map(item => {
                 let emoji = "🍕";
-                if (item.category === "lanches") emoji = "🍔";
-                else if (item.category === "calzones") emoji = "🥟";
-                else if (item.category === "bebidas") emoji = "🥤";
-                else if (item.category === "acais") emoji = "🍧";
+                let category = item.category;
+                
+                if (item.category === "pizzas" && item.subcategory) {
+                    category = item.subcategory;
+                }
+                
+                if (category === "lanches") emoji = "🍔";
+                else if (category === "calzones") emoji = "🥟";
+                else if (category === "bebidas") emoji = "🥤";
+                else if (category === "acais" || category === "acai") emoji = "🍧";
                 
                 return {
                     id: item.id,
                     name: item.name,
-                    category: item.category,
+                    category: category,
                     description: item.description || "",
                     price: item.price || (item.prices ? item.prices.G : 0) || 0,
                     emoji: emoji,
@@ -103,6 +109,7 @@ function renderBestSellers() {
     bests.forEach(product => {
         const itemContainer = document.createElement("div");
         itemContainer.className = "scroll-item-lg";
+        const btnText = (product.category === 'salgadas' || product.category === 'doces' || product.category === 'pizzas' || product.category === 'acais') ? 'Montar' : 'Comprar';
         itemContainer.innerHTML = `
             <div class="product-card">
                 <div class="product-image-wrapper">
@@ -114,7 +121,7 @@ function renderBestSellers() {
                     <p class="product-desc">${product.description}</p>
                     <div class="product-footer">
                         <span class="product-price">R$ ${product.price.toFixed(2).replace('.', ',')}</span>
-                        <button class="add-to-cart-btn" onclick="addToCart('${product.name}')">+</button>
+                        <button class="add-to-cart-btn" onclick="addToCart('${product.name}')">${btnText}</button>
                     </div>
                 </div>
             </div>
@@ -129,17 +136,29 @@ function renderRecommendedGrid(categoryFilter) {
     
     recommendedGrid.innerHTML = '';
     
+    // Normalize categoryFilter
+    if (categoryFilter === 'acais') categoryFilter = 'acai';
+    
     // Filter based on category select
     let filtered = CATALOG_PRODUCTS;
-    if (categoryFilter !== "todos" && categoryFilter !== "promocoes") {
-        filtered = CATALOG_PRODUCTS.filter(p => p.category === categoryFilter);
+    if (categoryFilter === "pizzas") {
+        filtered = CATALOG_PRODUCTS.filter(p => p.category === "salgadas");
+    } else if (categoryFilter === "calzones" || categoryFilter === "doces") {
+        filtered = CATALOG_PRODUCTS.filter(p => p.category === "doces" || p.category === "calzones");
+    } else if (categoryFilter === "bebidas") {
+        filtered = CATALOG_PRODUCTS.filter(p => p.category === "bebidas");
+    } else if (categoryFilter === "acai") {
+        filtered = CATALOG_PRODUCTS.filter(p => p.category === "acais" || p.category === "acai");
     } else if (categoryFilter === "promocoes") {
         filtered = CATALOG_PRODUCTS.filter(p => p.isPromo);
+    } else if (categoryFilter !== "todos") {
+        filtered = CATALOG_PRODUCTS.filter(p => p.category === categoryFilter);
     }
     
     filtered.forEach(product => {
         const card = document.createElement("div");
         card.className = "product-card";
+        const btnText = (product.category === 'salgadas' || product.category === 'doces' || product.category === 'pizzas' || product.category === 'acais') ? 'Montar' : 'Comprar';
         card.innerHTML = `
             <div class="product-image-wrapper">
                 <img class="product-img" src="${product.image}" alt="${product.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
@@ -150,7 +169,7 @@ function renderRecommendedGrid(categoryFilter) {
                 <p class="product-desc">${product.description}</p>
                 <div class="product-footer">
                     <span class="product-price">R$ ${product.price.toFixed(2).replace('.', ',')}</span>
-                    <button class="add-to-cart-btn" onclick="addToCart('${product.name}')">+</button>
+                    <button class="add-to-cart-btn" onclick="addToCart('${product.name}')">${btnText}</button>
                 </div>
             </div>
         `;
@@ -166,7 +185,6 @@ function filterCategory(category, buttonElement) {
     
     // 2. Add active class to clicked chip
     if (buttonElement) {
-        buttonElement.classList.remove("active"); // Safety
         buttonElement.classList.add("active");
     }
     
@@ -178,8 +196,15 @@ function filterCategory(category, buttonElement) {
         } else if (category === "promocoes") {
             sectionTitle.innerHTML = "🔥 Promoções Selecionadas";
         } else {
-            const catName = category.charAt(0).toUpperCase() + category.slice(1);
-            sectionTitle.innerHTML = `⭐ Principais ${catName}`;
+            const catNames = {
+                pizzas: "Pizzas Salgadas",
+                lanches: "Lanches",
+                calzones: "Pizzas Doces",
+                bebidas: "Bebidas",
+                acai: "Açaís",
+                acais: "Açaís"
+            };
+            sectionTitle.innerHTML = `⭐ Principais ${catNames[category] || category}`;
         }
     }
     
@@ -187,7 +212,15 @@ function filterCategory(category, buttonElement) {
     renderRecommendedGrid(category);
     
     // Show a quick visual indication
-    showToast(`Filtrado por: ${category === 'todos' ? 'Todos os itens' : category.toUpperCase()}`);
+    const labelMap = {
+        todos: 'Todos os itens',
+        pizzas: 'Pizzas Salgadas',
+        lanches: 'Lanches',
+        calzones: 'Pizzas Doces',
+        bebidas: 'Bebidas',
+        acais: 'Açaís'
+    };
+    showToast(`Filtrado por: ${labelMap[category] || category}`);
 }
 
 // 5. Add to Cart interaction with bounce badge animation

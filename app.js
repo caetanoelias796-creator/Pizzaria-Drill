@@ -9,6 +9,27 @@ let MENU_ITEMS = {
     acais: []
 };
 let BORDAS = {};
+
+const SIZE_MAP = {
+    'brotinho': 'B',
+    'media': 'M',
+    'grande': 'G',
+    'familia': 'F'
+};
+
+const TAMANHO_NOMES = {
+    'brotinho': 'Brotinho (20cm)',
+    'media': 'Média (25cm)',
+    'grande': 'Grande (35cm)',
+    'familia': 'Família (40cm)'
+};
+
+const TAMANHO_REGRAS = {
+    'brotinho': { maxFlavors: 1, slices: 4, name: 'Brotinho' },
+    'media': { maxFlavors: 2, slices: 6, name: 'Média' },
+    'grande': { maxFlavors: 3, slices: 12, name: 'Grande' },
+    'familia': { maxFlavors: 4, slices: 16, name: 'Família' }
+};
 db = window.db || null;
 if (typeof firebase !== 'undefined' && typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey !== 'SUA_API_KEY') {
     if (!firebase.apps.length) {
@@ -495,6 +516,11 @@ function renderMenu() {
 let currentCategory = 'todos';
 
 function filterCategory(category, buttonElement) {
+    const originalCategory = category;
+    
+    // Normalize category for internal logic
+    if (category === 'acais') category = 'acai';
+    
     currentCategory = category;
     
     // Remove active class from all category chips
@@ -505,7 +531,7 @@ function filterCategory(category, buttonElement) {
     if (buttonElement) {
         buttonElement.classList.add("active");
     } else {
-        const targetChip = document.querySelector(`.category-chip[onclick*="'${category}'"]`);
+        const targetChip = document.querySelector(`.category-chip[onclick*="'${originalCategory}'"]`);
         if (targetChip) targetChip.classList.add("active");
     }
     
@@ -520,11 +546,12 @@ function filterCategory(category, buttonElement) {
             sectionTitle.innerHTML = "🔥 Promoções Selecionadas";
         } else {
             const catNames = {
-                pizzas: "Pizzas",
+                pizzas: "Pizzas Salgadas",
                 lanches: "Lanches",
-                calzones: "Calzones",
+                calzones: "Pizzas Doces",
                 bebidas: "Bebidas",
-                acai: "Açaís"
+                acai: "Açaís",
+                acais: "Açaís"
             };
             sectionTitle.innerHTML = `⭐ Principais ${catNames[category] || category}`;
         }
@@ -726,6 +753,9 @@ function renderRecommendedGrid(categoryFilter) {
     
     let list = [];
     
+    // Normalize categoryFilter
+    if (categoryFilter === 'acais') categoryFilter = 'acai';
+    
     if (categoryFilter === 'todos') {
         const pizzas = (MENU_ITEMS.pizzas || []).filter(p => p.available !== false).map(p => ({ ...p, type: 'pizza', emoji: '🍕' }));
         const lanches = (MENU_ITEMS.lanches || []).filter(l => l.available !== false).map(l => ({ ...l, type: 'lanche', emoji: '🍔' }));
@@ -753,11 +783,13 @@ function renderRecommendedGrid(categoryFilter) {
             list = [...firstPizzas, ...firstLanches];
         }
     } else if (categoryFilter === 'pizzas') {
-        list = (MENU_ITEMS.pizzas || []).filter(p => p.available !== false).map(p => ({ ...p, type: 'pizza', emoji: '🍕' }));
+        list = (MENU_ITEMS.pizzas || []).filter(p => p.available !== false && p.category !== 'doces').map(p => ({ ...p, type: 'pizza', emoji: '🍕' }));
     } else if (categoryFilter === 'lanches') {
         list = (MENU_ITEMS.lanches || []).filter(l => l.available !== false).map(l => ({ ...l, type: 'lanche', emoji: '🍔' }));
-    } else if (categoryFilter === 'calzones') {
-        list = (MENU_ITEMS.calzones || []).filter(c => c.available !== false).map(c => ({ ...c, type: 'calzone', emoji: '🥟' }));
+    } else if (categoryFilter === 'calzones' || categoryFilter === 'doces') {
+        const sweetPizzas = (MENU_ITEMS.pizzas || []).filter(p => p.available !== false && p.category === 'doces').map(p => ({ ...p, type: 'pizza', emoji: '🍕' }));
+        const simpleCalzones = (MENU_ITEMS.calzones || []).filter(c => c.available !== false).map(c => ({ ...c, type: 'calzone', emoji: '🍫' }));
+        list = [...sweetPizzas, ...simpleCalzones];
     } else if (categoryFilter === 'bebidas') {
         list = (MENU_ITEMS.bebidas || []).filter(b => b.available !== false).map(b => ({ ...b, type: 'bebida', emoji: '🥤' }));
     } else if (categoryFilter === 'acai') {
@@ -792,18 +824,28 @@ function renderRecommendedGrid(categoryFilter) {
         }
         
         const imagePath = product.image || 'assets/pizza_hero.png';
+        const badgeHTML = product.badge ? `<span class="item-card-badge">${product.badge}</span>` : '';
+        const btnText = (product.type === 'pizza' || product.type === 'acai') ? 'Montar' : 'Comprar';
+        const btnIcon = (product.type === 'pizza') ? 'local_pizza' : ((product.type === 'acai') ? 'icecream' : 'shopping_basket');
         
+        card.className = "item-card";
         card.innerHTML = `
-            <div class="product-image-wrapper">
-                <img class="product-img" src="${imagePath}" alt="${product.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+            <div class="item-card-image-wrapper">
+                ${badgeHTML}
+                <img src="${imagePath}" alt="${product.name}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
                 <div class="product-image-placeholder" style="display: none;">${product.emoji}</div>
             </div>
-            <div class="product-body">
-                <h4 class="product-title">${product.name}</h4>
-                <p class="product-desc">${product.description || ''}</p>
-                <div class="product-footer">
-                    <span class="product-price">${priceText}</span>
-                    <button class="add-to-cart-btn" onclick="handleAddToCartClick('${product.id}', '${product.type}', '${product.size || ''}')">+</button>
+            <div class="item-card-content">
+                <h3 class="item-card-title">${product.name}</h3>
+                <p class="item-card-desc">${product.description || ''}</p>
+                <div class="item-card-footer">
+                    <div class="item-card-price">
+                        <span class="price-value" style="font-size: 15px; font-weight: 700; color: #ffffff;">${priceText}</span>
+                    </div>
+                    <button class="btn-add" onclick="handleAddToCartClick('${product.id}', '${product.type}', '${product.size || ''}')" title="${btnText}">
+                        <span class="material-symbols-rounded">${btnIcon}</span>
+                        <span>${btnText}</span>
+                    </button>
                 </div>
             </div>
         `;
@@ -1944,6 +1986,9 @@ function initMenuData() {
         
         productsList.forEach((item) => {
             if (item.category === 'pizzas') {
+                if (item.subcategory) {
+                    item.category = item.subcategory;
+                }
                 MENU_ITEMS.pizzas.push(item);
             } else if (item.category === 'bordas') {
                 const key = item.id.replace('borda_', '');
