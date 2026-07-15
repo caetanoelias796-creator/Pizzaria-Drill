@@ -3180,3 +3180,46 @@ body > .floating-cart-btn {
     gap: 4px;
 }
 
+/* Daily Promotions Carousel */
+.promo-section-carousel {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    grid-column: 1 / -1;
+}
+
+.promo-section-track {
+    display: flex;
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    width: 100%;
+}
+
+.promo-section-slide {
+    min-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.promo-section-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.promo-section-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--border-color);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.promo-section-dot.active {
+    width: 18px;
+    background-color: var(--primary);
+    border-radius: 3px;
+}
+

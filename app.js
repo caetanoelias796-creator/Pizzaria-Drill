@@ -605,51 +605,97 @@ function openPizzaCustomizerWithPromoFilter() {
     filterFlavorsCarousel('promo');
 }
 
+let promoCarouselIndex = 0;
+let promoCarouselInterval = null;
+
+function startPromoSectionCarousel() {
+    if (promoCarouselInterval) clearInterval(promoCarouselInterval);
+    
+    const track = document.getElementById('promoSectionTrack');
+    const slides = document.querySelectorAll('#promoSectionTrack .promo-section-slide');
+    const dots = document.querySelectorAll('.promo-section-dots .promo-section-dot');
+    
+    if (slides.length <= 1 || !track) return;
+    
+    promoCarouselIndex = 0;
+    
+    promoCarouselInterval = setInterval(() => {
+        promoCarouselIndex = (promoCarouselIndex + 1) % slides.length;
+        updatePromoCarouselPosition(track, slides.length, dots);
+    }, 4000);
+}
+
+function updatePromoCarouselPosition(track, totalSlides, dots) {
+    if (!track) return;
+    track.style.transform = `translateX(-${promoCarouselIndex * 100}%)`;
+    
+    dots.forEach((dot, idx) => {
+        if (idx === promoCarouselIndex) {
+            dot.classList.add('active');
+        } else {
+            dot.classList.remove('active');
+        }
+    });
+}
+
+function setPromoCarouselSlide(index) {
+    const track = document.getElementById('promoSectionTrack');
+    const slides = document.querySelectorAll('#promoSectionTrack .promo-section-slide');
+    const dots = document.querySelectorAll('.promo-section-dots .promo-section-dot');
+    
+    if (slides.length <= 1 || !track) return;
+    
+    promoCarouselIndex = index;
+    updatePromoCarouselPosition(track, slides.length, dots);
+    
+    startPromoSectionCarousel();
+}
+
+function openCategoryPromo(category) {
+    switchTab('menu');
+    filterCategory(category);
+    const recommendedSection = document.getElementById("recommendedSection");
+    if (recommendedSection) {
+        recommendedSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
 function renderPromoSection() {
     const promoGrid = document.getElementById("promoGrid");
     if (!promoGrid) return;
     promoGrid.innerHTML = '';
     
+    // Obter itens promocionais de hoje por categoria
     const promoPizzas = (MENU_ITEMS.pizzas || []).filter(p => isItemPromoToday(p) && p.available !== false);
-    const promoOthers = [];
-    
-    // Lanches
-    const lanches = MENU_ITEMS.lanches || [];
-    lanches.forEach(l => {
-        if (isItemPromoToday(l) && l.available !== false) {
-            promoOthers.push({ ...l, type: 'lanche', emoji: '🍔' });
-        }
-    });
-    
-    // Calzones
-    const calzones = MENU_ITEMS.calzones || [];
-    calzones.forEach(c => {
-        if (isItemPromoToday(c) && c.available !== false) {
-            promoOthers.push({ ...c, type: 'calzone', emoji: '🥟' });
-        }
-    });
-    
-    // Bebidas
-    const bebidas = MENU_ITEMS.bebidas || [];
-    bebidas.forEach(b => {
-        if (isItemPromoToday(b) && b.available !== false) {
-            promoOthers.push({ ...b, type: 'bebida', emoji: '🥤' });
-        }
-    });
+    const promoLanches = (MENU_ITEMS.lanches || []).filter(l => isItemPromoToday(l) && l.available !== false);
+    const promoCalzones = (MENU_ITEMS.calzones || []).filter(c => isItemPromoToday(c) && c.available !== false);
+    const promoBebidas = (MENU_ITEMS.bebidas || []).filter(b => isItemPromoToday(b) && b.available !== false);
 
+    const totalPromos = promoPizzas.length + promoLanches.length + promoCalzones.length + promoBebidas.length;
+    
     const promoSection = document.getElementById("promoSection");
-    if (promoPizzas.length === 0 && promoOthers.length === 0) {
+    if (totalPromos === 0) {
         if (promoSection) promoSection.style.display = 'none';
         return;
     } else {
         if (promoSection) promoSection.style.display = 'block';
     }
     
-    // Se houver pizzas em promoção, renderiza o banner único
+    // Criar o container do carrossel
+    const carouselWrapper = document.createElement("div");
+    carouselWrapper.className = "promo-section-carousel";
+    
+    const track = document.createElement("div");
+    track.className = "promo-section-track";
+    track.id = "promoSectionTrack";
+    
+    let activeCategoriesCount = 0;
+    
+    // 1. Banner de Pizzas
     if (promoPizzas.length > 0) {
-        const bannerCard = document.createElement("div");
-        bannerCard.className = "promo-banner-single";
-        bannerCard.style.gridColumn = "1 / -1"; // Ocupa a largura total da grid
+        activeCategoriesCount++;
+        const slide = document.createElement("div");
+        slide.className = "promo-section-slide";
         
         let discountText = '';
         if (CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && CONFIG_SETTINGS.promoDiscountActive) {
@@ -660,48 +706,141 @@ function renderPromoSection() {
         
         const flavorNames = promoPizzas.map(p => p.name);
         
-        bannerCard.innerHTML = `
-            <div class="promo-banner-single-header">
-                <span class="promo-banner-single-tag">🔥 Promoção do Dia</span>
-                <span class="promo-banner-single-discount">${discountText}</span>
-            </div>
-            <h3 class="promo-banner-single-title">Pizzas com Preço Especial Hoje!</h3>
-            <p class="promo-banner-single-flavors"><strong>Sabores participantes:</strong> ${flavorNames.join(', ')}</p>
-            <div class="promo-banner-single-footer">
-                <span>Toque para montar a sua pizza</span>
-                <span class="material-symbols-rounded" style="font-size: 18px;">arrow_forward</span>
+        slide.innerHTML = `
+            <div class="promo-banner-single" style="background: linear-gradient(135deg, #b71c1c 0%, #1a0a0a 100%);">
+                <div class="promo-banner-single-header">
+                    <span class="promo-banner-single-tag">🍕 Promoção de Pizzas</span>
+                    <span class="promo-banner-single-discount">${discountText}</span>
+                </div>
+                <h3 class="promo-banner-single-title">Pizzas com Preço Especial Hoje!</h3>
+                <p class="promo-banner-single-flavors"><strong>Sabores:</strong> ${flavorNames.join(', ')}</p>
+                <div class="promo-banner-single-footer">
+                    <span>Toque para montar a sua pizza</span>
+                    <span class="material-symbols-rounded" style="font-size: 18px;">arrow_forward</span>
+                </div>
             </div>
         `;
-        
-        bannerCard.onclick = () => openPizzaCustomizerWithPromoFilter();
-        promoGrid.appendChild(bannerCard);
+        slide.querySelector('.promo-banner-single').onclick = () => openPizzaCustomizerWithPromoFilter();
+        track.appendChild(slide);
     }
     
-    // Se houver outros itens em promoção, renderiza cada um como um card individual abaixo do banner
-    promoOthers.forEach(product => {
-        const card = document.createElement("div");
-        card.className = "promo-mini-card";
-        card.style.cursor = "pointer";
+    // 2. Banner de Lanches
+    if (promoLanches.length > 0) {
+        activeCategoriesCount++;
+        const slide = document.createElement("div");
+        slide.className = "promo-section-slide";
         
-        const badgeText = product.badge || "PROMO";
-        let priceVal = parseFloat(product.price) || 0;
+        let discountText = 'PROMO';
         if (CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && CONFIG_SETTINGS.promoDiscountActive) {
-            priceVal *= (1 - (CONFIG_SETTINGS.promoDiscountPercent || 20) / 100);
+            discountText = `${CONFIG_SETTINGS.promoDiscountPercent || 20}% OFF`;
         }
         
-        card.innerHTML = `
-            <div class="promo-mini-emoji">${product.emoji}</div>
-            <h4 class="promo-mini-title">${product.name}</h4>
-            <p class="promo-mini-desc">${product.description || ''}</p>
-            <div class="promo-mini-footer">
-                <span class="promo-mini-price">R$ ${priceVal.toFixed(2).replace('.', ',')}</span>
-                <span class="discount-badge">${badgeText}</span>
+        const lancheNames = promoLanches.map(l => l.name);
+        
+        slide.innerHTML = `
+            <div class="promo-banner-single" style="background: linear-gradient(135deg, #e65100 0%, #1a0a00 100%);">
+                <div class="promo-banner-single-header">
+                    <span class="promo-banner-single-tag">🍔 Promoção de Lanches</span>
+                    <span class="promo-banner-single-discount">${discountText}</span>
+                </div>
+                <h3 class="promo-banner-single-title">Lanches Especiais do Dia!</h3>
+                <p class="promo-banner-single-flavors"><strong>Opções:</strong> ${lancheNames.join(', ')}</p>
+                <div class="promo-banner-single-footer">
+                    <span>Toque para ver os lanches</span>
+                    <span class="material-symbols-rounded" style="font-size: 18px;">arrow_forward</span>
+                </div>
             </div>
         `;
+        slide.querySelector('.promo-banner-single').onclick = () => openCategoryPromo('lanches');
+        track.appendChild(slide);
+    }
+    
+    // 3. Banner de Calzones
+    if (promoCalzones.length > 0) {
+        activeCategoriesCount++;
+        const slide = document.createElement("div");
+        slide.className = "promo-section-slide";
         
-        card.onclick = () => handleAddToCartClick(product.id, product.type);
-        promoGrid.appendChild(card);
-    });
+        let discountText = 'PROMO';
+        if (CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && CONFIG_SETTINGS.promoDiscountActive) {
+            discountText = `${CONFIG_SETTINGS.promoDiscountPercent || 20}% OFF`;
+        }
+        
+        const calzoneNames = promoCalzones.map(c => c.name);
+        
+        slide.innerHTML = `
+            <div class="promo-banner-single" style="background: linear-gradient(135deg, #ffd600 0%, #3e2723 100%);">
+                <div class="promo-banner-single-header">
+                    <span class="promo-banner-single-tag" style="color: #3e2723;">🥟 Calzones da Promo</span>
+                    <span class="promo-banner-single-discount">${discountText}</span>
+                </div>
+                <h3 class="promo-banner-single-title" style="color: #fff;">Calzones Recheados na Promoção!</h3>
+                <p class="promo-banner-single-flavors" style="color: rgba(255,255,255,0.7);"><strong>Opções:</strong> ${calzoneNames.join(', ')}</p>
+                <div class="promo-banner-single-footer" style="color: #ffd600;">
+                    <span>Toque para ver os calzones</span>
+                    <span class="material-symbols-rounded" style="font-size: 18px;">arrow_forward</span>
+                </div>
+            </div>
+        `;
+        slide.querySelector('.promo-banner-single').onclick = () => openCategoryPromo('calzones');
+        track.appendChild(slide);
+    }
+    
+    // 4. Banner de Bebidas
+    if (promoBebidas.length > 0) {
+        activeCategoriesCount++;
+        const slide = document.createElement("div");
+        slide.className = "promo-section-slide";
+        
+        let discountText = 'PROMO';
+        if (CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && CONFIG_SETTINGS.promoDiscountActive) {
+            discountText = `${CONFIG_SETTINGS.promoDiscountPercent || 20}% OFF`;
+        }
+        
+        const bebidaNames = promoBebidas.map(b => b.name);
+        
+        slide.innerHTML = `
+            <div class="promo-banner-single" style="background: linear-gradient(135deg, #0d47a1 0%, #0a0a1a 100%);">
+                <div class="promo-banner-single-header">
+                    <span class="promo-banner-single-tag">🥤 Bebidas da Promo</span>
+                    <span class="promo-banner-single-discount">${discountText}</span>
+                </div>
+                <h3 class="promo-banner-single-title">Bebidas com Desconto!</h3>
+                <p class="promo-banner-single-flavors"><strong>Opções:</strong> ${bebidaNames.join(', ')}</p>
+                <div class="promo-banner-single-footer">
+                    <span>Toque para ver as bebidas</span>
+                    <span class="material-symbols-rounded" style="font-size: 18px;">arrow_forward</span>
+                </div>
+            </div>
+        `;
+        slide.querySelector('.promo-banner-single').onclick = () => openCategoryPromo('bebidas');
+        track.appendChild(slide);
+    }
+    
+    carouselWrapper.appendChild(track);
+    
+    // Criar as bolinhas (dots) se houver mais de uma categoria em promoção
+    if (activeCategoriesCount > 1) {
+        const dotsContainer = document.createElement("div");
+        dotsContainer.className = "promo-section-dots";
+        
+        for (let i = 0; i < activeCategoriesCount; i++) {
+            const dot = document.createElement("div");
+            dot.className = `promo-section-dot ${i === 0 ? 'active' : ''}`;
+            dot.onclick = () => setPromoCarouselSlide(i);
+            dotsContainer.appendChild(dot);
+        }
+        carouselWrapper.appendChild(dotsContainer);
+    }
+    
+    promoGrid.appendChild(carouselWrapper);
+    
+    // Iniciar a animação automática do carrossel se houver mais de uma categoria ativa
+    if (activeCategoriesCount > 1) {
+        startPromoSectionCarousel();
+    } else {
+        if (promoCarouselInterval) clearInterval(promoCarouselInterval);
+    }
 }
 
 function renderBestSellers() {
