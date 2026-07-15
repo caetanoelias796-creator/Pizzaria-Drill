@@ -1,0 +1,22 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Redireciona as URLs limpas /painel e /catalog para seus respectivos arquivos HTML
+    RewriteRule ^painel$ painel.html [QSA,L]
+    RewriteRule ^catalog$ catalog.html [QSA,L]
+    
+    # Redireciona todas as requisições que iniciam com /api/ para api.php
+    RewriteCond %{REQUEST_URI} ^/api/(.*)$
+    RewriteRule ^api/(.*)$ api.php?route=$1 [QSA,L]
+</IfModule>
+
+# Bloqueio de segurança contra acesso direto a arquivos JSON (como orders.json e chaves do Firebase)
+<FilesMatch "\.(json)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
