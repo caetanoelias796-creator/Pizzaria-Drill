@@ -2448,7 +2448,7 @@ function renderPromocoesList() {
         const isChecked = promo.available !== false ? 'checked' : '';
         
         let priceText = '';
-        if (promo.type === 'pizza') {
+        if (promo.type === 'pizza' || promo.type === 'pizzas') {
             priceText = `B: R$ ${promo.prices?.B || 0} / M: R$ ${promo.prices?.M || 0} / G: R$ ${promo.prices?.G || 0} / F: R$ ${promo.prices?.F || 0}`;
         } else {
             priceText = `R$ ${(promo.price || 0).toFixed(2).replace('.', ',')}`;
