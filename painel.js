@@ -1650,6 +1650,14 @@ function saveMenuItem(event) {
         };
     } else {
         targetItem.price = parseFloat(document.getElementById('itemPrice').value) || 0;
+        
+        const promoPriceInput = document.getElementById('itemPromoPrice').value;
+        if (promoPriceInput !== '') {
+            targetItem.promoPrice = parseFloat(promoPriceInput) || 0;
+        } else {
+            targetItem.promoPrice = null;
+        }
+        
         if (type === 'calzone' || type === 'lanche') {
             targetItem.description = document.getElementById('flavorDescription').value.trim();
         }
@@ -1910,6 +1918,15 @@ function renderSettingsDashboard() {
     const promoDiscountPercentInput = document.getElementById('settingsPromoDiscountPercent');
     if (promoDiscountPercentInput) promoDiscountPercentInput.value = tempSettings.promoDiscountPercent || 20;
     
+    const promoLanchesPercent = document.getElementById('settingsPromoLanchesDiscountPercent');
+    if (promoLanchesPercent) promoLanchesPercent.value = tempSettings.promoLanchesDiscountPercent || 20;
+    
+    const promoCalzonesPercent = document.getElementById('settingsPromoCalzonesDiscountPercent');
+    if (promoCalzonesPercent) promoCalzonesPercent.value = tempSettings.promoCalzonesDiscountPercent || 20;
+    
+    const promoBebidasPercent = document.getElementById('settingsPromoBebidasDiscountPercent');
+    if (promoBebidasPercent) promoBebidasPercent.value = tempSettings.promoBebidasDiscountPercent || 20;
+    
     togglePromoDiscountGroup();
     
     renderSettingsFeesTable();
@@ -1996,6 +2013,9 @@ function saveSettings() {
     const promoSize = document.getElementById('settingsPromoSize')?.value || 'G';
     const promoDiscountActive = document.getElementById('settingsPromoDiscountActive')?.checked || false;
     const promoDiscountPercent = parseInt(document.getElementById('settingsPromoDiscountPercent')?.value) || 20;
+    const promoLanchesDiscountPercent = parseInt(document.getElementById('settingsPromoLanchesDiscountPercent')?.value) || 20;
+    const promoCalzonesDiscountPercent = parseInt(document.getElementById('settingsPromoCalzonesDiscountPercent')?.value) || 20;
+    const promoBebidasDiscountPercent = parseInt(document.getElementById('settingsPromoBebidasDiscountPercent')?.value) || 20;
     
     if (!whatsapp) {
         alert("O número do WhatsApp é obrigatório.");
@@ -2010,7 +2030,10 @@ function saveSettings() {
             promoPrice: promoPrice,
             promoSize: promoSize,
             promoDiscountActive: promoDiscountActive,
-            promoDiscountPercent: promoDiscountPercent
+            promoDiscountPercent: promoDiscountPercent,
+            promoLanchesDiscountPercent: promoLanchesDiscountPercent,
+            promoCalzonesDiscountPercent: promoCalzonesDiscountPercent,
+            promoBebidasDiscountPercent: promoBebidasDiscountPercent
         });
         
         const feesPromise = ConfigService.saveDeliveryFees(tempSettings.deliveryFees || {});
@@ -2557,6 +2580,9 @@ function openAddMenuItemModal(type) {
     document.getElementById('flavorForm').reset();
     
     // Reset checkbox promocional e dias
+    const promoPriceField = document.getElementById('itemPromoPrice');
+    if (promoPriceField) promoPriceField.value = '';
+    
     const promoCheck = document.getElementById('flavorIsPromo');
     if (promoCheck) promoCheck.checked = false;
     document.querySelectorAll('input[name="promoDay"]').forEach(chk => {
@@ -2632,6 +2658,7 @@ function openEditMenuItemModal(type, id) {
     } else {
         document.getElementById('flavorDescription').value = item.description || '';
         document.getElementById('itemPrice').value = item.price || 0;
+        document.getElementById('itemPromoPrice').value = item.promoPrice !== undefined ? item.promoPrice : '';
         document.getElementById('flavorImage').value = item.image || '';
         const promoCheck = document.getElementById('flavorIsPromo');
         if (promoCheck) promoCheck.checked = item.isPromo || false;
@@ -2659,6 +2686,11 @@ function adjustModalFields(type, isEdit) {
     const promoGroup = document.getElementById('flavorPromoGroup');
     if (promoGroup) {
         promoGroup.style.display = 'flex'; // ALWAYS show promo checkbox!
+    }
+    
+    const itemPromoPriceGroup = document.getElementById('itemPromoPriceGroup');
+    if (itemPromoPriceGroup) {
+        itemPromoPriceGroup.style.display = (type === 'pizza') ? 'none' : 'flex';
     }
     
     const title = document.getElementById('flavorModalTitle');

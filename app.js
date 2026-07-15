@@ -73,6 +73,32 @@ function isPromoEligibleForSize(item, sizeKey) {
     return sizeKey === (CONFIG_SETTINGS.promoSize || 'G');
 }
 
+function getPromoPriceForProduct(product) {
+    let priceVal = parseFloat(product.price) || 0;
+    
+    // Se o item tiver um preço promocional fixo definido, usa ele direto!
+    if (product.promoPrice !== undefined && product.promoPrice !== null && product.promoPrice !== '') {
+        return parseFloat(product.promoPrice);
+    }
+    
+    // Caso contrário, calcula com base na porcentagem de desconto da categoria do item
+    if (CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && CONFIG_SETTINGS.promoDiscountActive) {
+        let discount = CONFIG_SETTINGS.promoDiscountPercent || 20; // fallback pizzas / global
+        
+        if (product.type === 'lanche') {
+            discount = CONFIG_SETTINGS.promoLanchesDiscountPercent || discount;
+        } else if (product.type === 'calzone') {
+            discount = CONFIG_SETTINGS.promoCalzonesDiscountPercent || discount;
+        } else if (product.type === 'bebida') {
+            discount = CONFIG_SETTINGS.promoBebidasDiscountPercent || discount;
+        }
+        
+        priceVal *= (1 - discount / 100);
+    }
+    
+    return priceVal;
+}
+
 let TAXAS_ENTREGA = {};
 function getDeliveryFeeForBairro(bairroName) {
     if (!bairroName) return 10.00;
@@ -907,11 +933,8 @@ function renderBestSellers() {
                 priceText = `R$ ${priceMin.toFixed(0)} a R$ ${priceMax.toFixed(0)}${isEligiblePromo ? ' (Promo)' : ''}`;
             }
         } else {
-            let priceVal = parseFloat(product.price) || 0;
             const isEligiblePromo = CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && isItemPromoToday(product);
-            if (isEligiblePromo && CONFIG_SETTINGS.promoDiscountActive) {
-                priceVal *= (1 - (CONFIG_SETTINGS.promoDiscountPercent || 20) / 100);
-            }
+            const priceVal = isEligiblePromo ? getPromoPriceForProduct(product) : (parseFloat(product.price) || 0);
             priceText = `R$ ${priceVal.toFixed(2).replace('.', ',')}${isEligiblePromo ? ' (Promo)' : ''}`;
         }
         
@@ -1021,11 +1044,8 @@ function renderRecommendedGrid(categoryFilter) {
                 priceText = `R$ ${priceMin.toFixed(0)} a R$ ${priceMax.toFixed(0)}${isEligiblePromo ? ' (Promo)' : ''}`;
             }
         } else {
-            let priceVal = parseFloat(product.price) || 0;
             const isEligiblePromo = CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && isItemPromoToday(product);
-            if (isEligiblePromo && CONFIG_SETTINGS.promoDiscountActive) {
-                priceVal *= (1 - (CONFIG_SETTINGS.promoDiscountPercent || 20) / 100);
-            }
+            const priceVal = isEligiblePromo ? getPromoPriceForProduct(product) : (parseFloat(product.price) || 0);
             priceText = `R$ ${priceVal.toFixed(2).replace('.', ',')}${isEligiblePromo ? ' (Promo)' : ''}`;
         }
         
@@ -1695,14 +1715,24 @@ function addSimpleItemToCart(itemId, category) {
     
     if (!itemData) return;
     
+    const isPromoActive = CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && isItemPromoToday(itemData);
+    let priceVal = parseFloat(itemData.price) || 0;
+    
+    if (isPromoActive) {
+        priceVal = getPromoPriceForProduct({
+            ...itemData,
+            type: category === 'lanches' ? 'lanche' : (category === 'calzones' ? 'calzone' : 'bebida')
+        });
+    }
+    
     const cartItem = {
         type: 'simple',
         id: itemId,
         name: itemData.name,
         category: category,
         quantity: 1,
-        singlePrice: itemData.price,
-        totalPrice: itemData.price
+        singlePrice: priceVal,
+        totalPrice: priceVal
     };
     
     cart = CartService.addToCart(cartItem);
