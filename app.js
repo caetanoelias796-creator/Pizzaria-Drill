@@ -52,6 +52,27 @@ let CONFIG_SETTINGS = {
     whatsappFormatted: '(54) 99670-4189'
 };
 
+function isItemPromoToday(item) {
+    if (!item) return false;
+    if (!item.isPromo) return false;
+    if (!item.promoDays || item.promoDays.length === 0) return true; // Se nenhum dia selecionado, vale todos os dias
+    
+    const diasSemana = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
+    const hoje = diasSemana[new Date().getDay()];
+    return item.promoDays.includes(hoje);
+}
+
+function isPromoEligibleForSize(item, sizeKey) {
+    if (!CONFIG_SETTINGS || !CONFIG_SETTINGS.promoActive) return false;
+    if (!isItemPromoToday(item)) return false;
+    
+    // Se desconto percentual estiver ativo, vale para qualquer tamanho!
+    if (CONFIG_SETTINGS.promoDiscountActive) return true;
+    
+    // Caso contrário, vale apenas para o tamanho configurado (ex: G)
+    return sizeKey === (CONFIG_SETTINGS.promoSize || 'G');
+}
+
 let TAXAS_ENTREGA = {};
 function getDeliveryFeeForBairro(bairroName) {
     if (!bairroName) return 10.00;
@@ -589,11 +610,18 @@ function renderPromoSection() {
     // Pizzas
     const pizzas = MENU_ITEMS.pizzas || [];
     pizzas.forEach(p => {
-        if (p.isPromo && p.available !== false) {
+        if (isItemPromoToday(p) && p.available !== false) {
+            let priceText = '';
+            if (CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && CONFIG_SETTINGS.promoDiscountActive) {
+                const discount = CONFIG_SETTINGS.promoDiscountPercent || 20;
+                priceText = `${discount}% OFF`;
+            } else {
+                priceText = `R$ ${(parseFloat(CONFIG_SETTINGS.promoPrice) || 95.00).toFixed(0)} (G)`;
+            }
             promos.push({
                 ...p,
                 type: 'pizza',
-                priceText: `R$ ${(parseFloat(CONFIG_SETTINGS.promoPrice) || 95.00).toFixed(0)} (G)`,
+                priceText: priceText,
                 emoji: '🍕'
             });
         }
@@ -602,11 +630,15 @@ function renderPromoSection() {
     // Lanches
     const lanches = MENU_ITEMS.lanches || [];
     lanches.forEach(l => {
-        if (l.isPromo && l.available !== false) {
+        if (isItemPromoToday(l) && l.available !== false) {
+            let priceVal = parseFloat(l.price) || 0;
+            if (CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && CONFIG_SETTINGS.promoDiscountActive) {
+                priceVal *= (1 - (CONFIG_SETTINGS.promoDiscountPercent || 20) / 100);
+            }
             promos.push({
                 ...l,
                 type: 'lanche',
-                priceText: `R$ ${(parseFloat(l.price) || 0).toFixed(0)}`,
+                priceText: `R$ ${priceVal.toFixed(2).replace('.', ',')}`,
                 emoji: '🍔'
             });
         }
@@ -615,11 +647,15 @@ function renderPromoSection() {
     // Calzones
     const calzones = MENU_ITEMS.calzones || [];
     calzones.forEach(c => {
-        if (c.isPromo && c.available !== false) {
+        if (isItemPromoToday(c) && c.available !== false) {
+            let priceVal = parseFloat(c.price) || 0;
+            if (CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && CONFIG_SETTINGS.promoDiscountActive) {
+                priceVal *= (1 - (CONFIG_SETTINGS.promoDiscountPercent || 20) / 100);
+            }
             promos.push({
                 ...c,
                 type: 'calzone',
-                priceText: `R$ ${(parseFloat(c.price) || 0).toFixed(0)}`,
+                priceText: `R$ ${priceVal.toFixed(2).replace('.', ',')}`,
                 emoji: '🥟'
             });
         }
@@ -628,11 +664,15 @@ function renderPromoSection() {
     // Bebidas
     const bebidas = MENU_ITEMS.bebidas || [];
     bebidas.forEach(b => {
-        if (b.isPromo && b.available !== false) {
+        if (isItemPromoToday(b) && b.available !== false) {
+            let priceVal = parseFloat(b.price) || 0;
+            if (CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && CONFIG_SETTINGS.promoDiscountActive) {
+                priceVal *= (1 - (CONFIG_SETTINGS.promoDiscountPercent || 20) / 100);
+            }
             promos.push({
                 ...b,
                 type: 'bebida',
-                priceText: `R$ ${(parseFloat(b.price) || 0).toFixed(0)}`,
+                priceText: `R$ ${priceVal.toFixed(2).replace('.', ',')}`,
                 emoji: '🥤'
             });
         }
@@ -704,24 +744,40 @@ function renderBestSellers() {
         
         let priceText = "";
         if (product.type === 'pizza') {
-            const pB = product.prices?.B || 0;
-            const pM = product.prices?.M || 0;
-            const pG = product.prices?.G || 0;
-            const pF = product.prices?.F || 0;
+            let pB = product.prices?.B || 0;
+            let pM = product.prices?.M || 0;
+            let pG = product.prices?.G || 0;
+            let pF = product.prices?.F || 0;
+            
+            const isEligiblePromo = CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && isItemPromoToday(product);
+            
+            if (isEligiblePromo && CONFIG_SETTINGS.promoDiscountActive) {
+                const factor = 1 - (CONFIG_SETTINGS.promoDiscountPercent || 20) / 100;
+                if (pB > 0) pB *= factor;
+                if (pM > 0) pM *= factor;
+                if (pG > 0) pG *= factor;
+                if (pF > 0) pF *= factor;
+            }
+            
             const nonZero = [pB, pM, pG, pF].filter(p => p > 0);
             const priceMin = nonZero.length > 0 ? Math.min(...nonZero) : 0;
             const priceMax = nonZero.length > 0 ? Math.max(...nonZero) : 0;
-            const isEligiblePromo = CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && product.isPromo;
-            if (isEligiblePromo) {
+            
+            if (isEligiblePromo && !CONFIG_SETTINGS.promoDiscountActive) {
                 const promoPrice = parseFloat(CONFIG_SETTINGS.promoPrice) || 95.00;
-                priceText = `R$ ${promoPrice.toFixed(0)}`;
+                priceText = `R$ ${promoPrice.toFixed(0)} (Promo)`;
             } else if (priceMin === priceMax) {
-                priceText = `R$ ${priceMin.toFixed(0)}`;
+                priceText = `R$ ${priceMin.toFixed(0)}${isEligiblePromo ? ' (Promo)' : ''}`;
             } else {
-                priceText = `R$ ${priceMin.toFixed(0)} a R$ ${priceMax.toFixed(0)}`;
+                priceText = `R$ ${priceMin.toFixed(0)} a R$ ${priceMax.toFixed(0)}${isEligiblePromo ? ' (Promo)' : ''}`;
             }
         } else {
-            priceText = `R$ ${product.price.toFixed(2).replace('.', ',')}`;
+            let priceVal = parseFloat(product.price) || 0;
+            const isEligiblePromo = CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && isItemPromoToday(product);
+            if (isEligiblePromo && CONFIG_SETTINGS.promoDiscountActive) {
+                priceVal *= (1 - (CONFIG_SETTINGS.promoDiscountPercent || 20) / 100);
+            }
+            priceText = `R$ ${priceVal.toFixed(2).replace('.', ',')}${isEligiblePromo ? ' (Promo)' : ''}`;
         }
         
         const imagePath = product.image || 'assets/pizza_hero.png';
@@ -802,25 +858,40 @@ function renderRecommendedGrid(categoryFilter) {
         
         let priceText = "";
         if (product.type === 'pizza') {
-            const pB = product.prices?.B || 0;
-            const pM = product.prices?.M || 0;
-            const pG = product.prices?.G || 0;
-            const pF = product.prices?.F || 0;
+            let pB = product.prices?.B || 0;
+            let pM = product.prices?.M || 0;
+            let pG = product.prices?.G || 0;
+            let pF = product.prices?.F || 0;
+            
+            const isEligiblePromo = CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && isItemPromoToday(product);
+            
+            if (isEligiblePromo && CONFIG_SETTINGS.promoDiscountActive) {
+                const factor = 1 - (CONFIG_SETTINGS.promoDiscountPercent || 20) / 100;
+                if (pB > 0) pB *= factor;
+                if (pM > 0) pM *= factor;
+                if (pG > 0) pG *= factor;
+                if (pF > 0) pF *= factor;
+            }
+            
             const nonZero = [pB, pM, pG, pF].filter(p => p > 0);
             const priceMin = nonZero.length > 0 ? Math.min(...nonZero) : 0;
             const priceMax = nonZero.length > 0 ? Math.max(...nonZero) : 0;
             
-            const isEligiblePromo = CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && product.isPromo;
-            if (isEligiblePromo) {
+            if (isEligiblePromo && !CONFIG_SETTINGS.promoDiscountActive) {
                 const promoPrice = parseFloat(CONFIG_SETTINGS.promoPrice) || 95.00;
                 priceText = `R$ ${promoPrice.toFixed(0)} (Promo)`;
             } else if (priceMin === priceMax) {
-                priceText = `R$ ${priceMin.toFixed(0)}`;
+                priceText = `R$ ${priceMin.toFixed(0)}${isEligiblePromo ? ' (Promo)' : ''}`;
             } else {
-                priceText = `R$ ${priceMin.toFixed(0)} a R$ ${priceMax.toFixed(0)}`;
+                priceText = `R$ ${priceMin.toFixed(0)} a R$ ${priceMax.toFixed(0)}${isEligiblePromo ? ' (Promo)' : ''}`;
             }
         } else {
-            priceText = `R$ ${product.price.toFixed(2).replace('.', ',')}`;
+            let priceVal = parseFloat(product.price) || 0;
+            const isEligiblePromo = CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && isItemPromoToday(product);
+            if (isEligiblePromo && CONFIG_SETTINGS.promoDiscountActive) {
+                priceVal *= (1 - (CONFIG_SETTINGS.promoDiscountPercent || 20) / 100);
+            }
+            priceText = `R$ ${priceVal.toFixed(2).replace('.', ',')}${isEligiblePromo ? ' (Promo)' : ''}`;
         }
         
         const imagePath = product.image || 'assets/pizza_hero.png';
@@ -1128,12 +1199,16 @@ function renderCustomizerFlavors() {
         
         const catLabel = item.category === 'doces' ? 'Doce' : 'Salgada';
         const sizeKey = SIZE_MAP[currentPizza.size] || 'M';
-        const isEligiblePromo = CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && sizeKey === (CONFIG_SETTINGS.promoSize || 'G') && item.isPromo;
+        const isEligiblePromo = isPromoEligibleForSize(item, sizeKey);
         
-        const rawPrice = isEligiblePromo 
-            ? (CONFIG_SETTINGS.promoPrice || 95.00) 
-            : ((item.prices && item.prices[sizeKey]) || 0);
-        const priceVal = parseFloat(rawPrice) || 0;
+        let priceVal = parseFloat((item.prices && item.prices[sizeKey]) || 0);
+        if (isEligiblePromo) {
+            if (CONFIG_SETTINGS.promoDiscountActive) {
+                priceVal *= (1 - (CONFIG_SETTINGS.promoDiscountPercent || 20) / 100);
+            } else {
+                priceVal = parseFloat(CONFIG_SETTINGS.promoPrice) || 95.00;
+            }
+        }
             
         const priceLabel = `R$ ${priceVal.toFixed(0)}`;
         const promoLabel = isEligiblePromo ? ' <span style="color:#ffc107; font-weight:bold;">(Promo)</span>' : '';
@@ -1359,14 +1434,29 @@ function calculateCustomizerPrice() {
     let allFlavorsArePromo = currentPizza.selectedFlavors.length > 0;
     currentPizza.selectedFlavors.forEach(flavorId => {
         const flavorData = MENU_ITEMS.pizzas.find(p => p.id === flavorId);
-        if (!flavorData || !flavorData.isPromo) {
+        if (!flavorData || !isItemPromoToday(flavorData)) {
             allFlavorsArePromo = false;
         }
     });
     
-    // Se a promoção estiver ativa para o tamanho atual e todos os sabores forem promocionais
-    if (CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && sizeKey === (CONFIG_SETTINGS.promoSize || 'G') && allFlavorsArePromo) {
-        maxFlavorPrice = parseFloat(CONFIG_SETTINGS.promoPrice) || 95.00;
+    const isPromoActiveForSize = CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && (CONFIG_SETTINGS.promoDiscountActive || sizeKey === (CONFIG_SETTINGS.promoSize || 'G'));
+    
+    if (isPromoActiveForSize && allFlavorsArePromo) {
+        if (CONFIG_SETTINGS.promoDiscountActive) {
+            // Aplica desconto percentual ao preço normal de cada sabor selecionado e pega o maior
+            currentPizza.selectedFlavors.forEach(flavorId => {
+                const flavorData = MENU_ITEMS.pizzas.find(p => p.id === flavorId);
+                if (flavorData && flavorData.prices) {
+                    const price = (parseFloat(flavorData.prices[sizeKey]) || 0) * (1 - (CONFIG_SETTINGS.promoDiscountPercent || 20) / 100);
+                    if (price > maxFlavorPrice) {
+                        maxFlavorPrice = price;
+                    }
+                }
+            });
+        } else {
+            // Usa o preço promocional fixo
+            maxFlavorPrice = parseFloat(CONFIG_SETTINGS.promoPrice) || 95.00;
+        }
     } else {
         currentPizza.selectedFlavors.forEach(flavorId => {
             const flavorData = MENU_ITEMS.pizzas.find(p => p.id === flavorId);

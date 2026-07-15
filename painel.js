@@ -1659,6 +1659,12 @@ function saveMenuItem(event) {
     }
     targetItem.isPromo = document.getElementById('flavorIsPromo')?.checked || false;
     
+    const promoDaysChecked = [];
+    document.querySelectorAll('input[name="promoDay"]:checked').forEach(chk => {
+        promoDaysChecked.push(chk.value);
+    });
+    targetItem.promoDays = promoDaysChecked;
+    
     if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
         ProductsService.saveProduct(id, targetItem)
         .then(() => {
@@ -1899,6 +1905,13 @@ function renderSettingsDashboard() {
     document.getElementById('settingsPromoPrice').value = tempSettings.promoPrice || 95.00;
     document.getElementById('settingsPromoSize').value = tempSettings.promoSize || 'G';
     
+    const promoDiscountActiveChg = document.getElementById('settingsPromoDiscountActive');
+    if (promoDiscountActiveChg) promoDiscountActiveChg.checked = tempSettings.promoDiscountActive || false;
+    const promoDiscountPercentInput = document.getElementById('settingsPromoDiscountPercent');
+    if (promoDiscountPercentInput) promoDiscountPercentInput.value = tempSettings.promoDiscountPercent || 20;
+    
+    togglePromoDiscountGroup();
+    
     renderSettingsFeesTable();
 }
 
@@ -1981,6 +1994,8 @@ function saveSettings() {
     const promoActive = document.getElementById('settingsPromoActive')?.checked || false;
     const promoPrice = parseFloat(document.getElementById('settingsPromoPrice')?.value) || 0;
     const promoSize = document.getElementById('settingsPromoSize')?.value || 'G';
+    const promoDiscountActive = document.getElementById('settingsPromoDiscountActive')?.checked || false;
+    const promoDiscountPercent = parseInt(document.getElementById('settingsPromoDiscountPercent')?.value) || 20;
     
     if (!whatsapp) {
         alert("O número do WhatsApp é obrigatório.");
@@ -1993,7 +2008,9 @@ function saveSettings() {
             whatsappFormatted: whatsappFormatted,
             promoActive: promoActive,
             promoPrice: promoPrice,
-            promoSize: promoSize
+            promoSize: promoSize,
+            promoDiscountActive: promoDiscountActive,
+            promoDiscountPercent: promoDiscountPercent
         });
         
         const feesPromise = ConfigService.saveDeliveryFees(tempSettings.deliveryFees || {});
@@ -2454,13 +2471,22 @@ function renderPromocoesList() {
             priceText = `R$ ${(promo.price || 0).toFixed(2).replace('.', ',')}`;
         }
         
+        let daysText = 'Todos os dias';
+        if (promo.promoDays && promo.promoDays.length > 0) {
+            const mapDays = { segunda: 'Seg', terca: 'Ter', quarta: 'Qua', quinta: 'Qui', sexta: 'Sex', sabado: 'Sáb', domingo: 'Dom' };
+            daysText = promo.promoDays.map(d => mapDays[d] || d).join(', ');
+        }
+        
         card.innerHTML = `
             <div class="flavor-card-header">
                 <div class="flavor-card-info">
                     <h4 style="margin: 0; color: var(--text-main); font-size: 15px;">${promo.name}</h4>
-                    <div style="margin-top: 4px; display: flex; gap: 4px;">
-                        <span class="category-tag salgada" style="text-transform: uppercase;">${promo.type}</span>
-                        ${badgeHTML}
+                    <div style="margin-top: 4px; display: flex; flex-direction: column; gap: 4px;">
+                        <div style="display: flex; gap: 4px;">
+                            <span class="category-tag salgada" style="text-transform: uppercase;">${promo.type}</span>
+                            ${badgeHTML}
+                        </div>
+                        <span style="font-size: 11px; color: var(--text-muted);">📅 ${daysText}</span>
                     </div>
                 </div>
                 <label class="switch" title="${promo.available !== false ? 'Disponível no Site' : 'Pausado/Indisponível'}">
@@ -2530,9 +2556,13 @@ function openAddMenuItemModal(type) {
     document.getElementById('flavorEditId').value = '';
     document.getElementById('flavorForm').reset();
     
-    // Reset checkbox promocional
+    // Reset checkbox promocional e dias
     const promoCheck = document.getElementById('flavorIsPromo');
     if (promoCheck) promoCheck.checked = false;
+    document.querySelectorAll('input[name="promoDay"]').forEach(chk => {
+        chk.checked = false;
+    });
+    togglePromoDaysGroup();
     
     adjustModalFields(type, false);
     
@@ -2614,6 +2644,12 @@ function openEditMenuItemModal(type, id) {
             }
         }, 50);
     }
+    
+    const promoDays = item.promoDays || [];
+    document.querySelectorAll('input[name="promoDay"]').forEach(chk => {
+        chk.checked = promoDays.includes(chk.value);
+    });
+    togglePromoDaysGroup();
     
     adjustModalFields(type, true);
     openModal('flavorModal');
@@ -2774,4 +2810,20 @@ function populateBannerImageSuggestions() {
         });
         container.appendChild(link);
     });
+}
+
+function togglePromoDaysGroup() {
+    const isPromo = document.getElementById('flavorIsPromo')?.checked;
+    const daysGroup = document.getElementById('flavorPromoDaysGroup');
+    if (daysGroup) {
+        daysGroup.style.display = isPromo ? 'flex' : 'none';
+    }
+}
+
+function togglePromoDiscountGroup() {
+    const isDiscountActive = document.getElementById('settingsPromoDiscountActive')?.checked;
+    const group = document.getElementById('promoDiscountGroup');
+    if (group) {
+        group.style.display = isDiscountActive ? 'flex' : 'none';
+    }
 }
