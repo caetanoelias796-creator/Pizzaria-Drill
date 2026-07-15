@@ -518,14 +518,22 @@
                             <input type="number" step="0.01" id="settingsPromoPrice" placeholder="Ex: 95.00" style="padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main);">
                         </div>
                         
-                        <div class="form-group" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px;">
-                            <label for="settingsPromoSize" style="font-size: 13px; font-weight: 500; color: var(--text-light);">Tamanho da Pizza Elegível (Apenas para Preço Promocional Fixo)</label>
-                            <select id="settingsPromoSize" style="padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); cursor: pointer;">
-                                <option value="B">Brotinho (B)</option>
-                                <option value="M">Média (M)</option>
-                                <option value="G" selected>Grande (G)</option>
-                                <option value="F">Família (F)</option>
-                            </select>
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
+                            <label style="font-size: 13px; font-weight: 500; color: var(--text-light);">Tamanhos de Pizza Elegíveis (Apenas para Preço Promocional Fixo)</label>
+                            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; color: var(--text-main);">
+                                    <input type="checkbox" name="promoSizes" value="B" style="width: 16px; height: 16px; cursor: pointer;"> Brotinho (B)
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; color: var(--text-main);">
+                                    <input type="checkbox" name="promoSizes" value="M" style="width: 16px; height: 16px; cursor: pointer;"> Média (M)
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; color: var(--text-main);">
+                                    <input type="checkbox" name="promoSizes" value="G" style="width: 16px; height: 16px; cursor: pointer;"> Grande (G)
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; color: var(--text-main);">
+                                    <input type="checkbox" name="promoSizes" value="F" style="width: 16px; height: 16px; cursor: pointer;"> Família (F)
+                                </label>
+                            </div>
                         </div>
                         
                         <div class="form-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px;">

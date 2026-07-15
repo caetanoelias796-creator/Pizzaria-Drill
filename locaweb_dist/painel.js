@@ -2117,7 +2117,19 @@ function renderSettingsDashboard() {
     document.getElementById('settingsWhatsappFormatted').value = tempSettings.whatsappFormatted || '';
     document.getElementById('settingsPromoActive').checked = tempSettings.promoActive || false;
     document.getElementById('settingsPromoPrice').value = tempSettings.promoPrice || 95.00;
-    document.getElementById('settingsPromoSize').value = tempSettings.promoSize || 'G';
+    const selectedSizes = [];
+    const promoSizeRaw = tempSettings.promoSize || 'G';
+    if (Array.isArray(promoSizeRaw)) {
+        selectedSizes.push(...promoSizeRaw);
+    } else if (typeof promoSizeRaw === 'string') {
+        selectedSizes.push(...promoSizeRaw.split(',').map(s => s.trim()));
+    } else {
+        selectedSizes.push(String(promoSizeRaw));
+    }
+    
+    document.querySelectorAll('input[name="promoSizes"]').forEach(cb => {
+        cb.checked = selectedSizes.includes(cb.value);
+    });
     
     const promoDiscountActiveChg = document.getElementById('settingsPromoDiscountActive');
     if (promoDiscountActiveChg) promoDiscountActiveChg.checked = tempSettings.promoDiscountActive || false;
@@ -2216,7 +2228,7 @@ function saveSettings() {
     const whatsappFormatted = document.getElementById('settingsWhatsappFormatted').value.trim();
     const promoActive = document.getElementById('settingsPromoActive')?.checked || false;
     const promoPrice = parseFloat(document.getElementById('settingsPromoPrice')?.value) || 0;
-    const promoSize = document.getElementById('settingsPromoSize')?.value || 'G';
+    const promoSize = Array.from(document.querySelectorAll('input[name="promoSizes"]:checked')).map(cb => cb.value).join(',');
     const promoDiscountActive = document.getElementById('settingsPromoDiscountActive')?.checked || false;
     const promoDiscountPercent = parseInt(document.getElementById('settingsPromoDiscountPercent')?.value) || 20;
     const promoLanchesDiscountPercent = parseInt(document.getElementById('settingsPromoLanchesDiscountPercent')?.value) || 20;

@@ -62,6 +62,17 @@ function isItemPromoToday(item) {
     return item.promoDays.includes(hoje);
 }
 
+function isPromoSize(sizeKey) {
+    const promoSize = CONFIG_SETTINGS ? (CONFIG_SETTINGS.promoSize || 'G') : 'G';
+    if (Array.isArray(promoSize)) {
+        return promoSize.includes(sizeKey);
+    }
+    if (typeof promoSize === 'string') {
+        return promoSize.split(',').map(s => s.trim()).includes(sizeKey);
+    }
+    return sizeKey === promoSize;
+}
+
 function isPromoEligibleForSize(item, sizeKey) {
     if (!CONFIG_SETTINGS || !CONFIG_SETTINGS.promoActive) return false;
     if (!isItemPromoToday(item)) return false;
@@ -69,8 +80,8 @@ function isPromoEligibleForSize(item, sizeKey) {
     // Se desconto percentual estiver ativo, vale para qualquer tamanho!
     if (CONFIG_SETTINGS.promoDiscountActive) return true;
     
-    // Caso contrário, vale apenas para o tamanho configurado (ex: G)
-    return sizeKey === (CONFIG_SETTINGS.promoSize || 'G');
+    // Caso contrário, vale apenas para os tamanhos configurados (ex: G ou G,M)
+    return isPromoSize(sizeKey);
 }
 
 function getPromoPriceForProduct(product) {
@@ -1602,7 +1613,7 @@ function calculateCustomizerPrice() {
         }
     });
     
-    const isPromoActiveForSize = CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && (CONFIG_SETTINGS.promoDiscountActive || sizeKey === (CONFIG_SETTINGS.promoSize || 'G'));
+    const isPromoActiveForSize = CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && (CONFIG_SETTINGS.promoDiscountActive || isPromoSize(sizeKey));
     
     if (isPromoActiveForSize && allFlavorsArePromo) {
         if (CONFIG_SETTINGS.promoDiscountActive) {
