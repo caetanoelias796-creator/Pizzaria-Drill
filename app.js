@@ -606,7 +606,7 @@ function renderPromoSection() {
             promos.push({
                 ...l,
                 type: 'lanche',
-                priceText: `R$ ${l.price.toFixed(0)}`,
+                priceText: `R$ ${(parseFloat(l.price) || 0).toFixed(0)}`,
                 emoji: '🍔'
             });
         }
@@ -619,7 +619,7 @@ function renderPromoSection() {
             promos.push({
                 ...c,
                 type: 'calzone',
-                priceText: `R$ ${c.price.toFixed(0)}`,
+                priceText: `R$ ${(parseFloat(c.price) || 0).toFixed(0)}`,
                 emoji: '🥟'
             });
         }
@@ -632,7 +632,7 @@ function renderPromoSection() {
             promos.push({
                 ...b,
                 type: 'bebida',
-                priceText: `R$ ${b.price.toFixed(0)}`,
+                priceText: `R$ ${(parseFloat(b.price) || 0).toFixed(0)}`,
                 emoji: '🥤'
             });
         }
@@ -1130,9 +1130,10 @@ function renderCustomizerFlavors() {
         const sizeKey = SIZE_MAP[currentPizza.size] || 'M';
         const isEligiblePromo = CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && sizeKey === (CONFIG_SETTINGS.promoSize || 'G') && item.isPromo;
         
-        const priceVal = isEligiblePromo 
-            ? (parseFloat(CONFIG_SETTINGS.promoPrice) || 95.00) 
+        const rawPrice = isEligiblePromo 
+            ? (CONFIG_SETTINGS.promoPrice || 95.00) 
             : ((item.prices && item.prices[sizeKey]) || 0);
+        const priceVal = parseFloat(rawPrice) || 0;
             
         const priceLabel = `R$ ${priceVal.toFixed(0)}`;
         const promoLabel = isEligiblePromo ? ' <span style="color:#ffc107; font-weight:bold;">(Promo)</span>' : '';
