@@ -600,47 +600,24 @@ function openPizzaCustomizerWithFlavor(flavorId) {
     handleFlavorSelection(flavorId);
 }
 
+function openPizzaCustomizerWithPromoFilter() {
+    openPizzaCustomizer('grande');
+    filterFlavorsCarousel('promo');
+}
+
 function renderPromoSection() {
     const promoGrid = document.getElementById("promoGrid");
     if (!promoGrid) return;
     promoGrid.innerHTML = '';
     
-    const promos = [];
-    
-    // Pizzas
-    const pizzas = MENU_ITEMS.pizzas || [];
-    pizzas.forEach(p => {
-        if (isItemPromoToday(p) && p.available !== false) {
-            let priceText = '';
-            if (CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && CONFIG_SETTINGS.promoDiscountActive) {
-                const discount = CONFIG_SETTINGS.promoDiscountPercent || 20;
-                priceText = `${discount}% OFF`;
-            } else {
-                priceText = `R$ ${(parseFloat(CONFIG_SETTINGS.promoPrice) || 95.00).toFixed(0)} (G)`;
-            }
-            promos.push({
-                ...p,
-                type: 'pizza',
-                priceText: priceText,
-                emoji: '🍕'
-            });
-        }
-    });
+    const promoPizzas = (MENU_ITEMS.pizzas || []).filter(p => isItemPromoToday(p) && p.available !== false);
+    const promoOthers = [];
     
     // Lanches
     const lanches = MENU_ITEMS.lanches || [];
     lanches.forEach(l => {
         if (isItemPromoToday(l) && l.available !== false) {
-            let priceVal = parseFloat(l.price) || 0;
-            if (CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && CONFIG_SETTINGS.promoDiscountActive) {
-                priceVal *= (1 - (CONFIG_SETTINGS.promoDiscountPercent || 20) / 100);
-            }
-            promos.push({
-                ...l,
-                type: 'lanche',
-                priceText: `R$ ${priceVal.toFixed(2).replace('.', ',')}`,
-                emoji: '🍔'
-            });
+            promoOthers.push({ ...l, type: 'lanche', emoji: '🍔' });
         }
     });
     
@@ -648,16 +625,7 @@ function renderPromoSection() {
     const calzones = MENU_ITEMS.calzones || [];
     calzones.forEach(c => {
         if (isItemPromoToday(c) && c.available !== false) {
-            let priceVal = parseFloat(c.price) || 0;
-            if (CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && CONFIG_SETTINGS.promoDiscountActive) {
-                priceVal *= (1 - (CONFIG_SETTINGS.promoDiscountPercent || 20) / 100);
-            }
-            promos.push({
-                ...c,
-                type: 'calzone',
-                priceText: `R$ ${priceVal.toFixed(2).replace('.', ',')}`,
-                emoji: '🥟'
-            });
+            promoOthers.push({ ...c, type: 'calzone', emoji: '🥟' });
         }
     });
     
@@ -665,40 +633,68 @@ function renderPromoSection() {
     const bebidas = MENU_ITEMS.bebidas || [];
     bebidas.forEach(b => {
         if (isItemPromoToday(b) && b.available !== false) {
-            let priceVal = parseFloat(b.price) || 0;
-            if (CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && CONFIG_SETTINGS.promoDiscountActive) {
-                priceVal *= (1 - (CONFIG_SETTINGS.promoDiscountPercent || 20) / 100);
-            }
-            promos.push({
-                ...b,
-                type: 'bebida',
-                priceText: `R$ ${priceVal.toFixed(2).replace('.', ',')}`,
-                emoji: '🥤'
-            });
+            promoOthers.push({ ...b, type: 'bebida', emoji: '🥤' });
         }
     });
 
     const promoSection = document.getElementById("promoSection");
-    if (promos.length === 0) {
+    if (promoPizzas.length === 0 && promoOthers.length === 0) {
         if (promoSection) promoSection.style.display = 'none';
         return;
     } else {
         if (promoSection) promoSection.style.display = 'block';
     }
     
-    promos.forEach(product => {
+    // Se houver pizzas em promoção, renderiza o banner único
+    if (promoPizzas.length > 0) {
+        const bannerCard = document.createElement("div");
+        bannerCard.className = "promo-banner-single";
+        bannerCard.style.gridColumn = "1 / -1"; // Ocupa a largura total da grid
+        
+        let discountText = '';
+        if (CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && CONFIG_SETTINGS.promoDiscountActive) {
+            discountText = `${CONFIG_SETTINGS.promoDiscountPercent || 20}% OFF`;
+        } else {
+            discountText = `R$ ${(parseFloat(CONFIG_SETTINGS.promoPrice) || 95.00).toFixed(0)}`;
+        }
+        
+        const flavorNames = promoPizzas.map(p => p.name);
+        
+        bannerCard.innerHTML = `
+            <div class="promo-banner-single-header">
+                <span class="promo-banner-single-tag">🔥 Promoção do Dia</span>
+                <span class="promo-banner-single-discount">${discountText}</span>
+            </div>
+            <h3 class="promo-banner-single-title">Pizzas com Preço Especial Hoje!</h3>
+            <p class="promo-banner-single-flavors"><strong>Sabores participantes:</strong> ${flavorNames.join(', ')}</p>
+            <div class="promo-banner-single-footer">
+                <span>Toque para montar a sua pizza</span>
+                <span class="material-symbols-rounded" style="font-size: 18px;">arrow_forward</span>
+            </div>
+        `;
+        
+        bannerCard.onclick = () => openPizzaCustomizerWithPromoFilter();
+        promoGrid.appendChild(bannerCard);
+    }
+    
+    // Se houver outros itens em promoção, renderiza cada um como um card individual abaixo do banner
+    promoOthers.forEach(product => {
         const card = document.createElement("div");
         card.className = "promo-mini-card";
         card.style.cursor = "pointer";
         
         const badgeText = product.badge || "PROMO";
+        let priceVal = parseFloat(product.price) || 0;
+        if (CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && CONFIG_SETTINGS.promoDiscountActive) {
+            priceVal *= (1 - (CONFIG_SETTINGS.promoDiscountPercent || 20) / 100);
+        }
         
         card.innerHTML = `
             <div class="promo-mini-emoji">${product.emoji}</div>
             <h4 class="promo-mini-title">${product.name}</h4>
             <p class="promo-mini-desc">${product.description || ''}</p>
             <div class="promo-mini-footer">
-                <span class="promo-mini-price">${product.priceText}</span>
+                <span class="promo-mini-price">R$ ${priceVal.toFixed(2).replace('.', ',')}</span>
                 <span class="discount-badge">${badgeText}</span>
             </div>
         `;
@@ -1060,6 +1056,13 @@ function openPizzaCustomizer(sizeId) {
     
     // Reset carousel filter
     currentFlavorsFilter = 'todas';
+    
+    // Check if there are active promos today
+    const hasPromosToday = CONFIG_SETTINGS && CONFIG_SETTINGS.promoActive && (MENU_ITEMS.pizzas || []).some(p => isItemPromoToday(p));
+    const tabPromo = document.getElementById('tabFilterPromo');
+    if (tabPromo) {
+        tabPromo.style.display = hasPromosToday ? 'inline-block' : 'none';
+    }
     
     onSizeChange();
     

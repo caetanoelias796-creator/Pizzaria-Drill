@@ -3086,3 +3086,97 @@ body > .floating-cart-btn {
     border-radius: 4px;
 }
 
+/* Single Daily Promo Banner */
+.promo-banner-single {
+    background: linear-gradient(135deg, #b71c1c 0%, #1a0a0a 100%);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    transition: var(--transition);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.promo-banner-single:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+    box-shadow: var(--shadow-lg);
+}
+
+.promo-banner-single::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 193, 7, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.promo-banner-single-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.promo-banner-single-tag {
+    background: rgba(229, 57, 53, 0.2);
+    color: #ef5350;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+}
+
+.promo-banner-single-discount {
+    background-color: var(--primary);
+    color: var(--text-main);
+    font-size: 12px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.promo-banner-single-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.promo-banner-single-flavors {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin: 0;
+}
+
+.promo-banner-single-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--primary);
+    font-weight: 600;
+    margin-top: 4px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 12px;
+}
+
+.promo-banner-single-footer span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
