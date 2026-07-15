@@ -350,6 +350,32 @@
                             </div>
                         </div>
 
+                        <!-- Adicionais do Açaí -->
+                        <div class="prices-table-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <h3 style="color: var(--text-main); font-family: var(--font-display); margin: 0;">Adicionais do Açaí (R$)</h3>
+                                <button type="button" class="btn-status-next" onclick="openAcaiAdditionModal()" style="display: inline-flex; align-items: center; gap: 8px; border-radius: var(--radius-sm); border: none; padding: 8px 16px; cursor: pointer; font-weight: 500; font-size: 13px;">
+                                    <span class="material-symbols-rounded" style="font-size: 18px;">add</span> Adicionar Adicional
+                                </button>
+                            </div>
+                            <div style="overflow-x: auto;">
+                                <table class="prices-matrix-table" id="acaiAdditionsTable" style="width: 100%; border-collapse: collapse; text-align: left;">
+                                    <thead>
+                                        <tr style="border-bottom: 2px solid var(--border-color);">
+                                            <th style="padding: 12px 10px; font-weight: bold; color: var(--text-main);">Nome do Adicional</th>
+                                            <th style="padding: 12px 10px; font-weight: bold; color: var(--text-main);">Tipo (Valor)</th>
+                                            <th style="padding: 12px 10px; font-weight: bold; color: var(--text-main);">Preço Cobrado (R$)</th>
+                                            <th style="padding: 12px 10px; font-weight: bold; color: var(--text-main); text-align: center;">Disponível</th>
+                                            <th style="padding: 12px 10px; font-weight: bold; color: var(--text-main); text-align: right;">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="acaiAdditionsTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
                         <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 10px;">
                             <button class="btn-refresh" onclick="initMenuSync()" style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 10px 20px; font-weight: 500; cursor: pointer;">Descartar</button>
                             <button class="btn-status-next" onclick="saveMenuPrices()" style="display: inline-flex; align-items: center; gap: 8px; border-radius: var(--radius-sm); border: none; padding: 10px 25px; cursor: pointer; font-weight: 600;">
@@ -735,6 +761,39 @@
                 
                 <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 15px;">
                     <button type="button" class="btn-refresh" onclick="closeBorderModal()" style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 16px; cursor: pointer;">Cancelar</button>
+                    <button type="submit" class="btn-status-next" style="border: none; border-radius: var(--radius-sm); padding: 8px 24px; cursor: pointer; font-weight: 600;">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Açaí Addition Add Modal Overlay -->
+    <div class="modal-overlay display-none" id="acaiAdditionModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 1100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: var(--transition);">
+        <div class="modal-container" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: 92%; max-width: 400px; padding: 25px; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 id="acaiAdditionModalTitle" style="color: var(--text-main); font-family: var(--font-display); font-size: 18px;">Adicionar Novo Adicional</h3>
+                <button class="btn-close-modal" onclick="closeAcaiAdditionModal()" style="border: none; background: transparent; color: var(--text-light); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%;">
+                    <span class="material-symbols-rounded">close</span>
+                </button>
+            </div>
+            
+            <form id="acaiAdditionForm" onsubmit="saveNewAcaiAddition(event)" style="display: flex; flex-direction: column; gap: 15px;">
+                <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                    <label for="acaiAdditionName" style="font-size: 13px; font-weight: 500; color: var(--text-light);">Nome do Adicional</label>
+                    <input type="text" id="acaiAdditionName" required placeholder="Ex: Nutella" style="padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main);">
+                </div>
+                
+                <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                    <label for="acaiAdditionType" style="font-size: 13px; font-weight: 500; color: var(--text-light);">Tipo de Cobrança</label>
+                    <select id="acaiAdditionType" required style="padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); cursor: pointer;">
+                        <option value="free">Grátis (Incluso no Limite)</option>
+                        <option value="paid_2.5">Pago (R$ 2,50)</option>
+                        <option value="paid_5">Pago (R$ 5,00)</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 15px;">
+                    <button type="button" class="btn-refresh" onclick="closeAcaiAdditionModal()" style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 16px; cursor: pointer;">Cancelar</button>
                     <button type="submit" class="btn-status-next" style="border: none; border-radius: var(--radius-sm); padding: 8px 24px; cursor: pointer; font-weight: 600;">Adicionar</button>
                 </div>
             </form>

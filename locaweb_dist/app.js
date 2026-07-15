@@ -2258,12 +2258,14 @@ function initMenuData() {
                 const key = item.id.replace('borda_', '');
                 BORDAS[key] = { name: item.name, price: item.price, category: item.subcategory || 'ambas' };
             } else if (item.category === 'acai_adicionais') {
-                if (item.type === 'free') {
-                    freeAdds.push(item.name);
-                } else if (item.type === 'paid_5') {
-                    paid5.push(item.name);
-                } else if (item.type === 'paid_2.5') {
-                    paid25.push(item.name);
+                if (item.available !== false) {
+                    if (item.type === 'free') {
+                        freeAdds.push(item.name);
+                    } else if (item.type === 'paid_5') {
+                        paid5.push(item.name);
+                    } else if (item.type === 'paid_2.5') {
+                        paid25.push(item.name);
+                    }
                 }
             } else if (item.category) {
                 if (!MENU_ITEMS[item.category]) {

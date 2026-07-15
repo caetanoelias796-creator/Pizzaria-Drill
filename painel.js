@@ -928,7 +928,8 @@ const DEFAULT_MENU_DATA = {
     banners: [
         { tag: 'Promoção', title: 'Pizzas Promocionais G', subtitle: 'Selecione apenas sabores promocionais e pague preço único fixo!', gradient: 'linear-gradient(135deg, #b71c1c 0%, #1a0a0a 100%)' },
         { tag: 'Forno de Pedra', title: 'Massa Fina & Crocante', subtitle: 'Ingredientes frescos selecionados diariamente', gradient: 'linear-gradient(135deg, #ffd600 0%, #3e2723 100%)' }
-    ]
+    ],
+    acai_adicionais: []
 };
 
 /* ==========================================================================
@@ -1111,6 +1112,7 @@ function initMenuSync() {
             if (!menuData) menuData = {};
             menuData.menu_items = { pizzas: [], lanches: [], calzones: [], bebidas: [], acais: [] };
             menuData.borders = {};
+            menuData.acai_adicionais = [];
 
             list.forEach((item) => {
                 if (item.category === 'pizzas') {
@@ -1126,6 +1128,8 @@ function initMenuSync() {
                 } else if (item.category === 'bordas') {
                     const key = item.id.replace('borda_', '');
                     menuData.borders[key] = { name: item.name, price: item.price, category: item.subcategory || 'ambas' };
+                } else if (item.category === 'acai_adicionais') {
+                    menuData.acai_adicionais.push(item);
                 }
             });
             productsLoaded = true;
@@ -1346,6 +1350,7 @@ function renderMenuManager() {
     renderAcaisList();
     renderPricesMatrix();
     renderBordersTable();
+    renderAcaiAdditionsTable();
     renderCategoriasList();
     renderBannersList();
     renderPromocoesList();
@@ -1598,6 +1603,152 @@ function saveNewBorder(event) {
     
     closeBorderModal();
     renderBordersTable();
+}
+
+/* ==========================================================================
+   Açaí Additions Management Functions
+   ========================================================================== */
+function renderAcaiAdditionsTable() {
+    const tbody = document.getElementById('acaiAdditionsTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    
+    const additions = menuData.acai_adicionais || [];
+    
+    // Sort additions alphabetically by name
+    additions.sort((a, b) => a.name.localeCompare(b.name));
+    
+    additions.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid var(--border-color)';
+        
+        let typeLabel = 'Grátis';
+        let priceVal = 0;
+        if (item.type === 'paid_5') {
+            typeLabel = 'Pago (R$ 5,00)';
+            priceVal = 5.00;
+        } else if (item.type === 'paid_2.5') {
+            typeLabel = 'Pago (R$ 2,50)';
+            priceVal = 2.50;
+        }
+        
+        const isChecked = item.available !== false ? 'checked' : '';
+        
+        tr.innerHTML = `
+            <td style="padding: 12px 10px; font-weight: 600; color: var(--text-main);">${item.name}</td>
+            <td style="padding: 12px 10px; color: var(--text-light); font-size: 13px;">${typeLabel}</td>
+            <td style="padding: 8px 10px; color: var(--text-main);">
+                R$ ${priceVal.toFixed(2).replace('.', ',')}
+            </td>
+            <td style="padding: 8px 10px; text-align: center;">
+                <label class="switch" style="margin: 0 auto; display: inline-block;" title="${item.available !== false ? 'Ativo' : 'Pausado'}">
+                    <input type="checkbox" ${isChecked} onchange="toggleAcaiAdditionAvailability('${item.id}', this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </td>
+            <td style="padding: 12px 10px; text-align: right;">
+                <button type="button" class="btn-icon-action delete" onclick="deleteAcaiAddition('${item.id}')" title="Excluir Adicional" style="border: none; background: transparent; color: #ef4444; cursor: pointer; padding: 4px; border-radius: var(--radius-sm); display: inline-flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">delete</span>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function openAcaiAdditionModal() {
+    document.getElementById('acaiAdditionForm').reset();
+    openModal('acaiAdditionModal');
+}
+
+function closeAcaiAdditionModal() {
+    closeModal('acaiAdditionModal');
+}
+
+function saveNewAcaiAddition(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('acaiAdditionName').value.trim();
+    const type = document.getElementById('acaiAdditionType').value;
+    
+    if (!name) {
+        alert("Por favor, preencha o nome do adicional.");
+        return;
+    }
+    
+    // Generate a unique ID for the addition based on its name
+    const cleanId = 'add_' + name.toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // remove accents
+        .replace(/[^a-z0-9]+/g, '_'); // replace non-alphanumeric with _
+        
+    let price = 0;
+    if (type === 'paid_5') price = 5;
+    if (type === 'paid_2.5') price = 2.5;
+    
+    const newAddition = {
+        id: cleanId,
+        name: name,
+        price: price,
+        category: 'acai_adicionais',
+        type: type,
+        available: true
+    };
+    
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        ProductsService.saveProduct(cleanId, newAddition)
+        .then(() => {
+            closeAcaiAdditionModal();
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Erro ao salvar o adicional no Firebase.");
+        });
+    } else {
+        if (!menuData.acai_adicionais) menuData.acai_adicionais = [];
+        // Check if ID already exists
+        if (menuData.acai_adicionais.some(a => a.id === cleanId)) {
+            alert("Já existe um adicional com este nome.");
+            return;
+        }
+        menuData.acai_adicionais.push(newAddition);
+        closeAcaiAdditionModal();
+        renderAcaiAdditionsTable();
+    }
+}
+
+function toggleAcaiAdditionAvailability(id, isChecked) {
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+        ProductsService.updateProductAvailability(id, isChecked)
+        .catch(err => {
+            console.error(err);
+            alert("Erro ao alterar disponibilidade do adicional.");
+        });
+    } else {
+        const item = menuData.acai_adicionais.find(i => i.id === id);
+        if (item) {
+            item.available = isChecked;
+            renderAcaiAdditionsTable();
+        }
+    }
+}
+
+function deleteAcaiAddition(id) {
+    if (confirm("Tem certeza que deseja excluir este adicional de açaí?")) {
+        if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
+            ProductsService.deleteProduct(id)
+            .catch(err => {
+                console.error(err);
+                alert("Erro ao excluir o adicional no Firebase.");
+            });
+        } else {
+            const index = menuData.acai_adicionais.findIndex(a => a.id === id);
+            if (index !== -1) {
+                menuData.acai_adicionais.splice(index, 1);
+                renderAcaiAdditionsTable();
+            }
+        }
+    }
 }
 
 function saveMenuPrices() {
