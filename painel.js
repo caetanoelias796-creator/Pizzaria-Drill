@@ -1118,7 +1118,7 @@ function initMenuSync() {
             menuData.acai_adicionais = [];
 
             list.forEach((item) => {
-                if (item.category === 'pizzas') {
+                if (item.category === 'pizzas' || item.category === 'salgadas' || item.category === 'doces') {
                     menuData.menu_items.pizzas.push(item);
                 } else if (item.category === 'lanches') {
                     menuData.menu_items.lanches.push(item);
@@ -1370,7 +1370,8 @@ function renderFlavorsList() {
     const pizzas = menuData.menu_items?.pizzas || [];
     
     pizzas.forEach((pizza) => {
-        if (pizza.category === 'doces') {
+        const cat = pizza.subcategory || pizza.category;
+        if (cat === 'doces') {
             return;
         }
         
@@ -1448,7 +1449,8 @@ function renderSweetFlavorsList() {
     const pizzas = menuData.menu_items?.pizzas || [];
     
     pizzas.forEach((pizza) => {
-        if (pizza.category !== 'doces') {
+        const cat = pizza.subcategory || pizza.category;
+        if (cat !== 'doces') {
             return;
         }
         
