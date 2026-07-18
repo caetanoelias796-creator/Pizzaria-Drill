@@ -983,7 +983,7 @@ function switchSection(section) {
 function setMenuTab(tab) {
     currentMenuTab = tab;
     
-    const tabs = ['Flavors', 'Calzones', 'Bebidas', 'Lanches', 'Acais', 'Prices', 'Categorias', 'Banners', 'Promocoes'];
+    const tabs = ['Flavors', 'SweetPizzas', 'Calzones', 'Bebidas', 'Lanches', 'Acais', 'Prices', 'Categorias', 'Banners', 'Promocoes'];
     tabs.forEach(t => {
         const tabEl = document.getElementById('tab' + t);
         const contentEl = document.getElementById('menuTab' + t);
@@ -1011,7 +1011,10 @@ function setMenuTab(tab) {
         } else {
             btnAdd.style.display = 'inline-flex';
             if (tab === 'flavors') {
-                btnText.innerText = 'Adicionar Sabor';
+                btnText.innerText = 'Adicionar Sabor Salgado';
+                btnAdd.onclick = () => openAddMenuProductModal('pizza');
+            } else if (tab === 'sweetpizzas') {
+                btnText.innerText = 'Adicionar Sabor Doce';
                 btnAdd.onclick = () => openAddMenuProductModal('pizza');
             } else if (tab === 'calzones') {
                 btnText.innerText = 'Adicionar Calzone';
@@ -1344,6 +1347,7 @@ function renderMenuManager() {
     if (!menuData) return;
     
     renderFlavorsList();
+    renderSweetFlavorsList();
     renderCalzonesList();
     renderBebidasList();
     renderLanchesList();
@@ -1363,16 +1367,14 @@ function renderFlavorsList() {
     grid.innerHTML = '';
     
     const searchVal = document.getElementById('searchFlavor').value.toLowerCase().trim();
-    const filterCat = document.getElementById('filterCategory').value;
-    
     const pizzas = menuData.menu_items?.pizzas || [];
     
     pizzas.forEach((pizza) => {
-        if (searchVal && !pizza.name.toLowerCase().includes(searchVal) && !pizza.description.toLowerCase().includes(searchVal)) {
+        if (pizza.category === 'doces') {
             return;
         }
         
-        if (filterCat !== 'todos' && pizza.category !== filterCat) {
+        if (searchVal && !pizza.name.toLowerCase().includes(searchVal) && !pizza.description.toLowerCase().includes(searchVal)) {
             return;
         }
         
@@ -1391,9 +1393,7 @@ function renderFlavorsList() {
                 <div class="flavor-card-info">
                     <h4 style="margin: 0; color: var(--text-main); font-size: 15px;">${pizza.name}</h4>
                     <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px;">
-                        <span class="category-tag ${pizza.category === 'salgadas' ? 'salgada' : 'doce'}">
-                            ${pizza.category === 'salgadas' ? 'Salgada' : 'Doce'}
-                        </span>
+                        <span class="category-tag salgada">Salgada</span>
                         ${promoTagHTML}
                     </div>
                 </div>
@@ -1436,6 +1436,84 @@ function renderFlavorsList() {
 
 function filterFlavorsList() {
     renderFlavorsList();
+}
+
+function renderSweetFlavorsList() {
+    const grid = document.getElementById('sweetFlavorsListGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    
+    const searchVal = document.getElementById('searchSweetFlavor') ? document.getElementById('searchSweetFlavor').value.toLowerCase().trim() : '';
+    const pizzas = menuData.menu_items?.pizzas || [];
+    
+    pizzas.forEach((pizza) => {
+        if (pizza.category !== 'doces') {
+            return;
+        }
+        
+        if (searchVal && !pizza.name.toLowerCase().includes(searchVal) && !pizza.description.toLowerCase().includes(searchVal)) {
+            return;
+        }
+        
+        const card = document.createElement('div');
+        card.className = 'flavor-card';
+        if (pizza.available === false) {
+            card.style.opacity = '0.6';
+        }
+        
+        const badgeHTML = pizza.badge ? `<span class="flavor-badge-label">${pizza.badge}</span>` : '';
+        const isChecked = pizza.available !== false ? 'checked' : '';
+        const promoTagHTML = pizza.isPromo ? `<span class="category-tag promo" style="background: rgba(255, 193, 7, 0.15); color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.3); font-weight: bold;">Promoção</span>` : '';
+        
+        card.innerHTML = `
+            <div class="flavor-card-header">
+                <div class="flavor-card-info">
+                    <h4 style="margin: 0; color: var(--text-main); font-size: 15px;">${pizza.name}</h4>
+                    <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px;">
+                        <span class="category-tag doce">Doce</span>
+                        ${promoTagHTML}
+                    </div>
+                </div>
+                
+                <label class="switch" title="${pizza.available !== false ? 'Disponível no Site' : 'Pausado/Indisponível'}">
+                    <input type="checkbox" ${isChecked} onchange="toggleFlavorAvailability('${pizza.id}', this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <p class="flavor-card-desc" style="margin: 0; flex: 1;">${pizza.description}</p>
+            
+            <div class="flavor-card-prices" style="font-size: 11px; color: var(--text-muted); margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px 0; border-top: 1px dashed rgba(255,255,255,0.05); border-bottom: 1px dashed rgba(255,255,255,0.05);">
+                <span>Broto (B): <strong>R$ ${pizza.prices?.B || 0}</strong></span>
+                <span>Média (M): <strong>R$ ${pizza.prices?.M || 0}</strong></span>
+                <span>Grande (G): <strong>R$ ${pizza.prices?.G || 0}</strong></span>
+                <span>Família (F): <strong>R$ ${pizza.prices?.F || 0}</strong></span>
+            </div>
+            
+            <div class="flavor-card-meta" style="margin-top: 8px;">
+                <span class="flavor-price-tier" style="font-weight: 600; color: var(--primary); font-size: 12px; text-transform: uppercase;">
+                    ${pizza.categoryType || 'promocional'}
+                </span>
+                ${badgeHTML}
+            </div>
+            
+            <div class="flavor-card-actions">
+                <button class="btn-icon-action" onclick="openEditFlavorModal('${pizza.id}')" title="Editar Sabor">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">edit</span>
+                </button>
+                <button class="btn-icon-action delete" onclick="deleteFlavor('${pizza.id}')" title="Excluir Sabor">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">delete</span>
+                </button>
+            </div>
+        `;
+        
+        grid.appendChild(card);
+    });
+}
+
+function filterSweetFlavorsList() {
+    renderSweetFlavorsList();
 }
 
 function renderPricesMatrix() {
@@ -1545,6 +1623,20 @@ function updateLocalPricesAndBorders() {
             menuData.borders[key].price = parseFloat(input.value) || 0;
         }
     });
+
+    // Save acai additions prices
+    const acaiPriceInputs = document.querySelectorAll('.acai-addition-price-input');
+    acaiPriceInputs.forEach(input => {
+        const id = input.getAttribute('data-id');
+        const item = menuData.acai_adicionais.find(a => a.id === id);
+        if (item) {
+            item.price = parseFloat(input.value) || 0;
+            if (item.price === 0) item.type = 'free';
+            else if (item.price === 5) item.type = 'paid_5';
+            else if (item.price === 2.5) item.type = 'paid_2.5';
+            else item.type = `paid_${item.price}`;
+        }
+    });
 }
 
 function deleteBorder(key) {
@@ -1623,22 +1715,23 @@ function renderAcaiAdditionsTable() {
         tr.style.borderBottom = '1px solid var(--border-color)';
         
         let typeLabel = 'Grátis';
-        let priceVal = 0;
+        let defaultPrice = 0.00;
         if (item.type === 'paid_5') {
-            typeLabel = 'Pago (R$ 5,00)';
-            priceVal = 5.00;
+            typeLabel = 'Pago (Base R$ 5,00)';
+            defaultPrice = 5.00;
         } else if (item.type === 'paid_2.5') {
-            typeLabel = 'Pago (R$ 2,50)';
-            priceVal = 2.50;
+            typeLabel = 'Pago (Base R$ 2,50)';
+            defaultPrice = 2.50;
         }
         
+        const actualPrice = item.price !== undefined ? item.price : defaultPrice;
         const isChecked = item.available !== false ? 'checked' : '';
         
         tr.innerHTML = `
             <td style="padding: 12px 10px; font-weight: 600; color: var(--text-main);">${item.name}</td>
             <td style="padding: 12px 10px; color: var(--text-light); font-size: 13px;">${typeLabel}</td>
-            <td style="padding: 8px 10px; color: var(--text-main);">
-                R$ ${priceVal.toFixed(2).replace('.', ',')}
+            <td style="padding: 8px 10px;">
+                <input type="number" step="0.10" class="acai-addition-price-input" data-id="${item.id}" value="${actualPrice}" style="padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); width: 85px;">
             </td>
             <td style="padding: 8px 10px; text-align: center;">
                 <label class="switch" style="margin: 0 auto; display: inline-block;" title="${item.available !== false ? 'Ativo' : 'Pausado'}">
@@ -1752,9 +1845,9 @@ function deleteAcaiAddition(id) {
 }
 
 function saveMenuPrices() {
-    
-    const priceInputs = document.querySelectorAll('.price-category-input');
+    const priceInputs = document.querySelectorAll('.price-input');
     const borderPriceInputs = document.querySelectorAll('.border-price-input');
+    const acaiPriceInputs = document.querySelectorAll('.acai-addition-price-input');
     
     const updatedPrices = JSON.parse(JSON.stringify(menuData.pizza_prices || {}));
     const updatedBorders = JSON.parse(JSON.stringify(menuData.borders || {}));
@@ -1775,8 +1868,27 @@ function saveMenuPrices() {
         }
     });
     
+    acaiPriceInputs.forEach(input => {
+        const id = input.getAttribute('data-id');
+        const item = menuData.acai_adicionais.find(a => a.id === id);
+        if (item) {
+            item.price = parseFloat(input.value) || 0;
+            if (item.price === 0) item.type = 'free';
+            else if (item.price === 5) item.type = 'paid_5';
+            else if (item.price === 2.5) item.type = 'paid_2.5';
+            else item.type = `paid_${item.price}`;
+        }
+    });
+    
     if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && db) {
         const promises = [];
+        
+        // Save pizza prices if ConfigService is available
+        if (ConfigService && ConfigService.savePizzaPrices) {
+            promises.push(ConfigService.savePizzaPrices(updatedPrices));
+        }
+        
+        // Save borders
         Object.keys(updatedBorders).forEach(key => {
             const border = updatedBorders[key];
             const borderPromise = ProductsService.saveProduct(`borda_${key}`, {
@@ -1790,9 +1902,15 @@ function saveMenuPrices() {
             promises.push(borderPromise);
         });
         
+        // Save acai additions
+        menuData.acai_adicionais.forEach(item => {
+            const itemPromise = ProductsService.saveProduct(item.id, item);
+            promises.push(itemPromise);
+        });
+        
         Promise.all(promises)
         .then(() => {
-            alert("Bordas atualizadas com sucesso no Firebase!");
+            alert("Preços, bordas e adicionais de açaí atualizados com sucesso no Firebase!");
         })
         .catch(err => {
             console.error(err);
@@ -2788,16 +2906,25 @@ function openAddMenuProductModal(type) {
         return;
     }
     let finalType = type || 'pizza';
+    let preselectedCategory = '';
     if (!type) {
+        if (currentMenuTab === 'flavors') {
+            finalType = 'pizza';
+            preselectedCategory = 'salgadas';
+        }
+        if (currentMenuTab === 'sweetpizzas') {
+            finalType = 'pizza';
+            preselectedCategory = 'doces';
+        }
         if (currentMenuTab === 'calzones') finalType = 'calzone';
         if (currentMenuTab === 'bebidas') finalType = 'bebida';
         if (currentMenuTab === 'lanches') finalType = 'lanche';
         if (currentMenuTab === 'acais') finalType = 'acai';
     }
-    openAddMenuItemModal(finalType);
+    openAddMenuItemModal(finalType, preselectedCategory);
 }
 
-function openAddMenuItemModal(type) {
+function openAddMenuItemModal(type, preselectedCategory) {
     document.getElementById('menuItemType').value = type;
     document.getElementById('flavorEditId').value = '';
     document.getElementById('flavorForm').reset();
@@ -2813,7 +2940,7 @@ function openAddMenuItemModal(type) {
     });
     togglePromoDaysGroup();
     
-    adjustModalFields(type, false);
+    adjustModalFields(type, false, preselectedCategory);
     
     const imgInput = document.getElementById('flavorImage');
     if (imgInput) {
@@ -2907,7 +3034,7 @@ function openEditMenuItemModal(type, id) {
     openModal('flavorModal');
 }
 
-function adjustModalFields(type, isEdit) {
+function adjustModalFields(type, isEdit, preselectedCategory) {
     const promoGroup = document.getElementById('flavorPromoGroup');
     if (promoGroup) {
         promoGroup.style.display = 'flex'; // ALWAYS show promo checkbox!
@@ -2957,6 +3084,9 @@ function adjustModalFields(type, isEdit) {
                 <option value="salgadas">Salgadas</option>
                 <option value="doces">Doces</option>
             `;
+            if (preselectedCategory) {
+                catSelect.value = preselectedCategory;
+            }
         }
         badgeGroup.style.display = 'flex';
         imgLabel.innerText = 'Ilustração da Pizza';
